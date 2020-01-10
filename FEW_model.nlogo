@@ -263,7 +263,6 @@ to go
         energy-calculation]
     ]
 
-
   if Future_Process = "Wetter Years"
     [ ifelse ticks <= 9                             ;tick starts from 0
        [food-calculation_1
@@ -279,7 +278,6 @@ to go
            energy-calculation]
        ]
     ]
-
 
   if Future_Process = "Dryer Years"
     [ ifelse ticks <= 9                             ;tick starts from 0
