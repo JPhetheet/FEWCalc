@@ -17,11 +17,12 @@ globals [
   annual-income_1 avg-annual-income_1
   corn-tot-yield wheat-tot-yield soybean-tot-yield milo-tot-yield
   corn-use-in wheat-use-in soybean-use-in milo-use-in water-use-feet gw-change
-  avai-water consuming-patches
+  consuming-patches
   #Solar_panels solar-production wind-production solar-cost solar-sell wind-cost wind-sell solar-net-income wind-net-income energy-net-income %Solar-production %Wind-production
   yrs-seq
   aquifer-at-risk
   zero-line
+  area-multiplier
 ]
 
 to setup
@@ -31,6 +32,7 @@ to setup
   set zero-line 0
   set total-area (corn-area + wheat-area + soybean-area + milo-area)
   set current-elev 69
+  set area-multiplier 3000
 
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;;;;;;;;;;;;;;;;;; cropland patches ;;;;;;;;;;;;;;;;;;
@@ -44,8 +46,8 @@ to setup
     set pcolor black]
 
   ask patch -71 -97 [
-  set plabel "Cropland"
-  set plabel-color black
+    set plabel "Cropland"
+    set plabel-color black
   ]
 
   set crop-color [37 22 36 34]
@@ -68,29 +70,27 @@ to setup
   ask turtle 0 [setxy -1 0
     ask cropland-patches in-radius item 0 radius-of-%area [set pcolor item 0 crop-color]
     ask patch 6 -20 [
-    set plabel "Corn"
-    ;set plabel-color black
+      set plabel "Corn"
     ]
     die]
   ask turtle 1 [setxy -18 84
     ask cropland-patches in-radius item 1 radius-of-%area [set pcolor item 1 crop-color]
     ask patch -9 63 [
-    set plabel "Wheat"
-    set plabel-color black
+      set plabel "Wheat"
+      set plabel-color black
     ]
     die]
   ask turtle 2 [setxy -51.5 -51
     ask cropland-patches in-radius item 2 radius-of-%area [set pcolor item 2 crop-color]
     ask patch -39 -72 [
-    set plabel "Soybean"
-    set plabel-color black
+      set plabel "Soybean"
+      set plabel-color black
     ]
     die]
   ask turtle 3 [setxy -52 16
     ask cropland-patches in-radius item 3 radius-of-%area [set pcolor item 3 crop-color]
     ask patch -46 -5 [
-    set plabel "Milo"
-    ;set plabel-color black
+      set plabel "Milo"
     ]
     die]
 
@@ -101,7 +101,6 @@ to setup
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   set aquifer-patches patches with [pxcor > 66 and pxcor < 83 and pycor < 70]
   ask aquifer-patches [set pcolor blue]
-
   ask patch 79 -97 [set plabel "GW"]
 
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -109,7 +108,6 @@ to setup
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   set river-patches patches with [pxcor > 66 and pxcor < 83 and pycor > 70]
   ask river-patches [set pcolor 87]
-
   ask patch 78 96 [
     set plabel "SW"
     set plabel-color black]
@@ -118,8 +116,8 @@ to setup
   ;;;;;;;;;;;;;;;;;;; Solar patches ;;;;;;;;;;;;;;;;;;;;
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-  set %Solar-production ( Solar-production * 100 / (Solar-production + Wind-production) )
-  set %Wind-production ( Wind-production * 100 / (Solar-production + Wind-production) )
+  set %Solar-production (Solar-production * 100 / (Solar-production + Wind-production))
+  set %Wind-production (Wind-production * 100 / (Solar-production + Wind-production))
 
   set solar-bar patches with [pxcor > 83]
 
@@ -214,7 +212,6 @@ to setup
       ]
     ]
   ]
-  set avai-water aquifer-thickness
 
   if (item 0 corn-yield_1) < 195 [set corn-expenses (617.38 * corn-area)]
   if (item 0 corn-yield_1 >= 195) and (item 0 corn-yield_1 < 250) [set corn-expenses (671.06 * corn-area)]
@@ -502,8 +499,7 @@ to food-calculation_3
 
   if (ticks mod 10) = 0
   [ set yrs-seq [4 1 2 3 4 5 6 4 5 6]
-    set yrs-seq shuffle yrs-seq
-  ]
+    set yrs-seq shuffle yrs-seq]
 
   let n (ticks mod 10)
 
@@ -522,8 +518,7 @@ to food-calculation_4
 
   if (ticks mod 10) = 0
   [ set yrs-seq [0 1 2 3 4 5 6 7 8 9]
-    set yrs-seq shuffle yrs-seq
-  ]
+    set yrs-seq shuffle yrs-seq]
 
   let n (ticks mod 10)
 
@@ -561,8 +556,7 @@ end
 to dryland-farming_2
   if (ticks mod 10) = 0
   [ set yrs-seq [0 9 9 9 9 0 6 7 8 9]
-    set yrs-seq shuffle yrs-seq
-  ]
+    set yrs-seq shuffle yrs-seq]
 
   let n (ticks mod 10)
 
@@ -586,8 +580,7 @@ end
 to dryland-farming_3
   if (ticks mod 10) = 0
   [ set yrs-seq [4 1 2 3 4 5 6 4 5 6]
-    set yrs-seq shuffle yrs-seq
-  ]
+    set yrs-seq shuffle yrs-seq]
 
   let n (ticks mod 10)
 
@@ -611,8 +604,7 @@ end
 to dryland-farming_4
   if (ticks mod 10) = 0
   [ set yrs-seq [0 9 9 9 9 0 6 7 8 9]
-    set yrs-seq shuffle yrs-seq
-  ]
+    set yrs-seq shuffle yrs-seq]
 
   let n (ticks mod 10)
 
@@ -660,21 +652,21 @@ to gw-depletion_1
 
   set consuming-patches (gw-change * 170 / (aquifer-thickness))
 
-  ask aquifer-patches with [pycor > (current-elev - (consuming-patches))] [
-    set pcolor 7
-  ]
+  if current-elev > 69 [set consuming-patches 0]
 
-  ask aquifer-patches with [pycor < (current-elev - (consuming-patches))] [
-    set pcolor 105
-  ]
+  ifelse consuming-patches < 0
+    [ask aquifer-patches with [pycor > (current-elev + (consuming-patches))] [
+      set pcolor 7]         ;gray
+    ]
+    [ask aquifer-patches with [pycor < (current-elev + (consuming-patches))] [
+      set pcolor 105]       ;blue
+    ]
 
-  set current-elev (current-elev - consuming-patches)
-  set thickness_inch round ((thickness_inch) - consuming-patches)
+  set current-elev (current-elev + consuming-patches)
 
   if current-elev < -66 [
     ask aquifer-patches with [pycor < current-elev] [
-    set pcolor 14
-    ]
+      set pcolor 14]
   ]
 end
 
@@ -685,19 +677,26 @@ to gw-depletion_2
   set soybean-use-in item (item k yrs-seq) soybean-irrig_1
   set milo-use-in item (item k yrs-seq) milo-irrig_1
 
-  set thickness_inch (aquifer-thickness * 12)
-  set consuming-patches ((corn-use-in + wheat-use-in + soybean-use-in + milo-use-in) * 170 / (thickness_inch))
+  set water-use-feet (((corn-use-in * corn-area) + (wheat-use-in * wheat-area) + (soybean-use-in * soybean-area) + (milo-use-in * milo-area)) / (12 * total-area))
+  set gw-change ((-8.6628 * water-use-feet) + 8.4722)
 
-  ask aquifer-patches with [pycor > (current-elev - (consuming-patches))] [
-    set pcolor 7
-  ]
-  set current-elev (current-elev - consuming-patches)
-  set thickness_inch round ((thickness_inch) - consuming-patches)
+  set consuming-patches (gw-change * 170 / (aquifer-thickness))
+
+  if current-elev > 69 [set consuming-patches 0]
+
+  ifelse consuming-patches < 0
+    [ask aquifer-patches with [pycor > (current-elev + (consuming-patches))] [
+      set pcolor 7]         ;gray
+    ]
+    [ask aquifer-patches with [pycor < (current-elev + (consuming-patches))] [
+      set pcolor 105]       ;blue
+    ]
+
+  set current-elev (current-elev + consuming-patches)
 
   if current-elev < -66 [
     ask aquifer-patches with [pycor < current-elev] [
-    set pcolor 14
-    ]
+      set pcolor 14]
   ]
 end
 
@@ -708,19 +707,26 @@ to gw-depletion_3
   set soybean-use-in item (item k yrs-seq) soybean-irrig_1
   set milo-use-in item (item k yrs-seq) milo-irrig_1
 
-  set thickness_inch (aquifer-thickness * 12)
-  set consuming-patches ((corn-use-in + wheat-use-in + soybean-use-in + milo-use-in) * 170 / (thickness_inch))
+  set water-use-feet (((corn-use-in * corn-area) + (wheat-use-in * wheat-area) + (soybean-use-in * soybean-area) + (milo-use-in * milo-area)) / (12 * total-area))
+  set gw-change ((-8.6628 * water-use-feet) + 8.4722)
 
-  ask aquifer-patches with [pycor > (current-elev - (consuming-patches))] [
-    set pcolor 7
-  ]
-  set current-elev (current-elev - consuming-patches)
-  set thickness_inch round ((thickness_inch) - consuming-patches)
+  set consuming-patches (gw-change * 170 / (aquifer-thickness))
+
+  if current-elev > 69 [set consuming-patches 0]
+
+  ifelse consuming-patches < 0
+    [ask aquifer-patches with [pycor > (current-elev + (consuming-patches))] [
+      set pcolor 7]         ;gray
+    ]
+    [ask aquifer-patches with [pycor < (current-elev + (consuming-patches))] [
+      set pcolor 105]       ;blue
+    ]
+
+  set current-elev (current-elev + consuming-patches)
 
   if current-elev < -66 [
     ask aquifer-patches with [pycor < current-elev] [
-    set pcolor 14
-    ]
+      set pcolor 14]
   ]
 end
 
@@ -731,19 +737,26 @@ to gw-depletion_4
   set soybean-use-in item (item k yrs-seq) soybean-irrig_3
   set milo-use-in item (item k yrs-seq) milo-irrig_3
 
-  set thickness_inch (aquifer-thickness * 12)
-  set consuming-patches ((corn-use-in + wheat-use-in + soybean-use-in + milo-use-in) * 170 / (thickness_inch))
+  set water-use-feet (((corn-use-in * corn-area) + (wheat-use-in * wheat-area) + (soybean-use-in * soybean-area) + (milo-use-in * milo-area)) / (12 * total-area))
+  set gw-change ((-8.6628 * water-use-feet) + 8.4722)
 
-  ask aquifer-patches with [pycor > (current-elev - (consuming-patches))] [
-    set pcolor 7
-  ]
-  set current-elev (current-elev - consuming-patches)
-  set thickness_inch round ((thickness_inch) - consuming-patches)
+  set consuming-patches (gw-change * 170 / (aquifer-thickness))
+
+  if current-elev > 69 [set consuming-patches 0]
+
+  ifelse consuming-patches < 0
+    [ask aquifer-patches with [pycor > (current-elev + (consuming-patches))] [
+      set pcolor 7]         ;gray
+    ]
+    [ask aquifer-patches with [pycor < (current-elev + (consuming-patches))] [
+      set pcolor 105]       ;blue
+    ]
+
+  set current-elev (current-elev + consuming-patches)
 
   if current-elev < -66 [
     ask aquifer-patches with [pycor < current-elev] [
-    set pcolor 14
-    ]
+      set pcolor 14]
   ]
 end
 
@@ -802,7 +815,6 @@ to recalculate
        ]
        ]
 
-
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;;;;;;;;;;;;;;;;;;;;; Solar icons ;;;;;;;;;;;;;;;;;;;;
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -837,8 +849,8 @@ to recalculate
 
   set solar-production (#Solar_Panels * Panel_power * 5 * 365 / 1000000)            ; MWh = power(Watt) * 5hrs/day * 365days/year / 1000000
   set wind-production (#wind_turbines * Turbine_size * 0.425 * 24 * 365)            ; MWh = power(MW) * Kansas_wind_capacity * 24hrs/day * 365days/year                          ;45% (Bob)
-  set %Solar-production ( Solar-production * 100 / (Solar-production + Wind-production) )
-  set %Wind-production ( Wind-production * 100 / (Solar-production + Wind-production) )
+  set %Solar-production (Solar-production * 100 / (Solar-production + Wind-production))
+  set %Wind-production (Wind-production * 100 / (Solar-production + Wind-production))
 
   ask patch 93 -91 [
     set plabel round (%Wind-production)
@@ -933,16 +945,6 @@ Soybean-area
 1
 0
 Number
-
-CHOOSER
-1301
-780
-1396
-825
-Area-Multiplier
-Area-Multiplier
-100 1000 2000 3000
-3
 
 INPUTBOX
 245
@@ -1378,7 +1380,7 @@ CHOOSER
 Future_Process
 Future_Process
 "Repeat Historical" "Wetter Years" "Dryer Years" "Climate Projection"
-1
+0
 
 TEXTBOX
 71
@@ -1490,24 +1492,6 @@ TEXTBOX
 5.0
 1
 
-PLOT
-840
-639
-1274
-789
-plot 1
-NIL
-NIL
-0.0
-60.0
-0.0
-90.0
-true
-false
-"" ""
-PENS
-"default" 1.0 0 -16777216 true "" "plot (corn-pumping + wheat-pumping + soybean-pumping + milo-pumping)"
-
 TEXTBOX
 71
 407
@@ -1517,6 +1501,50 @@ Water is assumed to come from groundwater pumping. Effects on water quality are 
 11
 0.0
 1
+
+MONITOR
+357
+10
+478
+55
+NIL
+current-elev
+3
+1
+11
+
+MONITOR
+357
+111
+477
+156
+NIL
+consuming-patches
+3
+1
+11
+
+MONITOR
+357
+61
+478
+106
+NIL
+gw-change
+3
+1
+11
+
+MONITOR
+248
+10
+353
+55
+NIL
+water-use-feet
+3
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
