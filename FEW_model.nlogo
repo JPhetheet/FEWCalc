@@ -543,22 +543,22 @@ to food-calculation_2
   ifelse corn-tot-income > corn-guarantee
     [set corn-tot-income corn-tot-income]
     [set corn-tot-income corn-guarantee
-     print "apply corn insurance"]
+     print (word "year " (ticks + 2008) " applies corn insurance")]
 
   ifelse wheat-tot-income > wheat-guarantee
     [set wheat-tot-income wheat-tot-income]
     [set wheat-tot-income wheat-guarantee
-     print "apply wheat insurance"]
+     print (word "year " (ticks + 2008) " applies wheat insurance")]
 
   ifelse soybean-tot-income > soybean-guarantee
     [set soybean-tot-income soybean-tot-income]
     [set soybean-tot-income soybean-guarantee
-     print "apply soybean insurance"]
+     print (word "year " (ticks + 2008) " applies soybean insurance")]
 
   ifelse milo-tot-income > milo-guarantee
     [set milo-tot-income milo-tot-income]
     [set milo-tot-income milo-guarantee
-     print "apply milo insurance"]
+     print (word "year " (ticks + 2008) " applies milo insurance")]
 
   ;show corn-tot-income
 
@@ -606,22 +606,22 @@ to food-calculation_3
   ifelse corn-tot-income > corn-guarantee
     [set corn-tot-income corn-tot-income]
     [set corn-tot-income corn-guarantee
-     print "apply corn insurance"]
+     print (word "year " (ticks + 2008) " applies corn insurance")]
 
   ifelse wheat-tot-income > wheat-guarantee
     [set wheat-tot-income wheat-tot-income]
     [set wheat-tot-income wheat-guarantee
-     print "apply wheat insurance"]
+     print (word "year " (ticks + 2008) " applies wheat insurance")]
 
   ifelse soybean-tot-income > soybean-guarantee
     [set soybean-tot-income soybean-tot-income]
     [set soybean-tot-income soybean-guarantee
-     print "apply soybean insurance"]
+     print (word "year " (ticks + 2008) " applies soybean insurance")]
 
   ifelse milo-tot-income > milo-guarantee
     [set milo-tot-income milo-tot-income]
     [set milo-tot-income milo-guarantee
-     print "apply milo insurance"]
+     print (word "year " (ticks + 2008) " applies milo insurance")]
 
   ;show corn-tot-income
 
@@ -669,22 +669,22 @@ to food-calculation_4
   ifelse corn-tot-income > corn-guarantee
     [set corn-tot-income corn-tot-income]
     [set corn-tot-income corn-guarantee
-     print "apply corn insurance"]
+     print (word "year " (ticks + 2008) " applies corn insurance")]
 
   ifelse wheat-tot-income > wheat-guarantee
     [set wheat-tot-income wheat-tot-income]
     [set wheat-tot-income wheat-guarantee
-     print "apply wheat insurance"]
+     print (word "year " (ticks + 2008) " applies wheat insurance")]
 
   ifelse soybean-tot-income > soybean-guarantee
     [set soybean-tot-income soybean-tot-income]
     [set soybean-tot-income soybean-guarantee
-     print "apply soybean insurance"]
+     print (word "year " (ticks + 2008) " applies soybean insurance")]
 
   ifelse milo-tot-income > milo-guarantee
     [set milo-tot-income milo-tot-income]
     [set milo-tot-income milo-guarantee
-     print "apply milo insurance"]
+     print (word "year " (ticks + 2008) " applies milo insurance")]
 
   ;show corn-tot-income
 
@@ -751,22 +751,22 @@ to dryland-farming_2
   ifelse corn-tot-income > corn-guarantee
     [set corn-tot-income corn-tot-income]
     [set corn-tot-income corn-guarantee
-     print "apply corn insurance"]
+     print (word "year " (ticks + 2008) " applies corn insurance")]
 
   ifelse wheat-tot-income > wheat-guarantee
     [set wheat-tot-income wheat-tot-income]
     [set wheat-tot-income wheat-guarantee
-     print "apply wheat insurance"]
+     print (word "year " (ticks + 2008) " applies wheat insurance")]
 
   ifelse soybean-tot-income > soybean-guarantee
     [set soybean-tot-income soybean-tot-income]
     [set soybean-tot-income soybean-guarantee
-     print "apply soybean insurance"]
+     print (word "year " (ticks + 2008) " applies soybean insurance")]
 
   ifelse milo-tot-income > milo-guarantee
     [set milo-tot-income milo-tot-income]
     [set milo-tot-income milo-guarantee
-     print "apply milo insurance"]
+     print (word "year " (ticks + 2008) " applies milo insurance")]
 
   ;show corn-tot-income
 
@@ -819,22 +819,22 @@ to dryland-farming_3
   ifelse corn-tot-income > corn-guarantee
     [set corn-tot-income corn-tot-income]
     [set corn-tot-income corn-guarantee
-     print "apply corn insurance"]
+     print (word "year " (ticks + 2008) " applies corn insurance")]
 
   ifelse wheat-tot-income > wheat-guarantee
     [set wheat-tot-income wheat-tot-income]
     [set wheat-tot-income wheat-guarantee
-     print "apply wheat insurance"]
+     print (word "year " (ticks + 2008) " applies wheat insurance")]
 
   ifelse soybean-tot-income > soybean-guarantee
     [set soybean-tot-income soybean-tot-income]
     [set soybean-tot-income soybean-guarantee
-     print "apply soybean insurance"]
+     print (word "year " (ticks + 2008) " applies soybean insurance")]
 
   ifelse milo-tot-income > milo-guarantee
     [set milo-tot-income milo-tot-income]
     [set milo-tot-income milo-guarantee
-     print "apply milo insurance"]
+     print (word "year " (ticks + 2008) " applies milo insurance")]
 
   ;show corn-tot-income
 
@@ -887,22 +887,22 @@ to dryland-farming_4
   ifelse corn-tot-income > corn-guarantee
     [set corn-tot-income corn-tot-income]
     [set corn-tot-income corn-guarantee
-     print "apply corn insurance"]
+     print (word "year " (ticks + 2008) " applies corn insurance")]
 
   ifelse wheat-tot-income > wheat-guarantee
     [set wheat-tot-income wheat-tot-income]
     [set wheat-tot-income wheat-guarantee
-     print "apply wheat insurance"]
+     print (word "year " (ticks + 2008) " applies wheat insurance")]
 
   ifelse soybean-tot-income > soybean-guarantee
     [set soybean-tot-income soybean-tot-income]
     [set soybean-tot-income soybean-guarantee
-     print "apply soybean insurance"]
+     print (word "year " (ticks + 2008) " applies soybean insurance")]
 
   ifelse milo-tot-income > milo-guarantee
     [set milo-tot-income milo-tot-income]
     [set milo-tot-income milo-guarantee
-     print "apply milo insurance"]
+     print (word "year " (ticks + 2008) " applies milo insurance")]
 
   ;show corn-tot-income
 
@@ -1673,7 +1673,7 @@ CHOOSER
 Future_Process
 Future_Process
 "Repeat Historical" "Wetter Years" "Dryer Years" "Climate Projection"
-3
+1
 
 TEXTBOX
 71
