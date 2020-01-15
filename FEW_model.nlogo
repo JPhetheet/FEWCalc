@@ -432,18 +432,24 @@ end
 
 to future_processes
 if Future_Process = "Repeat Historical"
-    [ifelse current-elev > -66
-       [food-calculation_1
+   [ ifelse ticks <= 9                             ;tick starts from 0
+       [food-calculation_1-1
         energy-calculation
         gw-depletion_1]
 
-       [dryland-farming_1
-        energy-calculation]
+       [ifelse current-elev > -66
+         [food-calculation_1-2
+          energy-calculation
+          gw-depletion_1]
+
+         [dryland-farming_1
+          energy-calculation]
+       ]
     ]
 
   if Future_Process = "Wetter Years"
     [ ifelse ticks <= 9                             ;tick starts from 0
-       [food-calculation_1
+       [food-calculation_1-1
         energy-calculation
         gw-depletion_1]
 
@@ -459,7 +465,7 @@ if Future_Process = "Repeat Historical"
 
   if Future_Process = "Dryer Years"
     [ ifelse ticks <= 9                             ;tick starts from 0
-       [food-calculation_1
+       [food-calculation_1-1
         energy-calculation
         gw-depletion_1]
 
@@ -475,7 +481,7 @@ if Future_Process = "Repeat Historical"
 
   if Future_Process = "Climate Projection"
     [ ifelse ticks <= 9                             ;tick starts from 0
-       [food-calculation_1
+       [food-calculation_1-1
         energy-calculation
         gw-depletion_1]
 
@@ -490,18 +496,76 @@ if Future_Process = "Repeat Historical"
     ]
 end
 
-to food-calculation_1                                                                ; Wade Heger, Allan Andales CSU (Allan.Andales@colostate.edu) , Garvey Smith (Garvey.Smith@colostate.edu)
+to food-calculation_1-1                                                                ; Wade Heger, Allan Andales CSU (Allan.Andales@colostate.edu) , Garvey Smith (Garvey.Smith@colostate.edu)
   let n (ticks)
+
+  set corn-tot-income (item n corn-yield_1 * item n corn-price * corn-area)
+  set wheat-tot-income (item n wheat-yield_1 * item n wheat-price * wheat-area)
+  set soybean-tot-income (item n soybean-yield_1 * item n soybean-price * soybean-area)
+  set milo-tot-income (item n milo-yield_1 * item n milo-price * milo-area)
+
+  set corn-tot-yield (item n corn-yield_1)
+  set wheat-tot-yield (item n wheat-yield_1)
+  set soybean-tot-yield (item n soybean-yield_1)
+  set milo-tot-yield (item n milo-yield_1)
+end
+
+to food-calculation_1-2
+  let n (ticks)
+
+  set corn-tot-yield (item (n mod 10) corn-yield_1)
+  set wheat-tot-yield (item (n mod 10) wheat-yield_1)
+  set soybean-tot-yield (item (n mod 10) soybean-yield_1)
+  set milo-tot-yield (item (n mod 10) milo-yield_1)
+
+  set corn-history lput corn-tot-yield but-first corn-history
+  set wheat-history lput wheat-tot-yield but-first wheat-history
+  set soybean-history lput soybean-tot-yield but-first soybean-history
+  set milo-history lput milo-tot-yield but-first milo-history
+
+  ;show corn-history
+
+  set mean-corn-yield mean corn-history
+  set mean-wheat-yield mean wheat-history
+  set mean-soybean-yield mean soybean-history
+  set mean-milo-yield mean milo-history
+
+  ;show mean-corn-yield
+
+  set corn-guarantee ((mean-corn-yield * corn-coverage * corn-base-price) * corn-area)
+  set wheat-guarantee ((mean-wheat-yield * wheat-coverage * wheat-base-price) * wheat-area)
+  set soybean-guarantee ((mean-soybean-yield * soybean-coverage * soybean-base-price) * soybean-area)
+  set milo-guarantee ((mean-milo-yield * milo-coverage * milo-base-price) * milo-area)
 
   set corn-tot-income (item (n mod 10) corn-yield_1 * item (n mod 10) corn-price * corn-area)
   set wheat-tot-income (item (n mod 10) wheat-yield_1 * item (n mod 10) wheat-price * wheat-area)
   set soybean-tot-income (item (n mod 10) soybean-yield_1 * item (n mod 10) soybean-price * soybean-area)
   set milo-tot-income (item (n mod 10) milo-yield_1 * item (n mod 10) milo-price * milo-area)
 
-  set corn-tot-yield (item (n mod 10) corn-yield_1)
-  set wheat-tot-yield (item (n mod 10) wheat-yield_1)
-  set soybean-tot-yield (item (n mod 10) soybean-yield_1)
-  set milo-tot-yield (item (n mod 10) milo-yield_1)
+  ;show corn-tot-income
+  ;show corn-guarantee
+
+  ifelse corn-tot-income > corn-guarantee
+    [set corn-tot-income corn-tot-income]
+    [set corn-tot-income corn-guarantee
+     print (word "Seq " ticks ", year " (ticks + 2008) " applies corn insurance")]  ;tick stats from 0, so tick 0 = year 2008
+
+  ifelse wheat-tot-income > wheat-guarantee
+    [set wheat-tot-income wheat-tot-income]
+    [set wheat-tot-income wheat-guarantee
+     print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]
+
+  ifelse soybean-tot-income > soybean-guarantee
+    [set soybean-tot-income soybean-tot-income]
+    [set soybean-tot-income soybean-guarantee
+     print (word "Seq " ticks ", year " (ticks + 2008) " applies soybean insurance")]
+
+  ifelse milo-tot-income > milo-guarantee
+    [set milo-tot-income milo-tot-income]
+    [set milo-tot-income milo-guarantee
+     print (word "Seq " ticks ", year " (ticks + 2008) " applies milo insurance")]
+
+  ;show corn-tot-income
 end
 
 to food-calculation_2
@@ -513,6 +577,11 @@ to food-calculation_2
 
   let n (ticks mod 10)
 
+  set corn-tot-yield (item (item n yrs-seq) corn-yield_1)
+  set wheat-tot-yield (item (item n yrs-seq) wheat-yield_1)
+  set soybean-tot-yield (item (item n yrs-seq) soybean-yield_1)
+  set milo-tot-yield (item (item n yrs-seq) milo-yield_1)
+
   set corn-history lput corn-tot-yield but-first corn-history
   set wheat-history lput wheat-tot-yield but-first wheat-history
   set soybean-history lput soybean-tot-yield but-first soybean-history
@@ -543,29 +612,24 @@ to food-calculation_2
   ifelse corn-tot-income > corn-guarantee
     [set corn-tot-income corn-tot-income]
     [set corn-tot-income corn-guarantee
-     print (word "year " (ticks + 2008) " applies corn insurance")]
+     print (word "Seq " ticks ", year " (ticks + 2008) " applies corn insurance")]  ;tick stats from 0, so tick 0 = year 2008
 
   ifelse wheat-tot-income > wheat-guarantee
     [set wheat-tot-income wheat-tot-income]
     [set wheat-tot-income wheat-guarantee
-     print (word "year " (ticks + 2008) " applies wheat insurance")]
+     print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]
 
   ifelse soybean-tot-income > soybean-guarantee
     [set soybean-tot-income soybean-tot-income]
     [set soybean-tot-income soybean-guarantee
-     print (word "year " (ticks + 2008) " applies soybean insurance")]
+     print (word "Seq " ticks ", year " (ticks + 2008) " applies soybean insurance")]
 
   ifelse milo-tot-income > milo-guarantee
     [set milo-tot-income milo-tot-income]
     [set milo-tot-income milo-guarantee
-     print (word "year " (ticks + 2008) " applies milo insurance")]
+     print (word "Seq " ticks ", year " (ticks + 2008) " applies milo insurance")]
 
   ;show corn-tot-income
-
-  set corn-tot-yield (item (item n yrs-seq) corn-yield_1)
-  set wheat-tot-yield (item (item n yrs-seq) wheat-yield_1)
-  set soybean-tot-yield (item (item n yrs-seq) soybean-yield_1)
-  set milo-tot-yield (item (item n yrs-seq) milo-yield_1)
 end
 
 to food-calculation_3
@@ -576,6 +640,11 @@ to food-calculation_3
 
   let n (ticks mod 10)
 
+  set corn-tot-yield (item (item n yrs-seq) corn-yield_1)
+  set wheat-tot-yield (item (item n yrs-seq) wheat-yield_1)
+  set soybean-tot-yield (item (item n yrs-seq) soybean-yield_1)
+  set milo-tot-yield (item (item n yrs-seq) milo-yield_1)
+
   set corn-history lput corn-tot-yield but-first corn-history
   set wheat-history lput wheat-tot-yield but-first wheat-history
   set soybean-history lput soybean-tot-yield but-first soybean-history
@@ -606,29 +675,24 @@ to food-calculation_3
   ifelse corn-tot-income > corn-guarantee
     [set corn-tot-income corn-tot-income]
     [set corn-tot-income corn-guarantee
-     print (word "year " (ticks + 2008) " applies corn insurance")]
+     print (word "Seq " ticks ", year " (ticks + 2008) " applies corn insurance")]
 
   ifelse wheat-tot-income > wheat-guarantee
     [set wheat-tot-income wheat-tot-income]
     [set wheat-tot-income wheat-guarantee
-     print (word "year " (ticks + 2008) " applies wheat insurance")]
+     print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]
 
   ifelse soybean-tot-income > soybean-guarantee
     [set soybean-tot-income soybean-tot-income]
     [set soybean-tot-income soybean-guarantee
-     print (word "year " (ticks + 2008) " applies soybean insurance")]
+     print (word "Seq " ticks ", year " (ticks + 2008) " applies soybean insurance")]
 
   ifelse milo-tot-income > milo-guarantee
     [set milo-tot-income milo-tot-income]
     [set milo-tot-income milo-guarantee
-     print (word "year " (ticks + 2008) " applies milo insurance")]
+     print (word "Seq " ticks ", year " (ticks + 2008) " applies milo insurance")]
 
   ;show corn-tot-income
-
-  set corn-tot-yield (item (item n yrs-seq) corn-yield_1)
-  set wheat-tot-yield (item (item n yrs-seq) wheat-yield_1)
-  set soybean-tot-yield (item (item n yrs-seq) soybean-yield_1)
-  set milo-tot-yield (item (item n yrs-seq) milo-yield_1)
 end
 
 to food-calculation_4
@@ -638,6 +702,11 @@ to food-calculation_4
     set yrs-seq shuffle yrs-seq]
 
   let n (ticks mod 10)
+
+  set corn-tot-yield (item (item n yrs-seq) corn-yield_3)
+  set wheat-tot-yield (item (item n yrs-seq) wheat-yield_3)
+  set soybean-tot-yield (item (item n yrs-seq) soybean-yield_3)
+  set milo-tot-yield (item (item n yrs-seq) milo-yield_3)
 
   set corn-history lput corn-tot-yield but-first corn-history
   set wheat-history lput wheat-tot-yield but-first wheat-history
@@ -669,29 +738,24 @@ to food-calculation_4
   ifelse corn-tot-income > corn-guarantee
     [set corn-tot-income corn-tot-income]
     [set corn-tot-income corn-guarantee
-     print (word "year " (ticks + 2008) " applies corn insurance")]
+     print (word "Seq " ticks ", year " (ticks + 2008) " applies corn insurance")]
 
   ifelse wheat-tot-income > wheat-guarantee
     [set wheat-tot-income wheat-tot-income]
     [set wheat-tot-income wheat-guarantee
-     print (word "year " (ticks + 2008) " applies wheat insurance")]
+     print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]
 
   ifelse soybean-tot-income > soybean-guarantee
     [set soybean-tot-income soybean-tot-income]
     [set soybean-tot-income soybean-guarantee
-     print (word "year " (ticks + 2008) " applies soybean insurance")]
+     print (word "Seq " ticks ", year " (ticks + 2008) " applies soybean insurance")]
 
   ifelse milo-tot-income > milo-guarantee
     [set milo-tot-income milo-tot-income]
     [set milo-tot-income milo-guarantee
-     print (word "year " (ticks + 2008) " applies milo insurance")]
+     print (word "Seq " ticks ", year " (ticks + 2008) " applies milo insurance")]
 
   ;show corn-tot-income
-
-  set corn-tot-yield (item (item n yrs-seq) corn-yield_3)
-  set wheat-tot-yield (item (item n yrs-seq) wheat-yield_3)
-  set soybean-tot-yield (item (item n yrs-seq) soybean-yield_3)
-  set milo-tot-yield (item (item n yrs-seq) milo-yield_3)
 end
 
 to dryland-farming_1
@@ -707,6 +771,50 @@ to dryland-farming_1
   set soybean-tot-yield (item (n mod 10) soybean-yield_2)
   set milo-tot-yield (item (n mod 10) milo-yield_2)
 
+  set corn-history lput corn-tot-yield but-first corn-history
+  set wheat-history lput wheat-tot-yield but-first wheat-history
+  set soybean-history lput soybean-tot-yield but-first soybean-history
+  set milo-history lput milo-tot-yield but-first milo-history
+
+  ;show corn-history
+
+  set mean-corn-yield mean corn-history
+  set mean-wheat-yield mean wheat-history
+  set mean-soybean-yield mean soybean-history
+  set mean-milo-yield mean milo-history
+
+  ;show mean-corn-yield
+
+  set corn-guarantee ((mean-corn-yield * corn-coverage * corn-base-price) * corn-area)
+  set wheat-guarantee ((mean-wheat-yield * wheat-coverage * wheat-base-price) * wheat-area)
+  set soybean-guarantee ((mean-soybean-yield * soybean-coverage * soybean-base-price) * soybean-area)
+  set milo-guarantee ((mean-milo-yield * milo-coverage * milo-base-price) * milo-area)
+
+  ;show corn-tot-income
+  ;show corn-guarantee
+
+  ifelse corn-tot-income > corn-guarantee
+    [set corn-tot-income corn-tot-income]
+    [set corn-tot-income corn-guarantee
+     print (word "Seq " ticks ", year " (ticks + 2008) " applies corn insurance")]  ;tick stats from 0, so tick 0 = year 2008
+
+  ifelse wheat-tot-income > wheat-guarantee
+    [set wheat-tot-income wheat-tot-income]
+    [set wheat-tot-income wheat-guarantee
+     print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]
+
+  ifelse soybean-tot-income > soybean-guarantee
+    [set soybean-tot-income soybean-tot-income]
+    [set soybean-tot-income soybean-guarantee
+     print (word "Seq " ticks ", year " (ticks + 2008) " applies soybean insurance")]
+
+  ifelse milo-tot-income > milo-guarantee
+    [set milo-tot-income milo-tot-income]
+    [set milo-tot-income milo-guarantee
+     print (word "Seq " ticks ", year " (ticks + 2008) " applies milo insurance")]
+
+  ;show corn-tot-income
+
   let k ticks
   set corn-use-in item (k mod 10) corn-irrig_2
   set wheat-use-in item (k mod 10) wheat-irrig_2
@@ -720,6 +828,11 @@ to dryland-farming_2
     set yrs-seq shuffle yrs-seq]
 
   let n (ticks mod 10)
+
+  set corn-tot-yield (item (item n yrs-seq) corn-yield_2)
+  set wheat-tot-yield (item (item n yrs-seq) wheat-yield_2)
+  set soybean-tot-yield (item (item n yrs-seq) soybean-yield_2)
+  set milo-tot-yield (item (item n yrs-seq) milo-yield_2)
 
   set corn-history lput corn-tot-yield but-first corn-history
   set wheat-history lput wheat-tot-yield but-first wheat-history
@@ -751,29 +864,24 @@ to dryland-farming_2
   ifelse corn-tot-income > corn-guarantee
     [set corn-tot-income corn-tot-income]
     [set corn-tot-income corn-guarantee
-     print (word "year " (ticks + 2008) " applies corn insurance")]
+     print (word "Seq " ticks ", year " (ticks + 2008) " applies corn insurance")]
 
   ifelse wheat-tot-income > wheat-guarantee
     [set wheat-tot-income wheat-tot-income]
     [set wheat-tot-income wheat-guarantee
-     print (word "year " (ticks + 2008) " applies wheat insurance")]
+     print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]
 
   ifelse soybean-tot-income > soybean-guarantee
     [set soybean-tot-income soybean-tot-income]
     [set soybean-tot-income soybean-guarantee
-     print (word "year " (ticks + 2008) " applies soybean insurance")]
+     print (word "Seq " ticks ", year " (ticks + 2008) " applies soybean insurance")]
 
   ifelse milo-tot-income > milo-guarantee
     [set milo-tot-income milo-tot-income]
     [set milo-tot-income milo-guarantee
-     print (word "year " (ticks + 2008) " applies milo insurance")]
+     print (word "Seq " ticks ", year " (ticks + 2008) " applies milo insurance")]
 
   ;show corn-tot-income
-
-  set corn-tot-yield (item (item n yrs-seq) corn-yield_2)
-  set wheat-tot-yield (item (item n yrs-seq) wheat-yield_2)
-  set soybean-tot-yield (item (item n yrs-seq) soybean-yield_2)
-  set milo-tot-yield (item (item n yrs-seq) milo-yield_2)
 
   let k ticks
   set corn-use-in item (k mod 10) corn-irrig_2
@@ -789,6 +897,11 @@ to dryland-farming_3
 
   let n (ticks mod 10)
 
+  set corn-tot-yield (item (item n yrs-seq) corn-yield_2)
+  set wheat-tot-yield (item (item n yrs-seq) wheat-yield_2)
+  set soybean-tot-yield (item (item n yrs-seq) soybean-yield_2)
+  set milo-tot-yield (item (item n yrs-seq) milo-yield_2)
+
   set corn-history lput corn-tot-yield but-first corn-history
   set wheat-history lput wheat-tot-yield but-first wheat-history
   set soybean-history lput soybean-tot-yield but-first soybean-history
@@ -819,29 +932,24 @@ to dryland-farming_3
   ifelse corn-tot-income > corn-guarantee
     [set corn-tot-income corn-tot-income]
     [set corn-tot-income corn-guarantee
-     print (word "year " (ticks + 2008) " applies corn insurance")]
+     print (word "Seq " ticks ", year " (ticks + 2008) " applies corn insurance")]
 
   ifelse wheat-tot-income > wheat-guarantee
     [set wheat-tot-income wheat-tot-income]
     [set wheat-tot-income wheat-guarantee
-     print (word "year " (ticks + 2008) " applies wheat insurance")]
+     print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]
 
   ifelse soybean-tot-income > soybean-guarantee
     [set soybean-tot-income soybean-tot-income]
     [set soybean-tot-income soybean-guarantee
-     print (word "year " (ticks + 2008) " applies soybean insurance")]
+     print (word "Seq " ticks ", year " (ticks + 2008) " applies soybean insurance")]
 
   ifelse milo-tot-income > milo-guarantee
     [set milo-tot-income milo-tot-income]
     [set milo-tot-income milo-guarantee
-     print (word "year " (ticks + 2008) " applies milo insurance")]
+     print (word "Seq " ticks ", year " (ticks + 2008) " applies milo insurance")]
 
   ;show corn-tot-income
-
-  set corn-tot-yield (item (item n yrs-seq) corn-yield_2)
-  set wheat-tot-yield (item (item n yrs-seq) wheat-yield_2)
-  set soybean-tot-yield (item (item n yrs-seq) soybean-yield_2)
-  set milo-tot-yield (item (item n yrs-seq) milo-yield_2)
 
   let k ticks
   set corn-use-in item (k mod 10) corn-irrig_2
@@ -856,6 +964,11 @@ to dryland-farming_4
     set yrs-seq shuffle yrs-seq]
 
   let n (ticks mod 10)
+
+  set corn-tot-yield (item (item n yrs-seq) corn-yield_4)
+  set wheat-tot-yield (item (item n yrs-seq) wheat-yield_4)
+  set soybean-tot-yield (item (item n yrs-seq) soybean-yield_4)
+  set milo-tot-yield (item (item n yrs-seq) milo-yield_4)
 
   set corn-history lput corn-tot-yield but-first corn-history
   set wheat-history lput wheat-tot-yield but-first wheat-history
@@ -887,29 +1000,24 @@ to dryland-farming_4
   ifelse corn-tot-income > corn-guarantee
     [set corn-tot-income corn-tot-income]
     [set corn-tot-income corn-guarantee
-     print (word "year " (ticks + 2008) " applies corn insurance")]
+     print (word "Seq " ticks ", year " (ticks + 2008) " applies corn insurance")]
 
   ifelse wheat-tot-income > wheat-guarantee
     [set wheat-tot-income wheat-tot-income]
     [set wheat-tot-income wheat-guarantee
-     print (word "year " (ticks + 2008) " applies wheat insurance")]
+     print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]
 
   ifelse soybean-tot-income > soybean-guarantee
     [set soybean-tot-income soybean-tot-income]
     [set soybean-tot-income soybean-guarantee
-     print (word "year " (ticks + 2008) " applies soybean insurance")]
+     print (word "Seq " ticks ", year " (ticks + 2008) " applies soybean insurance")]
 
   ifelse milo-tot-income > milo-guarantee
     [set milo-tot-income milo-tot-income]
     [set milo-tot-income milo-guarantee
-     print (word "year " (ticks + 2008) " applies milo insurance")]
+     print (word "Seq " ticks ", year " (ticks + 2008) " applies milo insurance")]
 
   ;show corn-tot-income
-
-  set corn-tot-yield (item (item n yrs-seq) corn-yield_4)
-  set wheat-tot-yield (item (item n yrs-seq) wheat-yield_4)
-  set soybean-tot-yield (item (item n yrs-seq) soybean-yield_4)
-  set milo-tot-yield (item (item n yrs-seq) milo-yield_4)
 
   let k ticks
   set corn-use-in item (k mod 10) corn-irrig_4
@@ -1673,7 +1781,7 @@ CHOOSER
 Future_Process
 Future_Process
 "Repeat Historical" "Wetter Years" "Dryer Years" "Climate Projection"
-1
+0
 
 TEXTBOX
 71
