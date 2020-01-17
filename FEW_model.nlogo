@@ -1395,10 +1395,10 @@ true
 true
 "set-plot-background-color 58" ""
 PENS
-"Corn" 1.0 0 -4079321 true "" "plot (corn-tot-income - corn-expenses)"
-"Wheat" 1.0 0 -3844592 true "" "plot (wheat-tot-income - wheat-expenses)"
-"Soybean" 1.0 0 -13210332 true "" "plot (soybean-tot-income - soybean-expenses)"
-"Milo" 1.0 0 -12440034 true "" "plot (milo-tot-income - milo-expenses)"
+"Corn" 1.0 0 -4079321 true "" "ifelse ticks = 0 [set corn-expenses 0][plot (corn-tot-income - corn-expenses)]"
+"Wheat" 1.0 0 -3844592 true "" "ifelse ticks = 0 [set wheat-expenses 0][plot (wheat-tot-income - wheat-expenses)]"
+"Soybean" 1.0 0 -13210332 true "" "ifelse ticks = 0 [set soybean-expenses 0][plot (soybean-tot-income - soybean-expenses)]"
+"Milo" 1.0 0 -12440034 true "" "ifelse ticks = 0 [set milo-expenses 0][plot (milo-tot-income - milo-expenses)]"
 "$0" 1.0 2 -8053223 true "" "plot zero-line"
 
 BUTTON
@@ -1886,9 +1886,9 @@ Water --------------------------
 TEXTBOX
 835
 443
-1407
+1430
 478
-*First 10 years use historical data from 2008 to 2017 and subsequent years apply Future Process
+*First 10 years use historical data from 2008 to 2017 and subsequent years apply Future Process.
 12
 5.0
 1
@@ -1904,10 +1904,10 @@ Water is assumed to come from groundwater pumping. Effects on water quality are 
 1
 
 MONITOR
-357
-10
-478
-55
+872
+717
+993
+762
 NIL
 current-elev
 3
@@ -1915,10 +1915,10 @@ current-elev
 11
 
 MONITOR
-357
-111
-477
-156
+872
+818
+992
+863
 NIL
 consuming-patches
 3
@@ -1926,10 +1926,10 @@ consuming-patches
 11
 
 MONITOR
-357
-61
-478
-106
+872
+768
+993
+813
 NIL
 gw-change
 3
@@ -1937,15 +1937,25 @@ gw-change
 11
 
 MONITOR
-248
-10
-353
-55
+763
+717
+868
+762
 NIL
 water-use-feet
 3
 1
 11
+
+TEXTBOX
+836
+461
+1298
+479
+**Year in these plots represents a sequential year, i.e., year 1 is year 2008.
+12
+5.0
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
