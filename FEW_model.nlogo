@@ -9,30 +9,31 @@ globals [
   %local-energy %grid-energy
   image
   precip_raw precip thickness_inch current-elev
-  corn-data corn-sum corn-price corn-yield_1 corn-irrig_1 corn-yield_2 corn-irrig_2 corn-yield_3 corn-irrig_3 corn-yield_4 corn-irrig_4 corn-expenses corn-annual-income_1
-  wheat-data wheat-sum wheat-price wheat-yield_1 wheat-irrig_1 wheat-yield_2 wheat-irrig_2 wheat-yield_3 wheat-irrig_3 wheat-yield_4 wheat-irrig_4 wheat-expenses wheat-annual-income_1
-  soybean-data soybean-sum soybean-price soybean-yield_1 soybean-irrig_1 soybean-yield_2 soybean-irrig_2 soybean-yield_3 soybean-irrig_3 soybean-yield_4 soybean-irrig_4 soybean-expenses soybean-annual-income_1
-  milo-data milo-sum milo-price milo-yield_1 milo-irrig_1 milo-yield_2 milo-irrig_2 milo-yield_3 milo-irrig_3 milo-yield_4 milo-irrig_4 milo-expenses milo-annual-income_1
+  corn-data corn-sum corn-price corn-yield_1 corn-irrig_1 corn-yield_2 corn-irrig_2 corn-yield_3 corn-irrig_3 corn-yield_4 corn-irrig_4 corn-expenses
+  wheat-data wheat-sum wheat-price wheat-yield_1 wheat-irrig_1 wheat-yield_2 wheat-irrig_2 wheat-yield_3 wheat-irrig_3 wheat-yield_4 wheat-irrig_4 wheat-expenses
+  soybean-data soybean-sum soybean-price soybean-yield_1 soybean-irrig_1 soybean-yield_2 soybean-irrig_2 soybean-yield_3 soybean-irrig_3 soybean-yield_4 soybean-irrig_4 soybean-expenses
+  milo-data milo-sum milo-price milo-yield_1 milo-irrig_1 milo-yield_2 milo-irrig_2 milo-yield_3 milo-irrig_3 milo-yield_4 milo-irrig_4 milo-expenses
   corn-tot-income wheat-tot-income soybean-tot-income milo-tot-income
+  corn-net-income wheat-net-income soybean-net-income milo-net-income
   corn-history wheat-history soybean-history milo-history
   corn-coverage wheat-coverage soybean-coverage milo-coverage
   corn-base-price wheat-base-price soybean-base-price milo-base-price
   corn-guarantee wheat-guarantee soybean-guarantee milo-guarantee
   mean-corn-yield mean-wheat-yield mean-soybean-yield mean-milo-yield
-  annual-income_1 avg-annual-income_1
   corn-tot-yield wheat-tot-yield soybean-tot-yield milo-tot-yield
   corn-use-in wheat-use-in soybean-use-in milo-use-in water-use-feet gw-change
-  consuming-patches
+  patch-change
   #Solar_panels solar-production wind-production solar-cost solar-sell wind-cost wind-sell solar-net-income wind-net-income energy-net-income %Solar-production %Wind-production
   yrs-seq
-  aquifer-at-risk
   zero-line
   area-multiplier
+  turbine_size
 ]
 
 to setup
   ca
   import-data
+  set turbine_size 2
   energy-calculation
   set zero-line 0
   set total-area (corn-area + wheat-area + soybean-area + milo-area)
@@ -46,6 +47,7 @@ to setup
   set wheat-base-price 6.94
   set soybean-base-price 9.39
   set milo-base-price 3.14
+
 
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;;;;;;;;;;;;;;;;;; cropland patches ;;;;;;;;;;;;;;;;;;
@@ -225,14 +227,12 @@ to setup
       ]
     ]
   ]
-  initial_expenses
   reset-ticks
 end
 
 to go
   if ticks = Input-years [stop]
   recalculate
-  calculate-expenses
   future_processes
   contaminant
   treatment
@@ -394,40 +394,87 @@ to import-data
   show corn-history
 end
 
-to initial_expenses
-  if (item 0 corn-yield_1) < 195 [set corn-expenses (617.38 * corn-area)]
-  if (item 0 corn-yield_1 >= 195) and (item 0 corn-yield_1 < 250) [set corn-expenses (671.06 * corn-area)]
-  if (item 0 corn-yield_1 >= 250) [set corn-expenses (714.18 * corn-area)]
+to calculate-expenses_yield_1    ;Irrigated yields
+  let k (ticks mod 10)
+  if (item (item k yrs-seq) corn-yield_1) < 210 [set corn-expenses (786.23 * corn-area)]
+  if (item (item k yrs-seq) corn-yield_1) >= 210 and (item (item k yrs-seq) corn-yield_1) <= 237.5 [set corn-expenses (861.41 * corn-area)]
+  if (item (item k yrs-seq) corn-yield_1) > 237.5 [set corn-expenses (920.04 * corn-area)]
 
-  if (item 0 wheat-yield_1) < 60 [set wheat-expenses (513.76 * wheat-area)]
-  if (item 0 wheat-yield_1 >= 60) and (item 0 wheat-yield_1 < 70) [set corn-expenses (540.65 * wheat-area)]
-  if (item 0 wheat-yield_1 >= 70) [set wheat-expenses (567.53 * wheat-area)]
+  if (item (item k yrs-seq) wheat-yield_1) < 62.5 [set wheat-expenses (498.13 * wheat-area)]
+  if (item (item k yrs-seq) wheat-yield_1) >= 62.5 and (item (item k yrs-seq) wheat-yield_1) <= 67.5 [set wheat-expenses (523.43 * wheat-area)]
+  if (item (item k yrs-seq) wheat-yield_1) > 67.5 [set wheat-expenses (548.74 * wheat-area)]
 
-  if (item 0 soybean-yield_1) < 55 [set soybean-expenses (558.17 * soybean-area)]
-  if (item 0 soybean-yield_1 >= 55) and (item 0 soybean-yield_1 < 67) [set soybean-expenses (590.41 * soybean-area)]
-  if (item 0 soybean-yield_1 >= 67) [set soybean-expenses (642.54 * soybean-area)]
+  if (item (item k yrs-seq) soybean-yield_1) < 58 [set soybean-expenses (542.07 * soybean-area)]
+  if (item (item k yrs-seq) soybean-yield_1) >= 58 and (item (item k yrs-seq) soybean-yield_1) <= 64 [set soybean-expenses (572.48 * soybean-area)]
+  if (item (item k yrs-seq) soybean-yield_1) > 64 [set soybean-expenses (620.95 * soybean-area)]
 
-  if (item 0 milo-yield_1) < 140 [set milo-expenses (631.96 * milo-area)]
-  if (item 0 milo-yield_1 >= 140) and (item 0 milo-yield_1 < 180) [set milo-expenses (681.41 * milo-area)]
-  if (item 0 milo-yield_1 >= 180) [set milo-expenses (730.87 * milo-area)]
+  if (item (item k yrs-seq) milo-yield_1) < 150 [set milo-expenses (618.55 * milo-area)]
+  if (item (item k yrs-seq) milo-yield_1) >= 150 and (item (item k yrs-seq) milo-yield_1) <= 170 [set milo-expenses (666.17 * milo-area)]
+  if (item (item k yrs-seq) milo-yield_1) > 170 [set milo-expenses (713.79 * milo-area)]
 end
 
-to calculate-expenses
-  if (item (ticks mod 10) corn-yield_1) < 195 [set corn-expenses (617.38 * corn-area)]
-  if (item (ticks mod 10) corn-yield_1 >= 195) and (item (ticks mod 10) corn-yield_1 < 250) [set corn-expenses (671.06 * corn-area)]
-  if (item (ticks mod 10) corn-yield_1 >= 250) [set corn-expenses (714.18 * corn-area)]
+to calculate-expenses_yield_2    ;Dryland yields
+  let k (ticks mod 10)
+  if (item (item k yrs-seq) corn-yield_2) < 66 [set corn-expenses (273.10 * corn-area)]
+  if (item (item k yrs-seq) corn-yield_2) >= 66 and (item (item k yrs-seq) corn-yield_2) <= 91 [set corn-expenses (337.57 * corn-area)]
+  if (item (item k yrs-seq) corn-yield_2) > 91 [set corn-expenses (377.54 * corn-area)]
 
-  if (item (ticks mod 10) wheat-yield_1) < 60 [set wheat-expenses (513.76 * wheat-area)]
-  if (item (ticks mod 10) wheat-yield_1 >= 60) and (item (ticks mod 10) wheat-yield_1 < 70) [set corn-expenses (540.65 * wheat-area)]
-  if (item (ticks mod 10) wheat-yield_1 >= 70) [set wheat-expenses (567.53 * wheat-area)]
+  if (item (item k yrs-seq) wheat-yield_2) < 37.5 [set wheat-expenses (245.47 * wheat-area)]
+  if (item (item k yrs-seq) wheat-yield_2) >= 37.5 and (item (item k yrs-seq) wheat-yield_2) <= 46.5 [set wheat-expenses (277.41 * wheat-area)]
+  if (item (item k yrs-seq) wheat-yield_2) > 46.5 [set wheat-expenses (309.35 * wheat-area)]
 
-  if (item (ticks mod 10) soybean-yield_1) < 55 [set soybean-expenses (558.17 * soybean-area)]
-  if (item (ticks mod 10) soybean-yield_1 >= 55) and (item (ticks mod 10) soybean-yield_1 < 67) [set soybean-expenses (590.41 * soybean-area)]
-  if (item (ticks mod 10) soybean-yield_1 >= 67) [set soybean-expenses (642.54 * soybean-area)]
+  if (item (item k yrs-seq) soybean-yield_2) < 22.5 [set soybean-expenses (224.51 * soybean-area)]
+  if (item (item k yrs-seq) soybean-yield_2) >= 22.5 and (item (item k yrs-seq) soybean-yield_2) <= 27.5 [set soybean-expenses (248.50 * soybean-area)]
+  if (item (item k yrs-seq) soybean-yield_2) > 27.5 [set soybean-expenses (272.48 * soybean-area)]
 
-  if (item (ticks mod 10) milo-yield_1) < 140 [set milo-expenses (631.96 * milo-area)]
-  if (item (ticks mod 10) milo-yield_1 >= 140) and (item (ticks mod 10) milo-yield_1 < 180) [set milo-expenses (681.41 * milo-area)]
-  if (item (ticks mod 10) milo-yield_1 >= 180) [set milo-expenses (730.87 * milo-area)]
+  if (item (item k yrs-seq) milo-yield_2) < 68 [set milo-expenses (263.01 * milo-area)]
+  if (item (item k yrs-seq) milo-yield_2) >= 68 and (item (item k yrs-seq) milo-yield_2) <= 93 [set milo-expenses (314.41 * milo-area)]
+  if (item (item k yrs-seq) milo-yield_2) > 93 [set milo-expenses (361.86 * milo-area)]
+end
+
+to calculate-expenses_yield_3    ;Climate projection yields
+  let k (ticks mod 10)
+  if (item (item k yrs-seq) corn-yield_3) < 210 [set corn-expenses (786.23 * corn-area)]
+  if (item (item k yrs-seq) corn-yield_3) >= 210 and (item (item k yrs-seq) corn-yield_3) <= 237.5 [set corn-expenses (861.41 * corn-area)]
+  if (item (item k yrs-seq) corn-yield_3) > 237.5 [set corn-expenses (920.04 * corn-area)]
+
+  if (item (item k yrs-seq) wheat-yield_3) < 62.5 [set wheat-expenses (498.13 * wheat-area)]
+  if (item (item k yrs-seq) wheat-yield_3) >= 62.5 and (item (item k yrs-seq) wheat-yield_3) <= 67.5 [set wheat-expenses (523.43 * wheat-area)]
+  if (item (item k yrs-seq) wheat-yield_3) > 67.5 [set wheat-expenses (548.74 * wheat-area)]
+
+  if (item (item k yrs-seq) soybean-yield_3) < 58 [set soybean-expenses (542.07 * soybean-area)]
+  if (item (item k yrs-seq) soybean-yield_3) >= 58 and (item (item k yrs-seq) soybean-yield_3) <= 64 [set soybean-expenses (572.48 * soybean-area)]
+  if (item (item k yrs-seq) soybean-yield_3) > 64 [set soybean-expenses (620.95 * soybean-area)]
+
+  if (item (item k yrs-seq) milo-yield_3) < 150 [set milo-expenses (618.55 * milo-area)]
+  if (item (item k yrs-seq) milo-yield_3) >= 150 and (item (item k yrs-seq) milo-yield_3) <= 170 [set milo-expenses (666.17 * milo-area)]
+  if (item (item k yrs-seq) milo-yield_3) > 170 [set milo-expenses (713.79 * milo-area)]
+end
+
+to calculate-expenses_yield_4    ;Climate projection + dryland yields
+  let k (ticks mod 10)
+  if (item (item k yrs-seq) corn-yield_4) < 66 [set corn-expenses (273.10 * corn-area)]
+  if (item (item k yrs-seq) corn-yield_4) >= 66 and (item (item k yrs-seq) corn-yield_4) <= 91 [set corn-expenses (337.57 * corn-area)]
+  if (item (item k yrs-seq) corn-yield_4) > 91 [set corn-expenses (377.54 * corn-area)]
+
+  if (item (item k yrs-seq) wheat-yield_4) < 37.5 [set wheat-expenses (245.47 * wheat-area)]
+  if (item (item k yrs-seq) wheat-yield_4) >= 37.5 and (item (item k yrs-seq) wheat-yield_4) <= 46.5 [set wheat-expenses (277.41 * wheat-area)]
+  if (item (item k yrs-seq) wheat-yield_4) > 46.5 [set wheat-expenses (309.35 * wheat-area)]
+
+  if (item (item k yrs-seq) soybean-yield_4) < 22.5 [set soybean-expenses (224.51 * soybean-area)]
+  if (item (item k yrs-seq) soybean-yield_4) >= 22.5 and (item (item k yrs-seq) soybean-yield_4) <= 27.5 [set soybean-expenses (248.50 * soybean-area)]
+  if (item (item k yrs-seq) soybean-yield_4) > 27.5 [set soybean-expenses (272.48 * soybean-area)]
+
+  if (item (item k yrs-seq) milo-yield_4) < 68 [set milo-expenses (263.01 * milo-area)]
+  if (item (item k yrs-seq) milo-yield_4) >= 68 and (item (item k yrs-seq) milo-yield_4) <= 93 [set milo-expenses (314.41 * milo-area)]
+  if (item (item k yrs-seq) milo-yield_4) > 93 [set milo-expenses (361.86 * milo-area)]
+end
+
+to calculate-net-income
+  set corn-net-income (corn-tot-income - corn-expenses)
+  set wheat-net-income (wheat-tot-income - wheat-expenses)
+  set soybean-net-income (soybean-tot-income - soybean-expenses)
+  set milo-net-income (milo-tot-income - milo-expenses)
 end
 
 to future_processes
@@ -497,6 +544,7 @@ if Future_Process = "Repeat Historical"
 end
 
 to food-calculation_1-1                                                                ; Wade Heger, Allan Andales CSU (Allan.Andales@colostate.edu) , Garvey Smith (Garvey.Smith@colostate.edu)
+  set yrs-seq [0 1 2 3 4 5 6 7 8 9]
   let n (ticks)
 
   set corn-tot-income (item n corn-yield_1 * item n corn-price * corn-area)
@@ -508,9 +556,14 @@ to food-calculation_1-1                                                         
   set wheat-tot-yield (item n wheat-yield_1)
   set soybean-tot-yield (item n soybean-yield_1)
   set milo-tot-yield (item n milo-yield_1)
+
+  calculate-expenses_yield_1
+  calculate-net-income
+
 end
 
 to food-calculation_1-2
+  set yrs-seq [0 1 2 3 4 5 6 7 8 9]
   let n (ticks)
 
   set corn-tot-yield (item (n mod 10) corn-yield_1)
@@ -523,14 +576,10 @@ to food-calculation_1-2
   set soybean-history lput soybean-tot-yield but-first soybean-history
   set milo-history lput milo-tot-yield but-first milo-history
 
-  ;show corn-history
-
   set mean-corn-yield mean corn-history
   set mean-wheat-yield mean wheat-history
   set mean-soybean-yield mean soybean-history
   set mean-milo-yield mean milo-history
-
-  ;show mean-corn-yield
 
   set corn-guarantee ((mean-corn-yield * corn-coverage * corn-base-price) * corn-area)
   set wheat-guarantee ((mean-wheat-yield * wheat-coverage * wheat-base-price) * wheat-area)
@@ -542,8 +591,8 @@ to food-calculation_1-2
   set soybean-tot-income (item (n mod 10) soybean-yield_1 * item (n mod 10) soybean-price * soybean-area)
   set milo-tot-income (item (n mod 10) milo-yield_1 * item (n mod 10) milo-price * milo-area)
 
-  ;show corn-tot-income
-  ;show corn-guarantee
+  calculate-expenses_yield_1
+  calculate-net-income
 
   ifelse corn-tot-income > corn-guarantee
     [set corn-tot-income corn-tot-income]
@@ -564,8 +613,6 @@ to food-calculation_1-2
     [set milo-tot-income milo-tot-income]
     [set milo-tot-income milo-guarantee
      print (word "Seq " ticks ", year " (ticks + 2008) " applies milo insurance")]
-
-  ;show corn-tot-income
 end
 
 to food-calculation_2
@@ -587,14 +634,10 @@ to food-calculation_2
   set soybean-history lput soybean-tot-yield but-first soybean-history
   set milo-history lput milo-tot-yield but-first milo-history
 
-  ;show corn-history
-
   set mean-corn-yield mean corn-history
   set mean-wheat-yield mean wheat-history
   set mean-soybean-yield mean soybean-history
   set mean-milo-yield mean milo-history
-
-  ;show mean-corn-yield
 
   set corn-guarantee ((mean-corn-yield * corn-coverage * corn-base-price) * corn-area)
   set wheat-guarantee ((mean-wheat-yield * wheat-coverage * wheat-base-price) * wheat-area)
@@ -606,8 +649,8 @@ to food-calculation_2
   set soybean-tot-income (item (item n yrs-seq) soybean-yield_1 * item (item n yrs-seq) soybean-price * soybean-area)
   set milo-tot-income (item (item n yrs-seq) milo-yield_1 * item (item n yrs-seq) milo-price * milo-area)
 
-  ;show corn-tot-income
-  ;show corn-guarantee
+  calculate-expenses_yield_1
+  calculate-net-income
 
   ifelse corn-tot-income > corn-guarantee
     [set corn-tot-income corn-tot-income]
@@ -628,8 +671,6 @@ to food-calculation_2
     [set milo-tot-income milo-tot-income]
     [set milo-tot-income milo-guarantee
      print (word "Seq " ticks ", year " (ticks + 2008) " applies milo insurance")]
-
-  ;show corn-tot-income
 end
 
 to food-calculation_3
@@ -650,14 +691,10 @@ to food-calculation_3
   set soybean-history lput soybean-tot-yield but-first soybean-history
   set milo-history lput milo-tot-yield but-first milo-history
 
-  ;show corn-history
-
   set mean-corn-yield mean corn-history
   set mean-wheat-yield mean wheat-history
   set mean-soybean-yield mean soybean-history
   set mean-milo-yield mean milo-history
-
-  ;show mean-corn-yield
 
   set corn-guarantee ((mean-corn-yield * corn-coverage * corn-base-price) * corn-area)
   set wheat-guarantee ((mean-wheat-yield * wheat-coverage * wheat-base-price) * wheat-area)
@@ -669,8 +706,8 @@ to food-calculation_3
   set soybean-tot-income (item (item n yrs-seq) soybean-yield_1 * item (item n yrs-seq) soybean-price * soybean-area)
   set milo-tot-income (item (item n yrs-seq) milo-yield_1 * item (item n yrs-seq) milo-price * milo-area)
 
-  ;show corn-tot-income
-  ;show corn-guarantee
+  calculate-expenses_yield_1
+  calculate-net-income
 
   ifelse corn-tot-income > corn-guarantee
     [set corn-tot-income corn-tot-income]
@@ -691,8 +728,6 @@ to food-calculation_3
     [set milo-tot-income milo-tot-income]
     [set milo-tot-income milo-guarantee
      print (word "Seq " ticks ", year " (ticks + 2008) " applies milo insurance")]
-
-  ;show corn-tot-income
 end
 
 to food-calculation_4
@@ -713,14 +748,10 @@ to food-calculation_4
   set soybean-history lput soybean-tot-yield but-first soybean-history
   set milo-history lput milo-tot-yield but-first milo-history
 
-  ;show corn-history
-
   set mean-corn-yield mean corn-history
   set mean-wheat-yield mean wheat-history
   set mean-soybean-yield mean soybean-history
   set mean-milo-yield mean milo-history
-
-  ;show mean-corn-yield
 
   set corn-guarantee ((mean-corn-yield * corn-coverage * corn-base-price) * corn-area)
   set wheat-guarantee ((mean-wheat-yield * wheat-coverage * wheat-base-price) * wheat-area)
@@ -732,8 +763,8 @@ to food-calculation_4
   set soybean-tot-income (item (item n yrs-seq) soybean-yield_3 * item (item n yrs-seq) soybean-price * soybean-area)
   set milo-tot-income (item (item n yrs-seq) milo-yield_3 * item (item n yrs-seq) milo-price * milo-area)
 
-  ;show corn-tot-income
-  ;show corn-guarantee
+  calculate-expenses_yield_3
+  calculate-net-income
 
   ifelse corn-tot-income > corn-guarantee
     [set corn-tot-income corn-tot-income]
@@ -754,17 +785,10 @@ to food-calculation_4
     [set milo-tot-income milo-tot-income]
     [set milo-tot-income milo-guarantee
      print (word "Seq " ticks ", year " (ticks + 2008) " applies milo insurance")]
-
-  ;show corn-tot-income
 end
 
 to dryland-farming_1
   let n (ticks)
-
-  set corn-tot-income (item (n mod 10) corn-yield_2 * item (n mod 10) corn-price * corn-area)
-  set wheat-tot-income (item (n mod 10) wheat-yield_2 * item (n mod 10) wheat-price * wheat-area)
-  set soybean-tot-income (item (n mod 10) soybean-yield_2 * item (n mod 10) soybean-price * soybean-area)
-  set milo-tot-income (item (n mod 10) milo-yield_2 * item (n mod 10) milo-price * milo-area)
 
   set corn-tot-yield (item (n mod 10) corn-yield_2)
   set wheat-tot-yield (item (n mod 10) wheat-yield_2)
@@ -776,22 +800,23 @@ to dryland-farming_1
   set soybean-history lput soybean-tot-yield but-first soybean-history
   set milo-history lput milo-tot-yield but-first milo-history
 
-  ;show corn-history
-
   set mean-corn-yield mean corn-history
   set mean-wheat-yield mean wheat-history
   set mean-soybean-yield mean soybean-history
   set mean-milo-yield mean milo-history
-
-  ;show mean-corn-yield
 
   set corn-guarantee ((mean-corn-yield * corn-coverage * corn-base-price) * corn-area)
   set wheat-guarantee ((mean-wheat-yield * wheat-coverage * wheat-base-price) * wheat-area)
   set soybean-guarantee ((mean-soybean-yield * soybean-coverage * soybean-base-price) * soybean-area)
   set milo-guarantee ((mean-milo-yield * milo-coverage * milo-base-price) * milo-area)
 
-  ;show corn-tot-income
-  ;show corn-guarantee
+  set corn-tot-income (item (n mod 10) corn-yield_2 * item (n mod 10) corn-price * corn-area)
+  set wheat-tot-income (item (n mod 10) wheat-yield_2 * item (n mod 10) wheat-price * wheat-area)
+  set soybean-tot-income (item (n mod 10) soybean-yield_2 * item (n mod 10) soybean-price * soybean-area)
+  set milo-tot-income (item (n mod 10) milo-yield_2 * item (n mod 10) milo-price * milo-area)
+
+  calculate-expenses_yield_2
+  calculate-net-income
 
   ifelse corn-tot-income > corn-guarantee
     [set corn-tot-income corn-tot-income]
@@ -813,8 +838,6 @@ to dryland-farming_1
     [set milo-tot-income milo-guarantee
      print (word "Seq " ticks ", year " (ticks + 2008) " applies milo insurance")]
 
-  ;show corn-tot-income
-
   let k ticks
   set corn-use-in item (k mod 10) corn-irrig_2
   set wheat-use-in item (k mod 10) wheat-irrig_2
@@ -829,24 +852,15 @@ to dryland-farming_2
 
   let n (ticks mod 10)
 
-  set corn-tot-yield (item (item n yrs-seq) corn-yield_2)
-  set wheat-tot-yield (item (item n yrs-seq) wheat-yield_2)
-  set soybean-tot-yield (item (item n yrs-seq) soybean-yield_2)
-  set milo-tot-yield (item (item n yrs-seq) milo-yield_2)
-
   set corn-history lput corn-tot-yield but-first corn-history
   set wheat-history lput wheat-tot-yield but-first wheat-history
   set soybean-history lput soybean-tot-yield but-first soybean-history
   set milo-history lput milo-tot-yield but-first milo-history
 
-  ;show corn-history
-
   set mean-corn-yield mean corn-history
   set mean-wheat-yield mean wheat-history
   set mean-soybean-yield mean soybean-history
   set mean-milo-yield mean milo-history
-
-  ;show mean-corn-yield
 
   set corn-guarantee ((mean-corn-yield * corn-coverage * corn-base-price) * corn-area)
   set wheat-guarantee ((mean-wheat-yield * wheat-coverage * wheat-base-price) * wheat-area)
@@ -858,8 +872,13 @@ to dryland-farming_2
   set soybean-tot-income (item (item n yrs-seq) soybean-yield_2 * item (item n yrs-seq) soybean-price * soybean-area)
   set milo-tot-income (item (item n yrs-seq) milo-yield_2 * item (item n yrs-seq) milo-price * milo-area)
 
-  ;show corn-tot-income
-  ;show corn-guarantee
+  set corn-tot-yield (item (item n yrs-seq) corn-yield_2)
+  set wheat-tot-yield (item (item n yrs-seq) wheat-yield_2)
+  set soybean-tot-yield (item (item n yrs-seq) soybean-yield_2)
+  set milo-tot-yield (item (item n yrs-seq) milo-yield_2)
+
+  calculate-expenses_yield_2
+  calculate-net-income
 
   ifelse corn-tot-income > corn-guarantee
     [set corn-tot-income corn-tot-income]
@@ -880,8 +899,6 @@ to dryland-farming_2
     [set milo-tot-income milo-tot-income]
     [set milo-tot-income milo-guarantee
      print (word "Seq " ticks ", year " (ticks + 2008) " applies milo insurance")]
-
-  ;show corn-tot-income
 
   let k ticks
   set corn-use-in item (k mod 10) corn-irrig_2
@@ -897,24 +914,15 @@ to dryland-farming_3
 
   let n (ticks mod 10)
 
-  set corn-tot-yield (item (item n yrs-seq) corn-yield_2)
-  set wheat-tot-yield (item (item n yrs-seq) wheat-yield_2)
-  set soybean-tot-yield (item (item n yrs-seq) soybean-yield_2)
-  set milo-tot-yield (item (item n yrs-seq) milo-yield_2)
-
   set corn-history lput corn-tot-yield but-first corn-history
   set wheat-history lput wheat-tot-yield but-first wheat-history
   set soybean-history lput soybean-tot-yield but-first soybean-history
   set milo-history lput milo-tot-yield but-first milo-history
 
-  ;show corn-history
-
   set mean-corn-yield mean corn-history
   set mean-wheat-yield mean wheat-history
   set mean-soybean-yield mean soybean-history
   set mean-milo-yield mean milo-history
-
-  ;show mean-corn-yield
 
   set corn-guarantee ((mean-corn-yield * corn-coverage * corn-base-price) * corn-area)
   set wheat-guarantee ((mean-wheat-yield * wheat-coverage * wheat-base-price) * wheat-area)
@@ -926,8 +934,13 @@ to dryland-farming_3
   set soybean-tot-income (item (item n yrs-seq) soybean-yield_2 * item (item n yrs-seq) soybean-price * soybean-area)
   set milo-tot-income (item (item n yrs-seq) milo-yield_2 * item (item n yrs-seq) milo-price * milo-area)
 
-  ;show corn-tot-income
-  ;show corn-guarantee
+  set corn-tot-yield (item (item n yrs-seq) corn-yield_2)
+  set wheat-tot-yield (item (item n yrs-seq) wheat-yield_2)
+  set soybean-tot-yield (item (item n yrs-seq) soybean-yield_2)
+  set milo-tot-yield (item (item n yrs-seq) milo-yield_2)
+
+  calculate-expenses_yield_2
+  calculate-net-income
 
   ifelse corn-tot-income > corn-guarantee
     [set corn-tot-income corn-tot-income]
@@ -949,8 +962,6 @@ to dryland-farming_3
     [set milo-tot-income milo-guarantee
      print (word "Seq " ticks ", year " (ticks + 2008) " applies milo insurance")]
 
-  ;show corn-tot-income
-
   let k ticks
   set corn-use-in item (k mod 10) corn-irrig_2
   set wheat-use-in item (k mod 10) wheat-irrig_2
@@ -960,29 +971,20 @@ end
 
 to dryland-farming_4
   if (ticks mod 10) = 0
-  [ set yrs-seq [0 9 9 9 9 0 6 7 8 9]
+  [ set yrs-seq [0 1 2 3 4 5 6 7 8 9]
     set yrs-seq shuffle yrs-seq]
 
   let n (ticks mod 10)
-
-  set corn-tot-yield (item (item n yrs-seq) corn-yield_4)
-  set wheat-tot-yield (item (item n yrs-seq) wheat-yield_4)
-  set soybean-tot-yield (item (item n yrs-seq) soybean-yield_4)
-  set milo-tot-yield (item (item n yrs-seq) milo-yield_4)
 
   set corn-history lput corn-tot-yield but-first corn-history
   set wheat-history lput wheat-tot-yield but-first wheat-history
   set soybean-history lput soybean-tot-yield but-first soybean-history
   set milo-history lput milo-tot-yield but-first milo-history
 
-  ;show corn-history
-
   set mean-corn-yield mean corn-history
   set mean-wheat-yield mean wheat-history
   set mean-soybean-yield mean soybean-history
   set mean-milo-yield mean milo-history
-
-  ;show mean-corn-yield
 
   set corn-guarantee ((mean-corn-yield * corn-coverage * corn-base-price) * corn-area)
   set wheat-guarantee ((mean-wheat-yield * wheat-coverage * wheat-base-price) * wheat-area)
@@ -994,8 +996,13 @@ to dryland-farming_4
   set soybean-tot-income (item (item n yrs-seq) soybean-yield_4 * item (item n yrs-seq) soybean-price * soybean-area)
   set milo-tot-income (item (item n yrs-seq) milo-yield_4 * item (item n yrs-seq) milo-price * milo-area)
 
-  ;show corn-tot-income
-  ;show corn-guarantee
+  set corn-tot-yield (item (item n yrs-seq) corn-yield_4)
+  set wheat-tot-yield (item (item n yrs-seq) wheat-yield_4)
+  set soybean-tot-yield (item (item n yrs-seq) soybean-yield_4)
+  set milo-tot-yield (item (item n yrs-seq) milo-yield_4)
+
+  calculate-expenses_yield_4
+  calculate-net-income
 
   ifelse corn-tot-income > corn-guarantee
     [set corn-tot-income corn-tot-income]
@@ -1017,8 +1024,6 @@ to dryland-farming_4
     [set milo-tot-income milo-guarantee
      print (word "Seq " ticks ", year " (ticks + 2008) " applies milo insurance")]
 
-  ;show corn-tot-income
-
   let k ticks
   set corn-use-in item (k mod 10) corn-irrig_4
   set wheat-use-in item (k mod 10) wheat-irrig_4
@@ -1029,7 +1034,7 @@ end
 to energy-calculation                                                                ; Bob Johnson (bobjohnson@centurylink.net), Earnie Lehman (earnielehman@gmail.com)
   set #Solar_panels (#solar_panel_sets * 1000)
   set solar-production (#Solar_Panels * Panel_power * 5 * 365 / 1000000)             ; MWh = power(Watt) * 5hrs/day * 365days/year / 1000000
-  set wind-production (#wind_turbines * Turbine_size * 0.425 * 24 * 365)             ; MWh = power(MW) * Kansas_wind_capacity * 24hrs/day * 365days/year                          ;45% (Bob)
+  set wind-production (#wind_turbines * turbine_size * 0.425 * 24 * 365)             ; MWh = power(MW) * Kansas_wind_capacity * 24hrs/day * 365days/year                          ;45% (Bob)
   set solar-cost (#Solar_Panels * Panel_power / 1000 * 3050)                         ; Solar cost = #Solar_Panels * Panel_power * $3050/kW
   set solar-sell (solar-production * 38)                                             ; Sell = MWh * $38/MWh                         --> (Wholesale was $22-24/MWh, Retail price is $105/MWh (**reference))
                                                                                      ; Wholesale < Coop $65 < Retail
@@ -1051,19 +1056,16 @@ to gw-depletion_1
   set water-use-feet (((corn-use-in * corn-area) + (wheat-use-in * wheat-area) + (soybean-use-in * soybean-area) + (milo-use-in * milo-area)) / (12 * total-area))
   set gw-change ((-8.6628 * water-use-feet) + 8.4722)
 
-  set consuming-patches (gw-change * 170 / (aquifer-thickness))
+  set patch-change (gw-change * 170 / (aquifer-thickness))
 
-  if current-elev > 69 [set consuming-patches 0]
+  ifelse patch-change < 0
+    [ask aquifer-patches with [pycor > (current-elev + (patch-change))] [
+     set pcolor 7]]           ;gray
+    [ask aquifer-patches with [pycor < (current-elev + (patch-change))] [
+     set pcolor 105]]         ;blue
 
-  ifelse consuming-patches < 0
-    [ask aquifer-patches with [pycor > (current-elev + (consuming-patches))] [
-      set pcolor 7]         ;gray
-    ]
-    [ask aquifer-patches with [pycor < (current-elev + (consuming-patches))] [
-      set pcolor 105]       ;blue
-    ]
-
-  set current-elev (current-elev + consuming-patches)
+   set current-elev (current-elev + patch-change)
+   if current-elev > 69 [set current-elev 69]
 
   if current-elev < -66 [
     ask aquifer-patches with [pycor < current-elev] [
@@ -1081,19 +1083,16 @@ to gw-depletion_2
   set water-use-feet (((corn-use-in * corn-area) + (wheat-use-in * wheat-area) + (soybean-use-in * soybean-area) + (milo-use-in * milo-area)) / (12 * total-area))
   set gw-change ((-8.6628 * water-use-feet) + 8.4722)
 
-  set consuming-patches (gw-change * 170 / (aquifer-thickness))
+  set patch-change (gw-change * 170 / (aquifer-thickness))
 
-  if current-elev > 69 [set consuming-patches 0]
+  ifelse patch-change < 0
+    [ask aquifer-patches with [pycor > (current-elev + (patch-change))] [
+     set pcolor 7]]           ;gray
+    [ask aquifer-patches with [pycor < (current-elev + (patch-change))] [
+     set pcolor 105]]         ;blue
 
-  ifelse consuming-patches < 0
-    [ask aquifer-patches with [pycor > (current-elev + (consuming-patches))] [
-      set pcolor 7]         ;gray
-    ]
-    [ask aquifer-patches with [pycor < (current-elev + (consuming-patches))] [
-      set pcolor 105]       ;blue
-    ]
-
-  set current-elev (current-elev + consuming-patches)
+   set current-elev (current-elev + patch-change)
+   if current-elev > 69 [set current-elev 69]
 
   if current-elev < -66 [
     ask aquifer-patches with [pycor < current-elev] [
@@ -1111,19 +1110,16 @@ to gw-depletion_3
   set water-use-feet (((corn-use-in * corn-area) + (wheat-use-in * wheat-area) + (soybean-use-in * soybean-area) + (milo-use-in * milo-area)) / (12 * total-area))
   set gw-change ((-8.6628 * water-use-feet) + 8.4722)
 
-  set consuming-patches (gw-change * 170 / (aquifer-thickness))
+  set patch-change (gw-change * 170 / (aquifer-thickness))
 
-  if current-elev > 69 [set consuming-patches 0]
+  ifelse patch-change < 0
+    [ask aquifer-patches with [pycor > (current-elev + (patch-change))] [
+     set pcolor 7]]           ;gray
+    [ask aquifer-patches with [pycor < (current-elev + (patch-change))] [
+     set pcolor 105]]         ;blue
 
-  ifelse consuming-patches < 0
-    [ask aquifer-patches with [pycor > (current-elev + (consuming-patches))] [
-      set pcolor 7]         ;gray
-    ]
-    [ask aquifer-patches with [pycor < (current-elev + (consuming-patches))] [
-      set pcolor 105]       ;blue
-    ]
-
-  set current-elev (current-elev + consuming-patches)
+   set current-elev (current-elev + patch-change)
+   if current-elev > 69 [set current-elev 69]
 
   if current-elev < -66 [
     ask aquifer-patches with [pycor < current-elev] [
@@ -1141,19 +1137,16 @@ to gw-depletion_4
   set water-use-feet (((corn-use-in * corn-area) + (wheat-use-in * wheat-area) + (soybean-use-in * soybean-area) + (milo-use-in * milo-area)) / (12 * total-area))
   set gw-change ((-8.6628 * water-use-feet) + 8.4722)
 
-  set consuming-patches (gw-change * 170 / (aquifer-thickness))
+  set patch-change (gw-change * 170 / (aquifer-thickness))
 
-  if current-elev > 69 [set consuming-patches 0]
+  ifelse patch-change < 0
+    [ask aquifer-patches with [pycor > (current-elev + (patch-change))] [
+     set pcolor 7]]           ;gray
+    [ask aquifer-patches with [pycor < (current-elev + (patch-change))] [
+     set pcolor 105]]         ;blue
 
-  ifelse consuming-patches < 0
-    [ask aquifer-patches with [pycor > (current-elev + (consuming-patches))] [
-      set pcolor 7]         ;gray
-    ]
-    [ask aquifer-patches with [pycor < (current-elev + (consuming-patches))] [
-      set pcolor 105]       ;blue
-    ]
-
-  set current-elev (current-elev + consuming-patches)
+   set current-elev (current-elev + patch-change)
+   if current-elev > 69 [set current-elev 69]
 
   if current-elev < -66 [
     ask aquifer-patches with [pycor < current-elev] [
@@ -1249,7 +1242,7 @@ to recalculate
   ]
 
   set solar-production (#Solar_Panels * Panel_power * 5 * 365 / 1000000)            ; MWh = power(Watt) * 5hrs/day * 365days/year / 1000000
-  set wind-production (#wind_turbines * Turbine_size * 0.425 * 24 * 365)            ; MWh = power(MW) * Kansas_wind_capacity * 24hrs/day * 365days/year                          ;45% (Bob)
+  set wind-production (#wind_turbines * turbine_size * 0.425 * 24 * 365)            ; MWh = power(MW) * Kansas_wind_capacity * 24hrs/day * 365days/year                          ;45% (Bob)
   set %Solar-production (Solar-production * 100 / (Solar-production + Wind-production))
   set %Wind-production (Wind-production * 100 / (Solar-production + Wind-production))
 
@@ -1395,10 +1388,10 @@ true
 true
 "set-plot-background-color 58" ""
 PENS
-"Corn" 1.0 0 -4079321 true "" "ifelse ticks = 0 [set corn-expenses 0][plot (corn-tot-income - corn-expenses)]"
-"Wheat" 1.0 0 -3844592 true "" "ifelse ticks = 0 [set wheat-expenses 0][plot (wheat-tot-income - wheat-expenses)]"
-"Soybean" 1.0 0 -13210332 true "" "ifelse ticks = 0 [set soybean-expenses 0][plot (soybean-tot-income - soybean-expenses)]"
-"Milo" 1.0 0 -12440034 true "" "ifelse ticks = 0 [set milo-expenses 0][plot (milo-tot-income - milo-expenses)]"
+"Corn" 1.0 0 -4079321 true "" ";ifelse ticks = 0 [set corn-expenses 0][plot (corn-tot-income - corn-expenses)]\nplot corn-net-income"
+"Wheat" 1.0 0 -3844592 true "" ";ifelse ticks = 0 [set wheat-expenses 0][plot (wheat-tot-income - wheat-expenses)]\nplot wheat-net-income"
+"Soybean" 1.0 0 -13210332 true "" ";ifelse ticks = 0 [set soybean-expenses 0][plot (soybean-tot-income - soybean-expenses)]\nplot soybean-net-income"
+"Milo" 1.0 0 -12440034 true "" ";ifelse ticks = 0 [set milo-expenses 0][plot (milo-tot-income - milo-expenses)]\nplot milo-net-income"
 "$0" 1.0 2 -8053223 true "" "plot zero-line"
 
 BUTTON
@@ -1437,17 +1430,6 @@ Energy ------------------------------------
 13
 25.0
 1
-
-SWITCH
-1038
-782
-1157
-815
-Fill_deficit
-Fill_deficit
-0
-1
--1000
 
 PLOT
 1122
@@ -1507,21 +1489,6 @@ NIL
 NIL
 NIL
 1
-
-SLIDER
-1161
-781
-1294
-814
-Turbine_size
-Turbine_size
-0
-3
-2.0
-0.1
-1
-MW
-HORIZONTAL
 
 SLIDER
 71
@@ -1904,10 +1871,10 @@ Water is assumed to come from groundwater pumping. Effects on water quality are 
 1
 
 MONITOR
-872
-717
-993
-762
+931
+607
+1010
+652
 NIL
 current-elev
 3
@@ -1915,21 +1882,21 @@ current-elev
 11
 
 MONITOR
-872
-818
-992
-863
+1089
+607
+1179
+652
 NIL
-consuming-patches
+patch-change
 3
 1
 11
 
 MONITOR
-872
-768
-993
-813
+1013
+607
+1086
+652
 NIL
 gw-change
 3
@@ -1937,10 +1904,10 @@ gw-change
 11
 
 MONITOR
-763
-717
-868
-762
+835
+607
+928
+652
 NIL
 water-use-feet
 3
@@ -1955,6 +1922,35 @@ TEXTBOX
 **Year in these plots represents a sequential year, i.e., year 1 is year 2008.
 12
 5.0
+1
+
+PLOT
+835
+483
+1406
+603
+Water-level Change
+Years
+Feet
+0.0
+60.0
+0.0
+5.0
+true
+true
+"" ""
+PENS
+"Water-level" 1.0 0 -14454117 true "" "plot gw-change"
+"Zero" 1.0 2 -8053223 true "" "plot zero-line"
+
+TEXTBOX
+1065
+503
+1323
+521
+Note: water declines if water use > 0.978 ft
+12
+104.0
 1
 
 @#$#@#$#@
