@@ -1014,16 +1014,20 @@ to dryland-farming_4
   set milo-use-in item (k mod 10) milo-irrig_4                                                      ;Each tick, irrigation will be accessed from a "milo-irrig_4" list
 end
 
-to energy-calculation                                                                ;Bob Johnson (bobjohnson@centurylink.net), Earnie Lehman (earnielehman@gmail.com)
+to energy-calculation
+  ;Bob Johnson (bobjohnson@centurylink.net), Earnie Lehman (earnielehman@gmail.com), and Hongyu Wu (hongyuwu@ksu.edu)
   ;assuming the cost spreads over 30 years with no interest
   set #Solar_panels (#solar_panel_sets * 1000)
-  set solar-production (#Solar_Panels * Panel_power * 5 * 365 / 1000000)             ;MWh = power(Watt) * 5hrs/day * 365days/year / 1000000
-  set wind-production (#wind_turbines * turbine_size * 0.425 * 24 * 365)             ;MWh = power(MW) * Kansas_wind_capacity * 24hrs/day * 365days/year, (capacity 42.5% (Berkeley Lab), 45% (Bob))
-  set solar-cost (#Solar_Panels * (Panel_power / 1000) * 3050 / 30)                  ;Solar cost = #Solar_Panels * Panel_power * $3050/kW, (divide 30 because it spreads over 30 years)
-  set solar-sell (solar-production * 38)                                             ;Sell = MWh * $38/MWh (Bob and Mary), (Wholesale was $22-24/MWh, Retail price is $105/MWh)
-                                                                                     ;Wholesale < Coop $65 < Retail
-  set wind-cost (((2000000 / 30) + 60000)) * #wind_turbines                          ;For 2MW wind turbine, Wind cost = 2,000,000/30 + (60,000 maintenance/yr) * #wind_turbines, (ref. Berkeley Lab)
-  set wind-sell (wind-production * 38)                                               ;Sell = MWh * $38/MWh
+  set solar-production (#Solar_Panels * Panel_power * 5 * 365 / 1000000)                            ;MWh = power(Watt) * 5hrs/day * 365days/year / 1000000
+  set wind-production (#wind_turbines * turbine_size * 0.425 * 24 * 365)                            ;MWh = power(MW) * Kansas_wind_capacity * 24hrs/day * 365days/year, capacity 42.5% (Berkeley Lab)
+  set solar-cost (#Solar_Panels * (Panel_power / 1000) * 3050 / 30)                                 ;Solar cost = #Solar_Panels * Panel_power * $3050/kW
+  set solar-sell (solar-production * 38)                                                            ;Sell = MWh * $38/MWh (Bob and Mary)
+                                                                                                    ;Wholesale < Coop $65 < Retail, , (Wholesale was $22-24/MWh, Retail price is $105/MWh)
+
+  ;Wind installation cost = $1000/kW or $1000000/MW, Annual O&M = 3% of installation cost
+  ;For 2MW, Wind cost = 2,000,000/30 + (60,000/yr) * #wind_turbines, (ref. Berkeley Lab, Hongyu Wu)
+  set wind-cost (((1000000 * turbine_size / 30) + (0.03 * 1000000 * turbine_size))) * #wind_turbines
+  set wind-sell (wind-production * 38)                                                              ;Sell = MWh * $38/MWh
   set solar-net-income (solar-sell - solar-cost)
   set wind-net-income  (wind-sell - wind-cost)
   set energy-net-income (solar-net-income + wind-net-income)
@@ -1946,6 +1950,10 @@ The location considered is the area around Garden City in [Finney County, Kansas
 
 FEWCalc is an interactive tool integrating agriculture, energy, and water components; calculating farm income; as well as visualizing results in the NetLogo World.
 
+![HPA](file:HPA_Lifetime.png)
+
+![WIND](file:Wind_Map.png)
+
 ## Load input data and initialize parameters
 ### Load input data
 There are four input files in comma-separated values (.csv) format under "FEWCalc" folder. Input values (e.g., precipitation and crop price) were from historical data between 2008 and 2017. Besides, they were calculated from DSSAT (e.g., yield and irrigation) using the same dataset. The input files listed below are separated into four major crop types in Kansas which are corn, wheat, soybean, and milo (sorghum).
@@ -2063,15 +2071,16 @@ Contact: Blake B. Wilson KGS (bwilson@kgs.ku.edu)
   1. Set model options (see "Initialize parameters")
   2. Click **Setup**
   3. Click **Go** to run the entire simulation or click **Go once** to advance the simulation one time step.
-## Pictures
-
-
 
 ## References
 
 Anderson, A.C., Gibson, B., White, S.W., & Hagedorn, L. (2012). The Economic Benefis of Kansas Wind Energy. Retrieved from https://www.renewableenergylawinsider.com/wp-content/uploads/sites/165/2012/11/Kansas-Wind-Report.pdf
 
 Jones, J.W, Hoogenboom, G., Porter, C., Boote, K., Batchelor, W., Hunt, L., … Ritchie, J. (2003). The DSSAT cropping system model. European Journal of Agronomy, 18(3–4), 235–265. doi:10.1016/S1161-0301(02)00107-7.
+
+Kansas Geological Survey (KGS). (2007). Estimated Usable Lifetime for the High Plains Aquifer in Kansas, available at: http://www.kgs.ku.edu/HighPlains/maps/index.shtml.
+
+National Renewable Energy Laboratory (NREL). (2011). United States – Annual Average Wind Speed at 80 m., available at: https://www.nrel.gov/gis/wind.html.
 
 Whittemore, D.O., Butler, J.J., & Wilson, B.B. (2016). Assessing the major drivers of water-level declines: new insights into the future of heavily stressed aquifers. 
 Hydrological Sciences Journal, 61(1), 134-145. doi:10.1080/02626667.2014.959958.
