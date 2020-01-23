@@ -1015,7 +1015,7 @@ to dryland-farming_4
 end
 
 to energy-calculation                                                                ;Bob Johnson (bobjohnson@centurylink.net), Earnie Lehman (earnielehman@gmail.com)
-  ;assuming the cost spreads over 30 years with no interest or maintenance
+  ;assuming the cost spreads over 30 years with no interest
   set #Solar_panels (#solar_panel_sets * 1000)
   set solar-production (#Solar_Panels * Panel_power * 5 * 365 / 1000000)             ;MWh = power(Watt) * 5hrs/day * 365days/year / 1000000
   set wind-production (#wind_turbines * turbine_size * 0.425 * 24 * 365)             ;MWh = power(MW) * Kansas_wind_capacity * 24hrs/day * 365days/year, (capacity 42.5% (Berkeley Lab), 45% (Bob))
@@ -1940,9 +1940,9 @@ Note: water declines if water use > 0.978 ft
 # FEWCalc
 **FEWCalc** is the **Food-Energy-Water Calculator** assembled by Jirapat Phetheet and Professor Mary C. Hill from Department of Geology, the University of Kansas. 
 
-The calculation is divided into two parts. The first part is crop calculation using a crop model called Decision Support System for Agrotechnology Transfer (DSSAT) which was developed by [Jones et al., 2003](https://doi.org/10.1016/S1161-0301(02)00107-7) from the University of Florida. The other is the **FEWCalc** conducted using NetLogo agent-based modeling software by [Uri Wilensky, 1999](https://ccl.northwestern.edu/netlogo). 
+The calculation is divided into two parts. The first part is crop calculation using a crop model called Decision Support System for Agrotechnology Transfer (DSSAT) which was developed by [Jones et al., 2003](https://doi.org/10.1016/S1161-0301(02)00107-7) from the University of Florida. The other is the FEWCalc conducted using NetLogo agent-based modeling software by [Uri Wilensky, 1999](https://ccl.northwestern.edu/netlogo/docs). 
 
-The location considered is the area around Garden City in [Finney County, Kansas.](https://en.wikipedia.org/wiki/Finney_County,_Kansas) FEWCalc is developed and tested using data from the southern High Plains aquifer (HPA), where groundwater has been decreasing at an alarming rate these days. Fortunately, Kansas is well positioned in the nation's wind belt that has access to a robust renewable energy source<sup> 1</sup>. Economically, Kansas is the second leading state, with about 50% of the electricity sold in the state being met by wind<sup> 2</sup> .
+The location considered is the area around Garden City in [Finney County, Kansas.](https://en.wikipedia.org/wiki/Finney_County,_Kansas) FEWCalc is developed and tested using data from the southern High Plains aquifer (HPA), where groundwater has been decreasing at an alarming rate these days. Fortunately, Kansas is well positioned in the nation's wind belt that has access to a robust renewable energy source (Anderson et al., 2012). Economically, Kansas is the second leading state, with about 50% of the electricity sold in the state being met by wind (Wiser and Bolinger, 2018).
 
 FEWCalc is an interactive tool integrating agriculture, energy, and water components; calculating farm income; as well as visualizing results in the NetLogo World.
 
@@ -1970,7 +1970,7 @@ These files are composed of a number of columns which column headers are not wel
   * **Irrig_4 (in):** simulated irrigation from dryland farming using Global Climate Models (GCMs) data. Values in this column are always zero.
   * **Unit explanation:** in is inch, $ is dollar, bu is bushel, and ac is acre.
 
-Unit conversion
+**Unit conversion**
 
   * 1 bushel corn or milo per acre = 62.77 kilograms per hectare
   * 1 bushel wheat or soybean per acre = 67.25 kilograms per hectare
@@ -1996,28 +1996,45 @@ FEWCalc allows users to specify parameters for their own simulation in the NetLo
 
 ## Model function
 
-INTRO ... FEWCalc -> food energy water ...
 
 ### Agriculture
 
+Crop simulations in FEWCalc are from simulated data from DSSAT. Results from DSSAT were based on both historical weather data from 2008 to 2017 and statistically downscaled Global Climate Models (GCMs) data under RCP8.5. Users have to select one of the future processes under **Climate Scenario** section. There are 4 options including _(1) Repeat Historical, (2) Wetter Years, (3) Dryer Years, and (4) Climate Projection._ Climate Projection scenario is the only one option applying GCMs data for the projection.
+
 **IRRIGATED FARMING**
+FEWCalc assumes that water for irrigation is all from groundwater. The model simulates irrigated farmland if the water is available and the aquifer thickness is not less than 20 percent of its initial thickness.
 
 **DRYLAND FARMING**
+During the simulation, groundwater is being consumed to supply water through the system. When the aquifer is depleted more than 80 percent of its initial thickness, the model stops irrigating and then applies dryland farming in the system. 
+
+
+**CROP INSURANCE**
+When crop production declines significantly, farmers would be able to claim insurance. Simulating crop insurance payment requires an understanding of insurance guarantees. Crop insurance guarantees are based on the level of coverage:
+
+  * Corn 75%
+  * Wheat 70%
+  * Soybean 65-70%
+  * Milo 65%
+
+These guarantees are calculated by taking this equation:
+>   * Insurance guarantee ($/ac) = average 10-year production history * level of coverage * base price
+
+Contact: Wade Heger KU (wheger@ku.edu), Allan Andales CSU (Allan.Andales@colostate.edu), and Garvey Smith CSU (Garvey.Smith@colostate.edu)
 
 ### Energy
 
+This recent version of FEWCalc assumes that installation cost spreads over 30 years. Users can define the number of solar panels and wind turbines in the interface under **Energy** section. A default wind turbine power is set at 2 megawatts.
 
-EQUATIONS:
+_EQUATIONS:_
 
-  * Solar production (MWh) = number of solar panels * power * average peak sun hours
+>  * Solar production (MWh) = number of solar panels * power * average peak sun hours
   * Wind production (MWh) = number of wind turbine * power * capacity factor
   * Solar cost ($) = number of solar panels * power * $3050/kW
   * Wind cost ($) = number of wind turbines * [($2,000,000 / 30 years) + $60,000]
   * Solar sell ($) = solar production * $38/MWh
   * Wind sell ($) = wind production * $38/MWh
 
-Installation cost is $1000/kW. Hence, a 2-MW wind turbine costs $2,000,000 for installation (operate over 30 years).
-Operations and maintenance costs are about 3% of the installation cost, accounting for $60,000.
+Installation cost is $1000/kW. Hence, a 2-MW wind turbine costs $2,000,000 for installation (operate over 30 years). Operations and maintenance costs are about 3% of the installation cost, accounting for $60,000.
 
 Contact: Bob Johnson (bobjohnson@centurylink.net), Earnie Lehman (earnielehman@gmail.com), and Hongyu Wu (hongyuwu@ksu.edu)
 
@@ -2025,38 +2042,43 @@ Contact: Bob Johnson (bobjohnson@centurylink.net), Earnie Lehman (earnielehman@g
 
 **GROUNDWATER**
 
-  * Groundwater depletion
-  * Water-level change versus water use
+  * **Water-level change versus water use:**
+[Whittemore et al (2016)](https://doi.org/10.1080/02626667.2014.959958) assessed the main drivers of water-level changes in the High Plain aquifer. They computed linear regression equations for correlation of mean annual water-level changes with reported water use during 1996-2012. They also evaluated the predicted response of the HPA and concluded that (1) water pumped for irrigation is the major driver of water-level changes. Besides, (2) a pumping reduction of 22% would stabilize the water level, and this could help extend the usable lifetime of the aquifer.
+  * **Groundwater depletion:** 
+FEWCalc employs a statistical method to determine the specific relationship between water-level change and water use for agriculture. A linear regression equation below was calculated based on historical data from 2008 to 2017 in Finney County, Kansas.
 
+> Water-level change (ft) = [-8.6628 * water use (ft)] + 8.4722
 
-**FUTURE WORK: SURFACE WATER**
+**FUTURE WORK:** SURFACE WATER
 
   * Surface water contamination
   * Treatment processes
 
+Contact: Blake B. Wilson KGS (bwilson@kgs.ku.edu)
+
+### Output displays
+
+
 ## Start the simulation
   1. Set model options (see "Initialize parameters")
   2. Click **Setup**
-  3. Click **Go** to run the entire simulation or click **Go once** to run 1 year at a time
-
-## PICTURE CODE
-
-![Estimated Usable Lifetime](file:HPA_Lifetime.jpg)
-![Wind Map](file:Wind_Map.jpg)
-
-## CREDITS AND REFERENCES
-
-[1] [Anderson et al., 2012](https://www.renewableenergylawinsider.com/wp-content/uploads/sites/165/2012/11/Kansas-Wind-Report.pdf)
-[2] [U.S. DOE, 2018](https://www.energy.gov/sites/prod/files/2019/08/f65/2018%20Wind%20Technologies%20Market%20Report%20FINAL.pdf)
+  3. Click **Go** to run the entire simulation or click **Go once** to advance the simulation one time step.
+## Pictures
 
 
-### Data Sources
 
-#### Agriculture
+## References
 
-#### Energy
+Anderson, A.C., Gibson, B., White, S.W., & Hagedorn, L. (2012). The Economic Benefis of Kansas Wind Energy. Retrieved from https://www.renewableenergylawinsider.com/wp-content/uploads/sites/165/2012/11/Kansas-Wind-Report.pdf
 
-#### Water
+Jones, J.W, Hoogenboom, G., Porter, C., Boote, K., Batchelor, W., Hunt, L., … Ritchie, J. (2003). The DSSAT cropping system model. European Journal of Agronomy, 18(3–4), 235–265. doi:10.1016/S1161-0301(02)00107-7.
+
+Whittemore, D.O., Butler, J.J., & Wilson, B.B. (2016). Assessing the major drivers of water-level declines: new insights into the future of heavily stressed aquifers. 
+Hydrological Sciences Journal, 61(1), 134-145. doi:10.1080/02626667.2014.959958.
+
+Wilensky, U. (1999). NetLogo. http://ccl.northwestern.edu/netlogo. Center for Connected Learning and Computer-Based Modeling, Northwestern University. Evanston, IL.
+
+Wiser, R., & Bolinger, M. (2019). 2018 Wind Technologies Market Report. U.S. Department of Energy. Retrieved from https://emp.lbl.gov/sites/default/files/wtmr_final_for_posting_8-9-19.pdf
 @#$#@#$#@
 default
 true
