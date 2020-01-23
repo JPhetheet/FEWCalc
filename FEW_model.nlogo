@@ -1970,6 +1970,11 @@ These files are composed of a number of columns which column headers are not wel
   * **Irrig_4 (in):** simulated irrigation from dryland farming using Global Climate Models (GCMs) data. Values in this column are always zero.
   * **Unit explanation:** in is inch, $ is dollar, bu is bushel, and ac is acre.
 
+Unit conversion
+
+  * 1 bushel corn or milo per acre = 62.77 kilograms per hectare
+  * 1 bushel wheat or soybean per acre = 67.25 kilograms per hectare
+
 ### Initialize parameters
 
 FEWCalc allows users to specify parameters for their own simulation in the NetLogo's interface. It is designed to define those numbers easily by using input box, slider, and chooser. Each parameter is described below.
@@ -1989,7 +1994,50 @@ FEWCalc allows users to specify parameters for their own simulation in the NetLo
     * Dryer Years - a future that is drier than historical period.
     * Climate Projection - a future involved climate change.
 
-## Rules
+## Model function
+
+INTRO ... FEWCalc -> food energy water ...
+
+### Agriculture
+
+**IRRIGATED FARMING**
+
+**DRYLAND FARMING**
+
+### Energy
+
+
+EQUATIONS:
+
+  * Solar production (MWh) = number of solar panels * power * average peak sun hours
+  * Wind production (MWh) = number of wind turbine * power * capacity factor
+  * Solar cost ($) = number of solar panels * power * $3050/kW
+  * Wind cost ($) = number of wind turbines * [($2,000,000 / 30 years) + $60,000]
+  * Solar sell ($) = solar production * $38/MWh
+  * Wind sell ($) = wind production * $38/MWh
+
+Installation cost is $1000/kW. Hence, a 2-MW wind turbine costs $2,000,000 for installation (operate over 30 years).
+Operations and maintenance costs are about 3% of the installation cost, accounting for $60,000.
+
+Contact: Bob Johnson (bobjohnson@centurylink.net), Earnie Lehman (earnielehman@gmail.com), and Hongyu Wu (hongyuwu@ksu.edu)
+
+### Water
+
+**GROUNDWATER**
+
+  * Groundwater depletion
+  * Water-level change versus water use
+
+
+**FUTURE WORK: SURFACE WATER**
+
+  * Surface water contamination
+  * Treatment processes
+
+## Start the simulation
+  1. Set model options (see "Initialize parameters")
+  2. Click **Setup**
+  3. Click **Go** to run the entire simulation or click **Go once** to run 1 year at a time
 
 ## PICTURE CODE
 
