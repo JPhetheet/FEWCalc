@@ -231,8 +231,8 @@ end
 
 to import-data                                                                                      ;Create a number of lists to store values from csv files
   set precip_raw []                                                                                 ;A list for precipitation data
-  set corn-data []                                                                                  ;All crop data including head of the table
-  set corn-sum []                                                                                   ;All crop data excluding head of the table
+  set corn-data []                                                                                  ;All crop data including headings of the table
+  set corn-sum []                                                                                   ;All crop data excluding headings of the table
   set corn-price []                                                                                 ;Historical crop price
   set corn-yield_1 []                                                                               ;Yield_1 means simulated yield from historical data
   set corn-irrig_1 []                                                                               ;Irrig_1 means simulated irrigation from historical data
@@ -286,7 +286,7 @@ to import-data                                                                  
 
   let m 1                                                                                           ;Set a temporary variable
   while [m < 11] [                                                                                  ;10 loops for 10-year data
-    foreach corn-data [x -> set corn-sum lput item m x corn-sum]                                    ;Get rid of head of the table (starting from item 1 instead of item 0)
+    foreach corn-data [x -> set corn-sum lput item m x corn-sum]                                    ;Get rid of headings of the table (starting from item 1 instead of item 0)
       foreach corn-sum [y -> set precip_raw lput item 1 y precip_raw]                               ;Item 1 of a csv file is precipitation
       foreach corn-sum [y -> set corn-price lput item 2 y corn-price]                               ;Item 2 of a csv file is historical crop price
       foreach corn-sum [y -> set corn-yield_1 lput item 3 y corn-yield_1]                           ;Item 3 of a csv file is yield_1 (yield_1 see "import-data" for more detail)
@@ -1521,9 +1521,9 @@ HORIZONTAL
 TEXTBOX
 71
 237
-204
-255
-1 set = 1000 panels
+213
+265
+1 set = 1000 solar panels
 11
 0.0
 1
@@ -1937,41 +1937,70 @@ Note: water declines if water use > 0.978 ft
 1
 
 @#$#@#$#@
-## WHAT IS IT?
+# FEWCalc
+**FEWCalc** is the **Food-Energy-Water Calculator** assembled by Jirapat Phetheet and Professor Mary C. Hill from Department of Geology, the University of Kansas. 
+
+The calculation is divided into two parts. The first part is crop calculation using a crop model called Decision Support System for Agrotechnology Transfer (DSSAT) which was developed by [Jones et al., 2003](https://doi.org/10.1016/S1161-0301(02)00107-7) from the University of Florida. The other is the **FEWCalc** conducted using NetLogo agent-based modeling software by [Uri Wilensky, 1999](https://ccl.northwestern.edu/netlogo). 
+
+The location considered is the area around Garden City in [Finney County, Kansas.](https://en.wikipedia.org/wiki/Finney_County,_Kansas) FEWCalc is developed and tested using data from the southern High Plains aquifer (HPA), where groundwater has been decreasing at an alarming rate these days. Fortunately, Kansas is well positioned in the nation's wind belt that has access to a robust renewable energy source<sup> 1</sup>. Economically, Kansas is the second leading state, with about 50% of the electricity sold in the state being met by wind<sup> 2</sup> .
+
+FEWCalc is an interactive tool integrating agriculture, energy, and water components; calculating farm income; as well as visualizing results in the NetLogo World.
+
+## Load input data and initialize parameters
+### Load input data
+There are four input files in comma-separated values (.csv) format under "FEWCalc" folder. Input values (e.g., precipitation and crop price) were from historical data between 2008 and 2017. Besides, they were calculated from DSSAT (e.g., yield and irrigation) using the same dataset. The input files listed below are separated into four major crop types in Kansas which are corn, wheat, soybean, and milo (sorghum).
+
+  * _**1_Corn_inputs.csv**_
+  * _**2_Wheat_inputs.csv**_
+  * _**3_Soybean_inputs.csv**_
+  * _**4_Milo_inputs.csv**_
+
+These files are composed of a number of columns which column headers are not well-defined. Here is a detailed explanation of those values.
+
+  * **Year:** simulation year.
+  * **Precip (in):** historical precipitation.
+  * **Price ($/bu):** historical crop price.
+  * **Yield_1 (bu/ac):** simulated yield from irrigated farming using historical data.
+  * **Irrig_1 (in):** simulated irrigation from irrigated farming using historical data.
+  * **Yield_2 (bu/ac):** simulated yield from dryland farming using historical data.
+  * **Irrig_2 (in):** simulated irrigation from dryland farming using historical data. Values in this column are always zero.
+  * **Yield_3 (bu/ac):** simulated yield from irrigated farming using Global Climate Models (GCMs) data.
+  * **Irrig_3 (in):** simulated irrigation from irrigated farming using Global Climate Models (GCMs) data.
+  * **Yield_4 (bu/ac):** simulated yield from dryland farming using Global Climate Models (GCMs) data.
+  * **Irrig_4 (in):** simulated irrigation from dryland farming using Global Climate Models (GCMs) data. Values in this column are always zero.
+  * **Unit explanation:** in is inch, $ is dollar, bu is bushel, and ac is acre.
+
+### Initialize parameters
+
+FEWCalc allows users to specify parameters for their own simulation in the NetLogo's interface. It is designed to define those numbers easily by using input box, slider, and chooser. Each parameter is described below.
+
+  * **Input-years:** a period of simulation.
+  * **Aquifer-thickness:** a thickness of aquifer in foot unit.
+  * **Corn-area:** an area of corn in acre unit.
+  * **Wheat-area:** an area of wheat in acre unit.
+  * **Soybean-area:** an area of soybean in acre unit.
+  * **Milo-area:** an area of milo in acre unit.
+  * **#Solar_panel_sets:** a number of solar panel set (each set has 1000 solar panels).
+  * **Panel_power:** power of solar panel (a default value is 250 watts).
+  * **#Wind_turbines:** a number of wind turbines.
+  * **Future_Process:** a drop-down menu of future process. Future process will be activated automatically after 10-year simulation using historical data from 2008 to 2017.
+    * Repeat Historical - 10-year DSSAT results are repeated consecutively.
+    * Wetter Years - a future that is wetter than historical period.
+    * Dryer Years - a future that is drier than historical period.
+    * Climate Projection - a future involved climate change.
+
+## Rules
+
+## PICTURE CODE
 
 ![Estimated Usable Lifetime](file:HPA_Lifetime.jpg)
-
 ![Wind Map](file:Wind_Map.jpg)
 
-## HOW IT WORKS
-
-(what rules the agents use to create the overall behavior of the model)
-
-## HOW TO USE IT
-
-(how to use the model, including a description of each of the items in the Interface tab)
-
-## THINGS TO NOTICE
-
-(suggested things for the user to notice while running the model)
-
-## THINGS TO TRY
-
-(suggested things for the user to try to do (move sliders, switches, etc.) with the model)
-
-## EXTENDING THE MODEL
-
-(suggested things to add or change in the Code tab to make the model more complicated, detailed, accurate, etc.)
-
-## NETLOGO FEATURES
-
-(interesting or unusual features of NetLogo that the model uses, particularly in the Code tab; or where workarounds were needed for missing features)
-
-## RELATED MODELS
-
-(models in the NetLogo Models Library and elsewhere which are of related interest)
-
 ## CREDITS AND REFERENCES
+
+[1] [Anderson et al., 2012](https://www.renewableenergylawinsider.com/wp-content/uploads/sites/165/2012/11/Kansas-Wind-Report.pdf)
+[2] [U.S. DOE, 2018](https://www.energy.gov/sites/prod/files/2019/08/f65/2018%20Wind%20Technologies%20Market%20Report%20FINAL.pdf)
+
 
 ### Data Sources
 
