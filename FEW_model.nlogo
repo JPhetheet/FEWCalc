@@ -1040,7 +1040,7 @@ to energy-calculation
   ;assuming the cost spreads over 30 years with no interest
   set #Solar_panels (#solar_panel_sets * 1000)
   set solar-production (#Solar_Panels * Panel_power * 5 * 365 / 1000000)                            ;MWh = power(Watt) * 5hrs/day * 365days/year / 1000000
-  set wind-production (#wind_turbines * turbine_size * 0.425 * 24 * 365)                            ;MWh = power(MW) * Kansas_wind_capacity * 24hrs/day * 365days/year, capacity 42.5% (Berkeley Lab)
+  set wind-production (#wind_turbines * turbine_size * 0.421 * 24 * 365)                            ;MWh = power(MW) * Kansas_wind_capacity * 24hrs/day * 365days/year, capacity 42.1% (Berkeley Lab)
   set solar-cost (#Solar_Panels * (Panel_power / 1000) * 3050 / 30)                                 ;Solar cost = #Solar_Panels * Panel_power * $3050/kW
   set solar-sell (solar-production * 38)                                                            ;Sell = MWh * $38/MWh (Bob and Mary)
                                                                                                     ;Wholesale < Coop $65 < Retail, , (Wholesale was $22-24/MWh, Retail price is $105/MWh)
