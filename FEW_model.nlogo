@@ -539,6 +539,7 @@ to food-calculation_1-1                                                         
   set soybean-tot-income (item n soybean-yield_1 * item n soybean-price * soybean-area)
   set milo-tot-income (item n milo-yield_1 * item n milo-price * milo-area)
 
+
   set corn-tot-yield (item n corn-yield_1)
   set wheat-tot-yield (item n wheat-yield_1)
   set soybean-tot-yield (item n soybean-yield_1)
@@ -629,10 +630,15 @@ to food-calculation_2                                                           
   set soybean-guarantee ((soybean-mean-yield * soybean-coverage * soybean-base-price) * soybean-area)
   set milo-guarantee ((milo-mean-yield * milo-coverage * milo-base-price) * milo-area)
 
-  set corn-tot-income (item (item n yrs-seq) corn-yield_1 * item (item n yrs-seq) corn-price * corn-area)               ;Calculate farm gross income
-  set wheat-tot-income (item (item n yrs-seq) wheat-yield_1 * item (item n yrs-seq) wheat-price * wheat-area)
-  set soybean-tot-income (item (item n yrs-seq) soybean-yield_1 * item (item n yrs-seq) soybean-price * soybean-area)
-  set milo-tot-income (item (item n yrs-seq) milo-yield_1 * item (item n yrs-seq) milo-price * milo-area)
+;  set corn-tot-income (item (item n yrs-seq) corn-yield_1 * item (item n yrs-seq) corn-price * corn-area)               ;Calculate farm gross income
+;  set wheat-tot-income (item (item n yrs-seq) wheat-yield_1 * item (item n yrs-seq) wheat-price * wheat-area)
+;  set soybean-tot-income (item (item n yrs-seq) soybean-yield_1 * item (item n yrs-seq) soybean-price * soybean-area)
+;  set milo-tot-income (item (item n yrs-seq) milo-yield_1 * item (item n yrs-seq) milo-price * milo-area)
+
+  set corn-tot-income (item (item n yrs-seq) corn-yield_1 * one-of corn-price * corn-area)               ;Calculate farm gross income
+  set wheat-tot-income (item (item n yrs-seq) wheat-yield_1 * one-of wheat-price * wheat-area)
+  set soybean-tot-income (item (item n yrs-seq) soybean-yield_1 * one-of soybean-price * soybean-area)
+  set milo-tot-income (item (item n yrs-seq) milo-yield_1 * one-of milo-price * milo-area)
 
   calculate-expenses_yield_1                                                                        ;Get farm expenses -- Link to "calculate-expenses_yield_1"
   calculate-net-income                                                                              ;Calculate farm net income
@@ -685,10 +691,15 @@ to food-calculation_3                                                           
   set soybean-guarantee ((soybean-mean-yield * soybean-coverage * soybean-base-price) * soybean-area)
   set milo-guarantee ((milo-mean-yield * milo-coverage * milo-base-price) * milo-area)
 
-  set corn-tot-income (item (item n yrs-seq) corn-yield_1 * item (item n yrs-seq) corn-price * corn-area)              ;Calculate farm gross income
-  set wheat-tot-income (item (item n yrs-seq) wheat-yield_1 * item (item n yrs-seq) wheat-price * wheat-area)
-  set soybean-tot-income (item (item n yrs-seq) soybean-yield_1 * item (item n yrs-seq) soybean-price * soybean-area)
-  set milo-tot-income (item (item n yrs-seq) milo-yield_1 * item (item n yrs-seq) milo-price * milo-area)
+;  set corn-tot-income (item (item n yrs-seq) corn-yield_1 * item (item n yrs-seq) corn-price * corn-area)              ;Calculate farm gross income
+;  set wheat-tot-income (item (item n yrs-seq) wheat-yield_1 * item (item n yrs-seq) wheat-price * wheat-area)
+;  set soybean-tot-income (item (item n yrs-seq) soybean-yield_1 * item (item n yrs-seq) soybean-price * soybean-area)
+;  set milo-tot-income (item (item n yrs-seq) milo-yield_1 * item (item n yrs-seq) milo-price * milo-area)
+
+  set corn-tot-income (item (item n yrs-seq) corn-yield_1 * one-of corn-price * corn-area)          ;Calculate farm gross income
+  set wheat-tot-income (item (item n yrs-seq) wheat-yield_1 * one-of wheat-price * wheat-area)
+  set soybean-tot-income (item (item n yrs-seq) soybean-yield_1 * one-of soybean-price * soybean-area)
+  set milo-tot-income (item (item n yrs-seq) milo-yield_1 * one-of milo-price * milo-area)
 
   calculate-expenses_yield_1                                                                        ;Get farm expenses -- Link to "calculate-expenses_yield_1"
   calculate-net-income                                                                              ;Calculate farm net income
@@ -855,10 +866,15 @@ to dryland-farming_2
   set soybean-guarantee ((soybean-mean-yield * soybean-coverage * soybean-base-price) * soybean-area)
   set milo-guarantee ((milo-mean-yield * milo-coverage * milo-base-price) * milo-area)
 
-  set corn-tot-income (item (item n yrs-seq) corn-yield_2 * item (item n yrs-seq) corn-price * corn-area)               ;Calculate farm gross income
-  set wheat-tot-income (item (item n yrs-seq) wheat-yield_2 * item (item n yrs-seq) wheat-price * wheat-area)
-  set soybean-tot-income (item (item n yrs-seq) soybean-yield_2 * item (item n yrs-seq) soybean-price * soybean-area)
-  set milo-tot-income (item (item n yrs-seq) milo-yield_2 * item (item n yrs-seq) milo-price * milo-area)
+;  set corn-tot-income (item (item n yrs-seq) corn-yield_2 * item (item n yrs-seq) corn-price * corn-area)               ;Calculate farm gross income
+;  set wheat-tot-income (item (item n yrs-seq) wheat-yield_2 * item (item n yrs-seq) wheat-price * wheat-area)
+;  set soybean-tot-income (item (item n yrs-seq) soybean-yield_2 * item (item n yrs-seq) soybean-price * soybean-area)
+;  set milo-tot-income (item (item n yrs-seq) milo-yield_2 * item (item n yrs-seq) milo-price * milo-area)
+
+  set corn-tot-income (item (item n yrs-seq) corn-yield_2 * one-of corn-price * corn-area)          ;Calculate farm gross income
+  set wheat-tot-income (item (item n yrs-seq) wheat-yield_2 * one-of wheat-price * wheat-area)
+  set soybean-tot-income (item (item n yrs-seq) soybean-yield_2 * one-of soybean-price * soybean-area)
+  set milo-tot-income (item (item n yrs-seq) milo-yield_2 * one-of milo-price * milo-area)
 
   calculate-expenses_yield_2                                                                        ;Get farm expenses -- Link to "calculate-expenses_yield_2"
   calculate-net-income                                                                              ;Calculate farm net income
@@ -917,10 +933,15 @@ to dryland-farming_3
   set soybean-guarantee ((soybean-mean-yield * soybean-coverage * soybean-base-price) * soybean-area)
   set milo-guarantee ((milo-mean-yield * milo-coverage * milo-base-price) * milo-area)
 
-  set corn-tot-income (item (item n yrs-seq) corn-yield_2 * item (item n yrs-seq) corn-price * corn-area)                 ;Calculate farm gross income
-  set wheat-tot-income (item (item n yrs-seq) wheat-yield_2 * item (item n yrs-seq) wheat-price * wheat-area)
-  set soybean-tot-income (item (item n yrs-seq) soybean-yield_2 * item (item n yrs-seq) soybean-price * soybean-area)
-  set milo-tot-income (item (item n yrs-seq) milo-yield_2 * item (item n yrs-seq) milo-price * milo-area)
+;  set corn-tot-income (item (item n yrs-seq) corn-yield_2 * item (item n yrs-seq) corn-price * corn-area)                 ;Calculate farm gross income
+;  set wheat-tot-income (item (item n yrs-seq) wheat-yield_2 * item (item n yrs-seq) wheat-price * wheat-area)
+;  set soybean-tot-income (item (item n yrs-seq) soybean-yield_2 * item (item n yrs-seq) soybean-price * soybean-area)
+;  set milo-tot-income (item (item n yrs-seq) milo-yield_2 * item (item n yrs-seq) milo-price * milo-area)
+
+  set corn-tot-income (item (item n yrs-seq) corn-yield_2 * one-of corn-price * corn-area)                 ;Calculate farm gross income
+  set wheat-tot-income (item (item n yrs-seq) wheat-yield_2 * one-of wheat-price * wheat-area)
+  set soybean-tot-income (item (item n yrs-seq) soybean-yield_2 * one-of soybean-price * soybean-area)
+  set milo-tot-income (item (item n yrs-seq) milo-yield_2 * one-of milo-price * milo-area)
 
   calculate-expenses_yield_2                                                                        ;Get farm expenses -- Link to "calculate-expenses_yield_2"
   calculate-net-income                                                                              ;Calculate farm net income
