@@ -1066,6 +1066,8 @@ to gw-depletion_1
   set water-use-feet (((corn-use-in * corn-area) + (wheat-use-in * wheat-area) + (soybean-use-in * soybean-area) + (milo-use-in * milo-area)) / (12 * total-area))
   set gw-change ((-8.6628 * water-use-feet) + 8.4722)                                               ;Calculate water-level change using a regression equation (Whittemore et al., 2016)
 
+  print (word "Year" (ticks + 2008) ": " water-use-feet)
+
   set patch-change (gw-change * 170 / aquifer-thickness)                                            ;Convert water-level change to patch change
 
   ifelse patch-change < 0                                                                           ;Is water level decreasing?
