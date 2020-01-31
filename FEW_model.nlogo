@@ -1323,7 +1323,7 @@ INPUTBOX
 80
 194
 Corn-area
-125.0
+0.0
 1
 0
 Number
@@ -1457,10 +1457,10 @@ true
 true
 "set-plot-background-color 88" ""
 PENS
-"Corn" 1.0 0 -4079321 true "" "plot corn-use-in"
-"Wheat" 1.0 0 -3844592 true "" "plot wheat-use-in"
-"Soybean" 1.0 0 -13210332 true "" "plot soybean-use-in"
-"Milo" 1.0 0 -12440034 true "" "plot milo-use-in"
+"Corn" 1.0 0 -4079321 true "" "ifelse corn-area = 0 \n  [set corn-use-in 0\n   plot corn-use-in]\n  [plot corn-use-in]"
+"Wheat" 1.0 0 -3844592 true "" "ifelse wheat-area = 0 \n  [set wheat-use-in 0\n   plot wheat-use-in]\n  [plot wheat-use-in]"
+"Soybean" 1.0 0 -13210332 true "" "ifelse soybean-area = 0 \n  [set soybean-use-in 0\n   plot soybean-use-in]\n  [plot soybean-use-in]"
+"Milo" 1.0 0 -12440034 true "" "ifelse milo-area = 0 \n  [set milo-use-in 0\n   plot milo-use-in]\n  [plot milo-use-in]"
 
 PLOT
 835
@@ -1478,10 +1478,10 @@ true
 true
 "set-plot-background-color 58" ""
 PENS
-"Corn" 1.0 0 -4079321 true "" "plot corn-tot-yield"
-"Wheat" 1.0 0 -3844592 true "" "plot wheat-tot-yield"
-"Soybean" 1.0 0 -13210332 true "" "plot soybean-tot-yield"
-"Milo" 1.0 0 -12440034 true "" "plot milo-tot-yield"
+"Corn" 1.0 0 -4079321 true "" "ifelse corn-area = 0 \n  [set corn-tot-yield 0 \n   plot corn-tot-yield] \n  [plot corn-tot-yield]"
+"Wheat" 1.0 0 -3844592 true "" "ifelse wheat-area = 0 \n  [set wheat-tot-yield 0 \n   plot wheat-tot-yield] \n  [plot wheat-tot-yield]"
+"Soybean" 1.0 0 -13210332 true "" "ifelse soybean-area = 0 \n  [set soybean-tot-yield 0\n   plot soybean-tot-yield] \n  [plot soybean-tot-yield]"
+"Milo" 1.0 0 -12440034 true "" "ifelse milo-area = 0 \n  [set milo-tot-yield 0\n   plot milo-tot-yield]\n  [plot milo-tot-yield]"
 
 BUTTON
 161
