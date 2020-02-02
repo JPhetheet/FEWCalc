@@ -479,7 +479,7 @@ if Future_Process = "Repeat Historical"                                         
        ]
     ]
 
-  if Future_Process = "Wetter Years"                                                                ;Wetter years scenario
+  if Future_Process = "Wetter Future"                                                               ;Wetter years scenario
     [ifelse ticks <= 9                                                                              ;First 10 year data based on history
        [food-calculation_1-1
         energy-calculation
@@ -495,7 +495,7 @@ if Future_Process = "Repeat Historical"                                         
        ]
     ]
 
-  if Future_Process = "Dryer Years"                                                                 ;Dryer years scenario
+  if Future_Process = "Dryer Future"                                                                 ;Dryer years scenario
     [ifelse ticks <= 9                                                                              ;First 10 year data based on history
        [food-calculation_1-1
         energy-calculation
@@ -511,7 +511,7 @@ if Future_Process = "Repeat Historical"                                         
        ]
     ]
 
-  if Future_Process = "Climate Projection"                                                          ;Climate projection scenario
+  if Future_Process = "Impose T and P Changes"                                                      ;Climate projection scenario
     [ifelse ticks <= 9                                                                              ;First 10 year data based on history
        [food-calculation_1-1
         energy-calculation
@@ -1066,7 +1066,7 @@ to gw-depletion_1
   set water-use-feet (((corn-use-in * corn-area) + (wheat-use-in * wheat-area) + (soybean-use-in * soybean-area) + (milo-use-in * milo-area)) / (12 * total-area))
   set gw-change ((-8.6628 * water-use-feet) + 8.4722)                                               ;Calculate water-level change using a regression equation (Whittemore et al., 2016)
 
-  print (word "Year" (ticks + 2008) ": " water-use-feet)
+  ;print (word "Year" (ticks + 2008) ": " water-use-feet)
 
   set patch-change (gw-change * 170 / aquifer-thickness)                                            ;Convert water-level change to patch change
 
@@ -1323,7 +1323,7 @@ INPUTBOX
 80
 194
 Corn-area
-0.0
+125.0
 1
 0
 Number
@@ -1383,9 +1383,9 @@ Agriculture --------------------------------\n
 1
 
 PLOT
-1122
+1118
 176
-1406
+1402
 296
 Ag Net Income
 Years
@@ -1442,9 +1442,9 @@ Energy ------------------------------------
 1
 
 PLOT
-1122
+1118
 34
-1406
+1402
 154
 Crop Groundwater Irrigation
 Years
@@ -1463,9 +1463,9 @@ PENS
 "Milo" 1.0 0 -12440034 true "" "ifelse milo-area = 0 \n  [set milo-use-in 0\n   plot milo-use-in]\n  [plot milo-use-in]"
 
 PLOT
-835
+831
 176
-1119
+1115
 296
 Crop Production
 Years
@@ -1702,9 +1702,9 @@ Circles show proportional crop areas (acres)
 1
 
 PLOT
-835
+831
 319
-1119
+1115
 439
 Farm Energy Production
 Years
@@ -1753,11 +1753,11 @@ Climate Scenario -----------------------------------
 CHOOSER
 69
 466
-240
+262
 511
 Future_Process
 Future_Process
-"Repeat Historical" "Wetter Years" "Dryer Years" "Climate Projection"
+"Repeat Historical" "Wetter Future" "Dryer Future" "Impose T and P Change"
 0
 
 TEXTBOX
@@ -1771,9 +1771,9 @@ TEXTBOX
 1
 
 PLOT
-835
+831
 34
-1119
+1115
 154
 Total Net Income
 Years
@@ -1812,9 +1812,9 @@ TEXTBOX
 1
 
 PLOT
-1122
+1118
 319
-1406
+1402
 439
 Energy Income
 Years
@@ -1831,9 +1831,9 @@ PENS
 "Wind" 1.0 0 -14070903 true "" "ifelse ticks = 0 [set wind-net-income 0\nplot (wind-net-income)]\n[plot (wind-net-income)]"
 
 TEXTBOX
-836
+832
 156
-1413
+1409
 179
 Agriculture ------------------------------------------------------
 15
@@ -1841,9 +1841,9 @@ Agriculture ------------------------------------------------------
 1
 
 TEXTBOX
-834
+830
 298
-1413
+1409
 317
 Energy ----------------------------------------------------------
 15
@@ -1851,9 +1851,9 @@ Energy ----------------------------------------------------------
 1
 
 TEXTBOX
-1121
+1117
 13
-1403
+1399
 33
 Water --------------------------
 15
@@ -1861,12 +1861,12 @@ Water --------------------------
 1
 
 TEXTBOX
-835
-443
-1430
-478
-*First 10 years use historical data from 2008 to 2017 and subsequent years apply Future Process.
-12
+357
+494
+850
+529
+*First 10 years use historical data from 2008 to 2017, subsequent years apply Future Process.
+10
 5.0
 1
 
@@ -1881,10 +1881,10 @@ Water is assumed to come from groundwater pumping. Effects on water quality are 
 1
 
 MONITOR
-931
-607
-1010
-652
+933
+716
+1012
+761
 NIL
 current-elev
 3
@@ -1892,10 +1892,10 @@ current-elev
 11
 
 MONITOR
-1089
-607
-1179
-652
+1091
+716
+1181
+761
 NIL
 patch-change
 3
@@ -1903,10 +1903,10 @@ patch-change
 11
 
 MONITOR
-1013
-607
-1086
-652
+1015
+716
+1088
+761
 NIL
 gw-change
 3
@@ -1914,10 +1914,10 @@ gw-change
 11
 
 MONITOR
-835
-607
-928
-652
+837
+716
+930
+761
 NIL
 water-use-feet
 3
@@ -1925,20 +1925,20 @@ water-use-feet
 11
 
 TEXTBOX
-836
-461
-1298
-479
+358
+507
+824
+525
 **Year in these plots represents a sequential year, i.e., year 1 is year 2008.
-12
+10
 5.0
 1
 
 PLOT
-835
-483
-1406
-603
+831
+444
+1402
+564
 Water-level Change
 Years
 Feet
@@ -1954,10 +1954,10 @@ PENS
 "Zero" 1.0 2 -8053223 true "" "plot zero-line"
 
 TEXTBOX
-1065
-503
-1323
-521
+1061
+464
+1319
+482
 Note: water declines if water use > 0.978 ft
 12
 104.0
