@@ -1753,12 +1753,12 @@ Climate Scenario -----------------------------------
 CHOOSER
 69
 466
-262
+269
 511
 Future_Process
 Future_Process
-"Repeat Historical" "Wetter Future" "Dryer Future" "Impose T and P Change"
-0
+"Repeat Historical" "Wetter Future" "Dryer Future" "Impose T and P Changes"
+3
 
 TEXTBOX
 71
