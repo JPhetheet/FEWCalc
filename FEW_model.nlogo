@@ -20,7 +20,8 @@ globals [
   corn-mean-yield wheat-mean-yield soybean-mean-yield milo-mean-yield
   corn-tot-yield wheat-tot-yield soybean-tot-yield milo-tot-yield
   corn-use-in wheat-use-in soybean-use-in milo-use-in water-use-feet gw-change
-  corn-N-app wheat-N-app soybean-N-app milo-N-app
+  corn-N-app wheat-N-app soybean-N-app milo-N-app N-residue
+  corn-N-use wheat-N-use soybean-N-use milo-N-use
   corn-N-use_1 wheat-N-use_1 soybean-N-use_1 milo-N-use_1
   corn-N-use_2 wheat-N-use_2 soybean-N-use_2 milo-N-use_2
   corn-N-use_3 wheat-N-use_3 soybean-N-use_3 milo-N-use_3
@@ -530,64 +531,112 @@ end
 to future_processes
 if Future_Process = "Repeat Historical"                                                             ;Repeat historical scenario
    [ifelse ticks <= 9                                                                               ;First 10 year data based on history
-       [food-calculation_1-1
+       [set corn-N-use corn-N-use_1                                                                 ;Classify nitrogen uses into different scenario
+        set wheat-N-use wheat-N-use_1                                                               ;Classify nitrogen uses into different scenario
+        set soybean-N-use soybean-N-use_1                                                           ;Classify nitrogen uses into different scenario
+        set milo-N-use milo-N-use_1                                                                 ;Classify nitrogen uses into different scenario
+        food-calculation_1-1
         energy-calculation
         gw-depletion_1]
 
        [ifelse current-elev > -66                                                                   ;Is aquifer thickness greater that 20% of its initial thickness?
-         [food-calculation_1-2                                                                      ;Irrigated farming
+         [set corn-N-use corn-N-use_1
+          set wheat-N-use wheat-N-use_1
+          set soybean-N-use soybean-N-use_1
+          set milo-N-use milo-N-use_1
+          food-calculation_1-2                                                                      ;Irrigated farming
           energy-calculation
           gw-depletion_1]
 
-         [dryland-farming_1                                                                         ;Dryland farming
+         [set corn-N-use corn-N-use_2
+          set wheat-N-use wheat-N-use_2
+          set soybean-N-use soybean-N-use_2
+          set milo-N-use milo-N-use_2
+          dryland-farming_1                                                                         ;Dryland farming
           energy-calculation]
        ]
     ]
 
   if Future_Process = "Wetter Future"                                                               ;Wetter years scenario
     [ifelse ticks <= 9                                                                              ;First 10 year data based on history
-       [food-calculation_1-1
+       [set corn-N-use corn-N-use_1
+        set wheat-N-use wheat-N-use_1
+        set soybean-N-use soybean-N-use_1
+        set milo-N-use milo-N-use_1
+        food-calculation_1-1
         energy-calculation
         gw-depletion_1]
 
        [ifelse current-elev > -66                                                                   ;Is aquifer thickness greater that 20% of its initial thickness?
-          [food-calculation_2                                                                       ;Irrigated farming
+          [set corn-N-use corn-N-use_1
+           set wheat-N-use wheat-N-use_1
+           set soybean-N-use soybean-N-use_1
+           set milo-N-use milo-N-use_1
+           food-calculation_2                                                                       ;Irrigated farming
            energy-calculation
            gw-depletion_2]
 
-          [dryland-farming_2                                                                        ;Dryland farming
+          [set corn-N-use corn-N-use_2
+           set wheat-N-use wheat-N-use_2
+           set soybean-N-use soybean-N-use_2
+           set milo-N-use milo-N-use_2
+           dryland-farming_2                                                                        ;Dryland farming
            energy-calculation]
        ]
     ]
 
   if Future_Process = "Dryer Future"                                                                 ;Dryer years scenario
     [ifelse ticks <= 9                                                                              ;First 10 year data based on history
-       [food-calculation_1-1
+       [set corn-N-use corn-N-use_1
+        set wheat-N-use wheat-N-use_1
+        set soybean-N-use soybean-N-use_1
+        set milo-N-use milo-N-use_1
+        food-calculation_1-1
         energy-calculation
         gw-depletion_1]
 
        [ifelse current-elev > -66                                                                   ;Is aquifer thickness greater that 20% of its initial thickness?
-          [food-calculation_3                                                                       ;Irrigated farming
+          [set corn-N-use corn-N-use_1
+           set wheat-N-use wheat-N-use_1
+           set soybean-N-use soybean-N-use_1
+           set milo-N-use milo-N-use_1
+           food-calculation_3                                                                       ;Irrigated farming
            energy-calculation
            gw-depletion_3]
 
-          [dryland-farming_3                                                                        ;Dryland farming
+          [set corn-N-use corn-N-use_2
+           set wheat-N-use wheat-N-use_2
+           set soybean-N-use soybean-N-use_2
+           set milo-N-use milo-N-use_2
+           dryland-farming_3                                                                        ;Dryland farming
            energy-calculation]
        ]
     ]
 
   if Future_Process = "Impose T and P Changes"                                                      ;Climate projection scenario
     [ifelse ticks <= 9                                                                              ;First 10 year data based on history
-       [food-calculation_1-1
+       [set corn-N-use corn-N-use_3
+        set wheat-N-use wheat-N-use_3
+        set soybean-N-use soybean-N-use_3
+        set milo-N-use milo-N-use_3
+        food-calculation_1-1
         energy-calculation
         gw-depletion_1]
 
        [ifelse current-elev > -66                                                                   ;Is aquifer thickness greater that 20% of its initial thickness?
-          [food-calculation_4                                                                       ;Irrigated farming
+          [set corn-N-use corn-N-use_3
+           set wheat-N-use wheat-N-use_3
+           set soybean-N-use soybean-N-use_3
+           set milo-N-use milo-N-use_3
+           food-calculation_4                                                                       ;Irrigated farming
            energy-calculation
            gw-depletion_4]
 
-          [dryland-farming_4                                                                        ;Dryland farming
+          [set corn-N-use corn-N-use_4
+           set wheat-N-use wheat-N-use_4
+           set soybean-N-use soybean-N-use_4
+           set milo-N-use milo-N-use_4
+           dryland-farming_4                                                                        ;Dryland farming
            energy-calculation]
        ]
     ]
@@ -1235,12 +1284,16 @@ to gw-depletion_4
 end
 
 to contaminant                                                                                      ;Surface water contamination
-  if random 2 = 1 [                                                                                 ;50:50 chance
-    ask n-of 3 river-patches with [pcolor = 87] [set pcolor brown]
-      if any? river-patches with [pcolor = brown][
-        ask one-of river-patches [set pcolor 87]
-      ]
-  ]
+;  if random 2 = 1 [                                                                                 ;50:50 chance
+;    ask n-of 3 river-patches with [pcolor = 87] [set pcolor brown]
+;      if any? river-patches with [pcolor = brown][
+;        ask one-of river-patches [set pcolor 87]
+;      ]
+;  ]
+
+  let k (ticks mod 10)
+  set N-residue ((item (item k yrs-seq) corn-N-app) - (item (item k yrs-seq) corn-N-use) + (item (item k yrs-seq) wheat-N-app) - (item (item k yrs-seq) wheat-N-use) + (item (item k yrs-seq) soybean-N-app) - (item (item k yrs-seq) soybean-N-use) + (item (item k yrs-seq) milo-N-app) - (item (item k yrs-seq) milo-N-use))
+  if N-residue > 0 [print(N-residue)]
 end
 
 to treatment                                                                                        ;Treatment
@@ -1823,7 +1876,7 @@ CHOOSER
 Future_Process
 Future_Process
 "Repeat Historical" "Wetter Future" "Dryer Future" "Impose T and P Changes"
-3
+0
 
 TEXTBOX
 71
