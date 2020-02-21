@@ -20,6 +20,11 @@ globals [
   corn-mean-yield wheat-mean-yield soybean-mean-yield milo-mean-yield
   corn-tot-yield wheat-tot-yield soybean-tot-yield milo-tot-yield
   corn-use-in wheat-use-in soybean-use-in milo-use-in water-use-feet gw-change
+  corn-N-app wheat-N-app soybean-N-app milo-N-app
+  corn-N-use_1 wheat-N-use_1 soybean-N-use_1 milo-N-use_1
+  corn-N-use_2 wheat-N-use_2 soybean-N-use_2 milo-N-use_2
+  corn-N-use_3 wheat-N-use_3 soybean-N-use_3 milo-N-use_3
+  corn-N-use_4 wheat-N-use_4 soybean-N-use_4 milo-N-use_4
   #Solar_panels solar-production wind-production solar-cost solar-sell wind-cost wind-sell solar-net-income wind-net-income energy-net-income %Solar-production %Wind-production
 ]
 
@@ -242,6 +247,11 @@ to import-data                                                                  
   set corn-irrig_3 []                                                                               ;Irrig_3 means simulated irrigation from GCMs data (projection)
   set corn-yield_4 []                                                                               ;Yield_4 means simulated yield from GCMs data + dryland simulation (dryland projection)
   set corn-irrig_4 []                                                                               ;Irrig_4 means simulated irrigation from GCMs data + dryland simulation (dryland projection)
+  set corn-N-app []                                                                                 ;N application
+  set corn-N-use_1 []                                                                               ;N used by corn from historical +  irrigated
+  set corn-N-use_2 []                                                                               ;N used by corn from historical + dryland
+  set corn-N-use_3 []                                                                               ;N used by corn from GCM + irrigated
+  set corn-N-use_4 []                                                                               ;N used by corn from GCM + dryland
 
   set wheat-data []                                                                                 ;See above from corn
   set wheat-sum []
@@ -254,6 +264,11 @@ to import-data                                                                  
   set wheat-irrig_3 []
   set wheat-yield_4 []
   set wheat-irrig_4 []
+  set wheat-N-app []
+  set wheat-N-use_1 []
+  set wheat-N-use_2 []
+  set wheat-N-use_3 []
+  set wheat-N-use_4 []
 
   set soybean-data []                                                                               ;See above from corn
   set soybean-sum []
@@ -266,6 +281,11 @@ to import-data                                                                  
   set soybean-irrig_3 []
   set soybean-yield_4 []
   set soybean-irrig_4 []
+  set soybean-N-app []
+  set soybean-N-use_1 []
+  set soybean-N-use_2 []
+  set soybean-N-use_3 []
+  set soybean-N-use_4 []
 
   set milo-data []                                                                                  ;See above from corn
   set milo-sum []
@@ -278,6 +298,11 @@ to import-data                                                                  
   set milo-irrig_3 []
   set milo-yield_4 []
   set milo-irrig_4 []
+  set milo-N-app []
+  set milo-N-use_1 []
+  set milo-N-use_2 []
+  set milo-N-use_3 []
+  set milo-N-use_4 []
 
   set corn-data lput csv:from-file "1_Corn_inputs.csv" corn-data                                    ;Import all corn values to a corn-data list
   set wheat-data lput csv:from-file "2_Wheat_inputs.csv" wheat-data                                 ;Import all wheat values to a corn-data list
@@ -297,6 +322,11 @@ to import-data                                                                  
       foreach corn-sum [y -> set corn-irrig_3 lput item 8 y corn-irrig_3]                           ;Item 8 of a csv file is irrig_3
       foreach corn-sum [y -> set corn-yield_4 lput item 9 y corn-yield_4]                           ;Item 9 of a csv file is yield_4
       foreach corn-sum [y -> set corn-irrig_4 lput item 10 y corn-irrig_4]                          ;Item 10 of a csv file is irrig_4
+      foreach corn-sum [y -> set corn-N-app lput item 11 y corn-N-app]                              ;Item 11 of a csv file is N-app
+      foreach corn-sum [y -> set corn-N-use_1 lput item 12 y corn-N-use_1]                          ;Item 12 of a csv file is N-use_1
+      foreach corn-sum [y -> set corn-N-use_2 lput item 13 y corn-N-use_2]                          ;Item 12 of a csv file is N-use_2
+      foreach corn-sum [y -> set corn-N-use_3 lput item 14 y corn-N-use_3]                          ;Item 12 of a csv file is N-use_3
+      foreach corn-sum [y -> set corn-N-use_4 lput item 15 y corn-N-use_4]                          ;Item 12 of a csv file is N-use_4
     foreach wheat-data [x -> set wheat-sum lput item m x wheat-sum]                                 ;See above
       foreach wheat-sum [y -> set wheat-price lput item 2 y wheat-price]
       foreach wheat-sum [y -> set wheat-yield_1 lput item 3 y wheat-yield_1]
@@ -307,6 +337,11 @@ to import-data                                                                  
       foreach wheat-sum [y -> set wheat-irrig_3 lput item 8 y wheat-irrig_3]
       foreach wheat-sum [y -> set wheat-yield_4 lput item 9 y wheat-yield_4]
       foreach wheat-sum [y -> set wheat-irrig_4 lput item 10 y wheat-irrig_4]
+      foreach wheat-sum [y -> set wheat-N-app lput item 11 y wheat-N-app]
+      foreach wheat-sum [y -> set wheat-N-use_1 lput item 12 y wheat-N-use_1]
+      foreach wheat-sum [y -> set wheat-N-use_2 lput item 13 y wheat-N-use_2]
+      foreach wheat-sum [y -> set wheat-N-use_3 lput item 14 y wheat-N-use_3]
+      foreach wheat-sum [y -> set wheat-N-use_4 lput item 15 y wheat-N-use_4]
     foreach soybean-data [x -> set soybean-sum lput item m x soybean-sum]                           ;See above
       foreach soybean-sum [y -> set soybean-price lput item 2 y soybean-price]
       foreach soybean-sum [y -> set soybean-yield_1 lput item 3 y soybean-yield_1]
@@ -317,6 +352,11 @@ to import-data                                                                  
       foreach soybean-sum [y -> set soybean-irrig_3 lput item 8 y soybean-irrig_3]
       foreach soybean-sum [y -> set soybean-yield_4 lput item 9 y soybean-yield_4]
       foreach soybean-sum [y -> set soybean-irrig_4 lput item 10 y soybean-irrig_4]
+      foreach soybean-sum [y -> set soybean-N-app lput item 11 y soybean-N-app]
+      foreach soybean-sum [y -> set soybean-N-use_1 lput item 12 y soybean-N-use_1]
+      foreach soybean-sum [y -> set soybean-N-use_2 lput item 13 y soybean-N-use_2]
+      foreach soybean-sum [y -> set soybean-N-use_3 lput item 14 y soybean-N-use_3]
+      foreach soybean-sum [y -> set soybean-N-use_4 lput item 15 y soybean-N-use_4]
     foreach milo-data [x -> set milo-sum lput item m x milo-sum]                                    ;See above
       foreach milo-sum [y -> set milo-price lput item 2 y milo-price]
       foreach milo-sum [y -> set milo-yield_1 lput item 3 y milo-yield_1]
@@ -327,6 +367,11 @@ to import-data                                                                  
       foreach milo-sum [y -> set milo-irrig_3 lput item 8 y milo-irrig_3]
       foreach milo-sum [y -> set milo-yield_4 lput item 9 y milo-yield_4]
       foreach milo-sum [y -> set milo-irrig_4 lput item 10 y milo-irrig_4]
+      foreach milo-sum [y -> set milo-N-app lput item 11 y milo-N-app]
+      foreach milo-sum [y -> set milo-N-use_1 lput item 12 y milo-N-use_1]
+      foreach milo-sum [y -> set milo-N-use_2 lput item 13 y milo-N-use_2]
+      foreach milo-sum [y -> set milo-N-use_3 lput item 14 y milo-N-use_3]
+      foreach milo-sum [y -> set milo-N-use_4 lput item 15 y milo-N-use_4]
 
         if length precip_raw != 10 [set precip_raw []]
 
@@ -339,6 +384,11 @@ to import-data                                                                  
         if length corn-irrig_3 != 10 [set corn-irrig_3 []]
         if length corn-yield_4 != 10 [set corn-yield_4 []]
         if length corn-irrig_4 != 10 [set corn-irrig_4 []]
+        if length corn-N-app != 10 [set corn-N-app []]
+        if length corn-N-use_1 != 10 [set corn-N-use_1 []]
+        if length corn-N-use_2 != 10 [set corn-N-use_2 []]
+        if length corn-N-use_3 != 10 [set corn-N-use_3 []]
+        if length corn-N-use_4 != 10 [set corn-N-use_4 []]
 
         if length wheat-price != 10 [set wheat-price []]
         if length wheat-yield_1 != 10 [set wheat-yield_1 []]
@@ -349,6 +399,11 @@ to import-data                                                                  
         if length wheat-irrig_3 != 10 [set wheat-irrig_3 []]
         if length wheat-yield_4 != 10 [set wheat-yield_4 []]
         if length wheat-irrig_4 != 10 [set wheat-irrig_4 []]
+        if length wheat-N-app != 10 [set wheat-N-app []]
+        if length wheat-N-use_1 != 10 [set wheat-N-use_1 []]
+        if length wheat-N-use_2 != 10 [set wheat-N-use_2 []]
+        if length wheat-N-use_3 != 10 [set wheat-N-use_3 []]
+        if length wheat-N-use_4 != 10 [set wheat-N-use_4 []]
 
         if length soybean-price != 10 [set soybean-price []]
         if length soybean-yield_1 != 10 [set soybean-yield_1 []]
@@ -359,6 +414,11 @@ to import-data                                                                  
         if length soybean-irrig_3 != 10 [set soybean-irrig_3 []]
         if length soybean-yield_4 != 10 [set soybean-yield_4 []]
         if length soybean-irrig_4 != 10 [set soybean-irrig_4 []]
+        if length soybean-N-app != 10 [set soybean-N-app []]
+        if length soybean-N-use_1 != 10 [set soybean-N-use_1 []]
+        if length soybean-N-use_2 != 10 [set soybean-N-use_2 []]
+        if length soybean-N-use_3 != 10 [set soybean-N-use_3 []]
+        if length soybean-N-use_4 != 10 [set soybean-N-use_4 []]
 
         if length milo-price != 10 [set milo-price []]
         if length milo-yield_1 != 10 [set milo-yield_1 []]
@@ -369,6 +429,11 @@ to import-data                                                                  
         if length milo-irrig_3 != 10 [set milo-irrig_3 []]
         if length milo-yield_4 != 10 [set milo-yield_4 []]
         if length milo-irrig_4 != 10 [set milo-irrig_4 []]
+        if length milo-N-app != 10 [set milo-N-app []]
+        if length milo-N-use_1 != 10 [set milo-N-use_1 []]
+        if length milo-N-use_2 != 10 [set milo-N-use_2 []]
+        if length milo-N-use_3 != 10 [set milo-N-use_3 []]
+        if length milo-N-use_4 != 10 [set milo-N-use_4 []]
 
     set m (m + 1)
   ]
