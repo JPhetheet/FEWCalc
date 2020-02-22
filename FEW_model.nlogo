@@ -615,10 +615,10 @@ if Future_Process = "Repeat Historical"                                         
 
   if Future_Process = "Impose T and P Changes"                                                      ;Climate projection scenario
     [ifelse ticks <= 9                                                                              ;First 10 year data based on history
-       [set corn-N-use corn-N-use_3
-        set wheat-N-use wheat-N-use_3
-        set soybean-N-use soybean-N-use_3
-        set milo-N-use milo-N-use_3
+       [set corn-N-use corn-N-use_1
+        set wheat-N-use wheat-N-use_1
+        set soybean-N-use soybean-N-use_1
+        set milo-N-use milo-N-use_1
         food-calculation_1-1
         energy-calculation
         gw-depletion_1]
@@ -648,6 +648,8 @@ to food-calculation_1-1                                                         
   set yrs-seq [0 1 2 3 4 5 6 7 8 9]
   let n (ticks)
 
+  print (word "food" yrs-seq)  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
   set corn-tot-income (item n corn-yield_1 * item n corn-price * corn-area)
   set wheat-tot-income (item n wheat-yield_1 * item n wheat-price * wheat-area)
   set soybean-tot-income (item n soybean-yield_1 * item n soybean-price * soybean-area)
@@ -667,6 +669,8 @@ end
 to food-calculation_1-2                                                                             ;Repeat historical data successively after 10 year simulation
   set yrs-seq [0 1 2 3 4 5 6 7 8 9]
   let n (ticks)
+
+  print (word "food" yrs-seq)  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
   set corn-tot-yield (item (n mod 10) corn-yield_1)                                                 ;Each tick, corn yield will be accessed from a "corn-yield_1" list
   set wheat-tot-yield (item (n mod 10) wheat-yield_1)                                               ;Each tick, wheat yield will be accessed from a "wheat-yield_1" list
@@ -721,6 +725,8 @@ to food-calculation_2                                                           
   if (ticks mod 10) = 0                                                                             ;Shuffle yrs-seq every 10 years
   [set yrs-seq [0 9 9 9 9 0 6 7 8 9]                                                                ;List of wetter years
    set yrs-seq shuffle yrs-seq]                                                                     ;Shuffle command
+
+  print (word "food" yrs-seq)  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
   let n (ticks mod 10)
 
@@ -785,6 +791,8 @@ to food-calculation_3                                                           
 
   let n (ticks mod 10)
 
+  print (word "food" yrs-seq)  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
   set corn-tot-yield (item (item n yrs-seq) corn-yield_1)                                           ;Each tick, corn yield will be accessed from a "corn-yield_1" list
   set wheat-tot-yield (item (item n yrs-seq) wheat-yield_1)                                         ;Each tick, wheat yield will be accessed from a "wheat-yield_1" list
   set soybean-tot-yield (item (item n yrs-seq) soybean-yield_1)                                     ;Each tick, soybean yield will be accessed from a "soybean-yield_1" list
@@ -845,6 +853,8 @@ to food-calculation_4                                                           
    set yrs-seq shuffle yrs-seq]                                                                     ;Shuffle command
 
   let n (ticks mod 10)
+
+  print (word "food" yrs-seq)  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
   set corn-tot-yield (item (item n yrs-seq) corn-yield_3)                                           ;Each tick, corn yield will be accessed from a "corn-yield_3" list
   set wheat-tot-yield (item (item n yrs-seq) wheat-yield_3)                                         ;Each tick, wheat yield will be accessed from a "wheat-yield_3" list
@@ -1171,6 +1181,8 @@ end
 to gw-depletion_1
   let k ticks                                                                                       ;Set a temporary variable
 
+  print (word "gw" yrs-seq)  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
   set corn-use-in item (k mod 10) corn-irrig_1                                                      ;Irrigation will be accessed from a "corn-irrig_1" list
   set wheat-use-in item (k mod 10) wheat-irrig_1                                                    ;Irrigation will be accessed from a "wheat-irrig_1" list
   set soybean-use-in item (k mod 10) soybean-irrig_1                                                ;Irrigation will be accessed from a "soybean-irrig_1" list
@@ -1206,6 +1218,8 @@ to gw-depletion_2
   set soybean-use-in item (item k yrs-seq) soybean-irrig_1                                          ;Irrigation will be accessed from a "soybean-irrig_1" list (seq is linked to "food_calculation_1")
   set milo-use-in item (item k yrs-seq) milo-irrig_1                                                ;Irrigation will be accessed from a "milo-irrig_1" list (seq is linked to "food_calculation_1")
 
+  print (word "gw" yrs-seq)  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
   ;Normalize water use
   set water-use-feet (((corn-use-in * corn-area) + (wheat-use-in * wheat-area) + (soybean-use-in * soybean-area) + (milo-use-in * milo-area)) / (12 * total-area))
   set gw-change ((-8.6628 * water-use-feet) + 8.4722)                                               ;Calculate water-level change using a regression equation (Whittemore et al., 2016)
@@ -1233,6 +1247,8 @@ to gw-depletion_3
   set wheat-use-in item (item k yrs-seq) wheat-irrig_1                                              ;Irrigation will be accessed from a "wheat-irrig_1" list (seq is linked to "food_calculation_1")
   set soybean-use-in item (item k yrs-seq) soybean-irrig_1                                          ;Irrigation will be accessed from a "soybean-irrig_1" list (seq is linked to "food_calculation_1")
   set milo-use-in item (item k yrs-seq) milo-irrig_1                                                ;Irrigation will be accessed from a "milo-irrig_1" list (seq is linked to "food_calculation_1")
+
+  print (word "gw" yrs-seq)  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
   ;Normalize water use
   set water-use-feet (((corn-use-in * corn-area) + (wheat-use-in * wheat-area) + (soybean-use-in * soybean-area) + (milo-use-in * milo-area)) / (12 * total-area))
@@ -1262,6 +1278,8 @@ to gw-depletion_4
   set soybean-use-in item (item k yrs-seq) soybean-irrig_3                                          ;Irrigation will be accessed from a "soybean-irrig_3" list (seq is linked to "food_calculation_3")
   set milo-use-in item (item k yrs-seq) milo-irrig_3                                                ;Irrigation will be accessed from a "milo-irrig_1" list (seq is linked to "food_calculation_3")
 
+  print (word "gw" yrs-seq)  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
   ;Normalize water use
   set water-use-feet (((corn-use-in * corn-area) + (wheat-use-in * wheat-area) + (soybean-use-in * soybean-area) + (milo-use-in * milo-area)) / (12 * total-area))
   set gw-change ((-8.6628 * water-use-feet) + 8.4722)                                               ;Calculate water-level change using a regression equation (Whittemore et al., 2016)
@@ -1284,7 +1302,7 @@ to gw-depletion_4
 end
 
 to contaminant                                                                                      ;Surface water contamination
-;  if random 2 = 1 [                                                                                 ;50:50 chance
+;  if random 2 = 1 [                                                                                ;50:50 chance
 ;    ask n-of 3 river-patches with [pcolor = 87] [set pcolor brown]
 ;      if any? river-patches with [pcolor = brown][
 ;        ask one-of river-patches [set pcolor 87]
@@ -1293,7 +1311,25 @@ to contaminant                                                                  
 
   let k (ticks mod 10)
   set N-residue ((item (item k yrs-seq) corn-N-app) - (item (item k yrs-seq) corn-N-use) + (item (item k yrs-seq) wheat-N-app) - (item (item k yrs-seq) wheat-N-use) + (item (item k yrs-seq) soybean-N-app) - (item (item k yrs-seq) soybean-N-use) + (item (item k yrs-seq) milo-N-app) - (item (item k yrs-seq) milo-N-use))
-  if N-residue > 0 [print(N-residue)]
+  print (word "Temp. var. k: " k)  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  print (word "corn-N-use" corn-N-use)  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  print (word "wheat-N-use" wheat-N-use)  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  print (word "soybean-N-use" soybean-N-use)  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  print (word "milo-N-use" milo-N-use)  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  print (word "corn-N-use item k: " (item (item k yrs-seq) corn-N-use)) ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  print (word "wheat-N-use item k: " (item (item k yrs-seq) wheat-N-use)) ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  print (word "soybean-N-use item k: " (item (item k yrs-seq) soybean-N-use)) ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  print (word "milo-N-use item k: " (item (item k yrs-seq) milo-N-use)) ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  print (word "Residue" N-residue)  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  print (word "contaminant" yrs-seq)  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+  if N-residue > -30 [                                                                              ;Vary threshold
+    ask n-of (0.1 * (abs N-residue)) river-patches with [pcolor = 87] [set pcolor brown]            ;10% of N-residue leaches into the stream
+      if any? river-patches with [pcolor = brown][
+        ask one-of river-patches [set pcolor 87]
+      ]
+  ]
+
 end
 
 to treatment                                                                                        ;Treatment
@@ -1876,7 +1912,7 @@ CHOOSER
 Future_Process
 Future_Process
 "Repeat Historical" "Wetter Future" "Dryer Future" "Impose T and P Changes"
-0
+3
 
 TEXTBOX
 71
