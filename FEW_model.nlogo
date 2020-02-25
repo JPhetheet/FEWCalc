@@ -3,7 +3,7 @@
 extensions [csv bitmap]
 
 globals [
-  cropland-patches aquifer-patches river-patches wind-bar solar-bar wind-patches solar-patches
+  cropland-patches aquifer-patches river-patches wind-bar solar-bar wind-patches solar-patches corn-patches
   crop-area crop-color radius-of-%area total-area area-multiplier crop-background
   precip_raw current-elev patch-change yrs-seq zero-line turbine_size
   corn-data corn-sum corn-price corn-yield_1 corn-irrig_1 corn-yield_2 corn-irrig_2 corn-yield_3 corn-irrig_3 corn-yield_4 corn-irrig_4
@@ -65,8 +65,6 @@ to setup
     set plabel-color black
   ]
 
-  set crop-color [37 22 36 34]                                                                      ;Set circle's color [corn, wheat, soybean, milo]
-
   set crop-area []                                                                                  ;Keep crop area in a list, namely "crop-area"
   set crop-area lput corn-area crop-area
   set crop-area lput wheat-area crop-area
@@ -81,10 +79,10 @@ to setup
     set radius-of-%area lput sqrt ((x / (sum crop-area) * area-multiplier) / pi) radius-of-%area    ;Calculate radius of crop circle
   ]
 
-  ask patch -1 0 [ask patches in-radius (item 0 radius-of-%area) [set pcolor item 0 crop-color]]
-  ask patch -18 84 [ask patches in-radius (item 1 radius-of-%area) [set pcolor item 1 crop-color]]
-  ask patch -51.5 -51 [ask patches in-radius (item 2 radius-of-%area) [set pcolor item 2 crop-color]]
-  ask patch -52 16 [ask patches in-radius (item 3 radius-of-%area) [set pcolor item 3 crop-color]]
+  ask patch -1 0 [ask patches in-radius (item 0 radius-of-%area) [set pcolor 37]]
+  ask patch -18 84 [ask patches in-radius (item 1 radius-of-%area) [set pcolor 22]]
+  ask patch -51.5 -51 [ask patches in-radius (item 2 radius-of-%area) [set pcolor 36]]
+  ask patch -52 16 [ask patches in-radius (item 3 radius-of-%area) [set pcolor 34]]
 
   ask patch 6 -20 [
     set plabel "Corn"]
@@ -605,7 +603,7 @@ if Future_Process = "Repeat Historical"                                         
        ]
     ]
 
-  if Future_Process = "Impose T and P Changes"                                                      ;Climate projection scenario
+  if Future_Process = "Impose T, P, & S Changes"                                                    ;Climate projection scenario
     [ifelse ticks <= 9                                                                              ;First 10 year data based on history
        [set corn-N-use corn-N-use_1
         set wheat-N-use wheat-N-use_1
@@ -1330,13 +1328,24 @@ to contaminant                                                                  
 
   set N-accu (N-accu + N-accu-temp)
 
+  ask patch -1 0 [ask n-of (0.07 * (item (item k yrs-seq) corn-N-app) / 1.12) patches in-radius (item 0 radius-of-%area) [set pcolor brown]]        ;show dots in lbs/ac
+  ask patch -18 84 [ask n-of (0.07 * (item (item k yrs-seq) corn-N-app) / 1.12) patches in-radius (item 0 radius-of-%area) [set pcolor brown]]      ;show dots in lbs/ac
+  ask patch -51.5 -51 [ask n-of (0.07 * (item (item k yrs-seq) corn-N-app) / 1.12) patches in-radius (item 0 radius-of-%area) [set pcolor brown]]   ;show dots in lbs/ac
+  ask patch -52 16 [ask n-of (0.07 * (item (item k yrs-seq) corn-N-app) / 1.12) patches in-radius (item 0 radius-of-%area) [set pcolor brown]]      ;show dots in lbs/ac
+
   if (item k yrs-seq) = 7 or (item k yrs-seq) = 8 or (item k yrs-seq) = 9 [
     ask n-of (0.001 * N-accu) river-patches with [pcolor = 87] [set pcolor brown]                   ;0.001 is a scaling factor
       if any? river-patches with [pcolor = brown][
         ask one-of river-patches [set pcolor 87]
       ]
     set N-accu 0
+    ask patch -1 0 [ask patches in-radius (item 0 radius-of-%area) [set pcolor 37]]
+    ask patch -18 84 [ask patches in-radius (item 1 radius-of-%area) [set pcolor 22]]
+    ask patch -51.5 -51 [ask patches in-radius (item 2 radius-of-%area) [set pcolor 36]]
+    ask patch -52 16 [ask patches in-radius (item 3 radius-of-%area) [set pcolor 34]]
   ]
+
+
 
   print (word "Temp. var. k: " k)  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   print (word "corn-N-use" corn-N-use)  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1928,12 +1937,12 @@ Climate Scenario -----------------------------------
 CHOOSER
 69
 466
-269
+272
 511
 Future_Process
 Future_Process
-"Repeat Historical" "Wetter Future" "Dryer Future" "Impose T and P Changes"
-2
+"Repeat Historical" "Wetter Future" "Dryer Future" "Impose T, P, & S Changes"
+0
 
 TEXTBOX
 71
