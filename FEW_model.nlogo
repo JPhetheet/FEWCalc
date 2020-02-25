@@ -20,7 +20,7 @@ globals [
   corn-mean-yield wheat-mean-yield soybean-mean-yield milo-mean-yield
   corn-tot-yield wheat-tot-yield soybean-tot-yield milo-tot-yield
   corn-use-in wheat-use-in soybean-use-in milo-use-in water-use-feet gw-change
-  corn-N-app wheat-N-app soybean-N-app milo-N-app N-residue
+  corn-N-app wheat-N-app soybean-N-app milo-N-app N-accu
   corn-N-use wheat-N-use soybean-N-use milo-N-use
   corn-N-use_1 wheat-N-use_1 soybean-N-use_1 milo-N-use_1
   corn-N-use_2 wheat-N-use_2 soybean-N-use_2 milo-N-use_2
@@ -46,6 +46,7 @@ to setup
   set wheat-base-price 6.94                                                                         ;Base price for crop insurance calculation
   set soybean-base-price 9.39                                                                       ;Base price for crop insurance calculation
   set milo-base-price 3.14                                                                          ;Base price for crop insurance calculation
+  set N-accu 0                                                                                      ;Assume there is no N accumulation in soil (fertilizer)
 
 
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -80,33 +81,21 @@ to setup
     set radius-of-%area lput sqrt ((x / (sum crop-area) * area-multiplier) / pi) radius-of-%area    ;Calculate radius of crop circle
   ]
 
-  crt 4                                                                                             ;Set crop location using turtles
-  ask turtle 0 [setxy -1 0
-    ask cropland-patches in-radius item 0 radius-of-%area [set pcolor item 0 crop-color]
-    ask patch 6 -20 [
-      set plabel "Corn"
-    ]
-    die]
-  ask turtle 1 [setxy -18 84
-    ask cropland-patches in-radius item 1 radius-of-%area [set pcolor item 1 crop-color]
-    ask patch -9 63 [
-      set plabel "Wheat"
-      set plabel-color black
-    ]
-    die]
-  ask turtle 2 [setxy -51.5 -51
-    ask cropland-patches in-radius item 2 radius-of-%area [set pcolor item 2 crop-color]
-    ask patch -39 -72 [
-      set plabel "Soybean"
-      set plabel-color black
-    ]
-    die]
-  ask turtle 3 [setxy -52 16
-    ask cropland-patches in-radius item 3 radius-of-%area [set pcolor item 3 crop-color]
-    ask patch -46 -5 [
-      set plabel "Milo"
-    ]
-    die]
+  ask patch -1 0 [ask patches in-radius (item 0 radius-of-%area) [set pcolor item 0 crop-color]]
+  ask patch -18 84 [ask patches in-radius (item 1 radius-of-%area) [set pcolor item 1 crop-color]]
+  ask patch -51.5 -51 [ask patches in-radius (item 2 radius-of-%area) [set pcolor item 2 crop-color]]
+  ask patch -52 16 [ask patches in-radius (item 3 radius-of-%area) [set pcolor item 3 crop-color]]
+
+  ask patch 6 -20 [
+    set plabel "Corn"]
+  ask patch -9 63 [
+    set plabel "Wheat"
+    set plabel-color black]
+  ask patch -39 -72 [
+    set plabel "Soybean"
+    set plabel-color black]
+  ask patch -46 -5 [
+    set plabel "Milo"]
 
   import-drawing "crop-symbol.png"                                                                  ;Overlay each crop circle by its symbol
 
@@ -548,11 +537,12 @@ if Future_Process = "Repeat Historical"                                         
           energy-calculation
           gw-depletion_1]
 
-         [set corn-N-use corn-N-use_2
+         [set corn-N-use corn-N-use_2                                                               ;Dryland farming
           set wheat-N-use wheat-N-use_2
           set soybean-N-use soybean-N-use_2
           set milo-N-use milo-N-use_2
-          dryland-farming_1                                                                         ;Dryland farming
+          dryland-farming_1
+          gw-depletion_dryland
           energy-calculation]
        ]
     ]
@@ -576,11 +566,12 @@ if Future_Process = "Repeat Historical"                                         
            energy-calculation
            gw-depletion_2]
 
-          [set corn-N-use corn-N-use_2
+          [set corn-N-use corn-N-use_2                                                              ;Dryland farming
            set wheat-N-use wheat-N-use_2
            set soybean-N-use soybean-N-use_2
            set milo-N-use milo-N-use_2
-           dryland-farming_2                                                                        ;Dryland farming
+           dryland-farming_2
+           gw-depletion_dryland
            energy-calculation]
        ]
     ]
@@ -604,11 +595,12 @@ if Future_Process = "Repeat Historical"                                         
            energy-calculation
            gw-depletion_3]
 
-          [set corn-N-use corn-N-use_2
+          [set corn-N-use corn-N-use_2                                                              ;Dryland farming
            set wheat-N-use wheat-N-use_2
            set soybean-N-use soybean-N-use_2
            set milo-N-use milo-N-use_2
-           dryland-farming_3                                                                        ;Dryland farming
+           dryland-farming_3
+           gw-depletion_dryland
            energy-calculation]
        ]
     ]
@@ -632,11 +624,12 @@ if Future_Process = "Repeat Historical"                                         
            energy-calculation
            gw-depletion_4]
 
-          [set corn-N-use corn-N-use_4
+          [set corn-N-use corn-N-use_4                                                              ;Dryland farming
            set wheat-N-use wheat-N-use_4
            set soybean-N-use soybean-N-use_4
            set milo-N-use milo-N-use_4
-           dryland-farming_4                                                                        ;Dryland farming
+           dryland-farming_4
+           gw-depletion_dryland
            energy-calculation]
        ]
     ]
@@ -786,7 +779,7 @@ end
 
 to food-calculation_3                                                                               ;Randomly choose dry year
   if (ticks mod 10) = 0                                                                             ;Shuffle yrs-seq every 10 years
-  [set yrs-seq [4 1 2 3 4 5 6 4 5 6]                                                                ;List of dryer years
+  [set yrs-seq [4 1 2 3 4 5 7 4 5 6]                                                                ;List of dryer years
    set yrs-seq shuffle yrs-seq]                                                                     ;Shuffle command
 
   let n (ticks mod 10)
@@ -1032,7 +1025,7 @@ end
 
 to dryland-farming_3
   if (ticks mod 10) = 0                                                                             ;Shuffle yrs-seq every 10 years
-  [set yrs-seq [4 1 2 3 4 5 6 4 5 6]                                                                ;List of dryer years (must be the same seq as "food-calculation_3")
+  [set yrs-seq [4 1 2 3 4 5 7 4 5 6]                                                                ;List of dryer years (must be the same seq as "food-calculation_3")
    set yrs-seq shuffle yrs-seq]                                                                     ;Shuffle command
 
   let n (ticks mod 10)
@@ -1301,17 +1294,49 @@ to gw-depletion_4
   ]
 end
 
-to contaminant                                                                                      ;Surface water contamination
-;  if random 2 = 1 [                                                                                ;50:50 chance
-;    ask n-of 3 river-patches with [pcolor = 87] [set pcolor brown]
-;      if any? river-patches with [pcolor = brown][
-;        ask one-of river-patches [set pcolor 87]
-;      ]
-;  ]
+to gw-depletion_dryland
+  let k (ticks mod 10)                                                                              ;Set a temporary variable
+  set corn-use-in item (item k yrs-seq) corn-irrig_2                                                ;Irrigation will be accessed from a "corn-irrig_3" list (seq is linked to "food_calculation_3")
+  set wheat-use-in item (item k yrs-seq) wheat-irrig_2                                              ;Irrigation will be accessed from a "wheat-irrig_3" list (seq is linked to "food_calculation_3")
+  set soybean-use-in item (item k yrs-seq) soybean-irrig_2                                          ;Irrigation will be accessed from a "soybean-irrig_3" list (seq is linked to "food_calculation_3")
+  set milo-use-in item (item k yrs-seq) milo-irrig_2                                                ;Irrigation will be accessed from a "milo-irrig_1" list (seq is linked to "food_calculation_3")
 
+  print (word "gw" yrs-seq)  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+  ;Normalize water use
+  set water-use-feet (((corn-use-in * corn-area) + (wheat-use-in * wheat-area) + (soybean-use-in * soybean-area) + (milo-use-in * milo-area)) / (12 * total-area))
+  set gw-change ((-8.6628 * water-use-feet) + 8.4722)                                               ;Calculate water-level change using a regression equation (Whittemore et al., 2016)
+
+  set patch-change (gw-change * 170 / aquifer-thickness)                                            ;Convert water-level change to patch change
+
+  ifelse patch-change < 0                                                                           ;Is water level decreasing?
+    [ask aquifer-patches with [pycor > (current-elev + patch-change)] [                             ;Yes
+     set pcolor 7]]                                                                                 ;Set patches above "new" level of aquifer (new current elevation) to be gray
+    [ask aquifer-patches with [pycor < (current-elev + patch-change)] [                             ;No
+     set pcolor 105]]                                                                               ;Set patches below "new" level of aquifer (new current elevation) to be blue
+
+  set current-elev (current-elev + patch-change)                                                    ;Set new current elevation (new top of aquifer)
+  if current-elev > 69 [set current-elev 69]                                                        ;Exceed capacity
+
+  if current-elev < -66 [                                                                           ;Is the top of aquifer below 80% of initial thickness?
+    ask aquifer-patches with [pycor < current-elev] [                                               ;Yes
+      set pcolor 14]                                                                                ;Set "aquifer-patches" to be red
+  ]
+end
+
+to contaminant                                                                                      ;Surface water contamination
   let k (ticks mod 10)
-  set N-residue ((item (item k yrs-seq) corn-N-app) - (item (item k yrs-seq) corn-N-use) + (item (item k yrs-seq) wheat-N-app) - (item (item k yrs-seq) wheat-N-use) + (item (item k yrs-seq) soybean-N-app) - (item (item k yrs-seq) soybean-N-use) + (item (item k yrs-seq) milo-N-app) - (item (item k yrs-seq) milo-N-use))
-  ;;1-2%
+  let N-accu-temp (0.07 * (((item (item k yrs-seq) corn-N-app) * corn-area) + ((item (item k yrs-seq) wheat-N-app) * wheat-area) + ((item (item k yrs-seq) soybean-N-app) * soybean-area) + ((item (item k yrs-seq) milo-N-app) * milo-area) / 1.12)) ;1.12 (convert from kg/ha to pound/ac)
+
+  set N-accu (N-accu + N-accu-temp)
+
+  if (item k yrs-seq) = 7 or (item k yrs-seq) = 8 or (item k yrs-seq) = 9 [
+    ask n-of (0.001 * N-accu) river-patches with [pcolor = 87] [set pcolor brown]                   ;0.001 is a scaling factor
+      if any? river-patches with [pcolor = brown][
+        ask one-of river-patches [set pcolor 87]
+      ]
+    set N-accu 0
+  ]
 
   print (word "Temp. var. k: " k)  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   print (word "corn-N-use" corn-N-use)  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1322,15 +1347,9 @@ to contaminant                                                                  
   print (word "wheat-N-use item k: " (item (item k yrs-seq) wheat-N-use)) ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   print (word "soybean-N-use item k: " (item (item k yrs-seq) soybean-N-use)) ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   print (word "milo-N-use item k: " (item (item k yrs-seq) milo-N-use)) ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  print (word "Residue" N-residue)  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  print (word "N-accu-temp" N-accu-temp)  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  print (word "N-accu" N-accu)  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   print (word "contaminant" yrs-seq)  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-  if N-residue > -30 [                                                                              ;Vary threshold
-    ask n-of (0.1 * (abs N-residue)) river-patches with [pcolor = 87] [set pcolor brown]            ;10% of N-residue leaches into the stream
-      if any? river-patches with [pcolor = brown][
-        ask one-of river-patches [set pcolor 87]
-      ]
-  ]
 
 end
 
@@ -1914,7 +1933,7 @@ CHOOSER
 Future_Process
 Future_Process
 "Repeat Historical" "Wetter Future" "Dryer Future" "Impose T and P Changes"
-1
+2
 
 TEXTBOX
 71
@@ -2110,10 +2129,10 @@ PENS
 "Zero" 1.0 2 -8053223 true "" "plot zero-line"
 
 TEXTBOX
-1061
-464
-1319
-482
+1062
+533
+1320
+551
 Note: water declines if water use > 0.978 ft
 12
 104.0
