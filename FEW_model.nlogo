@@ -1190,7 +1190,7 @@ to gw-depletion_1
 
   ;Normalize water use
   set water-use-feet (((corn-use-in * corn-area) + (wheat-use-in * wheat-area) + (soybean-use-in * soybean-area) + (milo-use-in * milo-area)) / (12 * total-area))
-  set gw-change ((-8.6628 * water-use-feet) + 8.4722)                                               ;Calculate water-level change using a regression equation (Whittemore et al., 2016)
+  set gw-change ((-32.386 * water-use-feet) + 8.0014)                                               ;Calculate water-level change using a regression equation (Whittemore et al., 2016)
 
   ;print (word "Year" (ticks + 2008) ": " water-use-feet)
 
@@ -1311,6 +1311,8 @@ to contaminant                                                                  
 
   let k (ticks mod 10)
   set N-residue ((item (item k yrs-seq) corn-N-app) - (item (item k yrs-seq) corn-N-use) + (item (item k yrs-seq) wheat-N-app) - (item (item k yrs-seq) wheat-N-use) + (item (item k yrs-seq) soybean-N-app) - (item (item k yrs-seq) soybean-N-use) + (item (item k yrs-seq) milo-N-app) - (item (item k yrs-seq) milo-N-use))
+  ;;1-2%
+
   print (word "Temp. var. k: " k)  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   print (word "corn-N-use" corn-N-use)  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   print (word "wheat-N-use" wheat-N-use)  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1912,7 +1914,7 @@ CHOOSER
 Future_Process
 Future_Process
 "Repeat Historical" "Wetter Future" "Dryer Future" "Impose T and P Changes"
-3
+1
 
 TEXTBOX
 71
