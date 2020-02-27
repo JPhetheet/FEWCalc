@@ -830,7 +830,7 @@ end
 
 to food-calculation_3                                                                               ;Randomly choose dry year
   if (ticks mod 10) = 0                                                                             ;Shuffle yrs-seq every 10 years
-  [set yrs-seq [4 1 2 3 4 5 7 4 5 6]                                                                ;List of dryer years
+  [set yrs-seq [0 0 4 3 4 5 7 4 4 4]                                                                ;List of dryer years
    set yrs-seq shuffle yrs-seq]                                                                     ;Shuffle command
 
   let n (ticks mod 10)
@@ -1172,7 +1172,7 @@ end
 
 to dryland-farming_3
   if (ticks mod 10) = 0                                                                             ;Shuffle yrs-seq every 10 years
-  [set yrs-seq [4 1 2 3 4 5 7 4 5 6]                                                                ;List of dryer years (must be the same seq as "food-calculation_3")
+  [set yrs-seq [0 0 4 3 4 5 7 4 4 4]                                                                ;List of dryer years (must be the same seq as "food-calculation_3")
    set yrs-seq shuffle yrs-seq]                                                                     ;Shuffle command
 
   let n (ticks mod 10)
@@ -1378,7 +1378,7 @@ to gw-depletion_1
 
   ;Normalize water use
   set water-use-feet (((corn-use-in * corn-area) + (wheat-use-in * wheat-area) + (soybean-use-in * soybean-area) + (milo-use-in * milo-area)) / (12 * total-area))
-  set gw-change ((-32.386 * water-use-feet) + 8.0014)                                               ;Calculate water-level change using a regression equation (Whittemore et al., 2016)
+  set gw-change ((-32.306 * water-use-feet) + 7.98)                                                 ;Calculate water-level change using a regression equation (Whittemore et al., 2016)
 
   ;print (word "Year" (ticks + 2008) ": " water-use-feet)
 
@@ -1410,7 +1410,7 @@ to gw-depletion_2
 
   ;Normalize water use
   set water-use-feet (((corn-use-in * corn-area) + (wheat-use-in * wheat-area) + (soybean-use-in * soybean-area) + (milo-use-in * milo-area)) / (12 * total-area))
-  set gw-change ((-8.6628 * water-use-feet) + 8.4722)                                               ;Calculate water-level change using a regression equation (Whittemore et al., 2016)
+  set gw-change ((-32.306 * water-use-feet) + 7.98)                                                 ;Calculate water-level change using a regression equation (Whittemore et al., 2016)
 
   set patch-change (gw-change * 170 / aquifer-thickness)                                            ;Convert water-level change to patch change
 
@@ -1440,7 +1440,7 @@ to gw-depletion_3
 
   ;Normalize water use
   set water-use-feet (((corn-use-in * corn-area) + (wheat-use-in * wheat-area) + (soybean-use-in * soybean-area) + (milo-use-in * milo-area)) / (12 * total-area))
-  set gw-change ((-8.6628 * water-use-feet) + 8.4722)                                               ;Calculate water-level change using a regression equation (Whittemore et al., 2016)
+  set gw-change ((-32.306 * water-use-feet) + 7.98)                                                 ;Calculate water-level change using a regression equation (Whittemore et al., 2016)
 
   set patch-change (gw-change * 170 / aquifer-thickness)                                            ;Convert water-level change to patch change
 
@@ -1470,7 +1470,7 @@ to gw-depletion_4
 
   ;Normalize water use
   set water-use-feet (((corn-use-in * corn-area) + (wheat-use-in * wheat-area) + (soybean-use-in * soybean-area) + (milo-use-in * milo-area)) / (12 * total-area))
-  set gw-change ((-8.6628 * water-use-feet) + 8.4722)                                               ;Calculate water-level change using a regression equation (Whittemore et al., 2016)
+  set gw-change ((-32.306 * water-use-feet) + 7.98)                                                 ;Calculate water-level change using a regression equation (Whittemore et al., 2016)
 
   set patch-change (gw-change * 170 / aquifer-thickness)                                            ;Convert water-level change to patch change
 
@@ -1500,7 +1500,7 @@ to gw-depletion_dryland
 
   ;Normalize water use
   set water-use-feet (((corn-use-in * corn-area) + (wheat-use-in * wheat-area) + (soybean-use-in * soybean-area) + (milo-use-in * milo-area)) / (12 * total-area))
-  set gw-change ((-8.6628 * water-use-feet) + 8.4722)                                               ;Calculate water-level change using a regression equation (Whittemore et al., 2016)
+  set gw-change ((-32.306 * water-use-feet) + 7.98)                                                 ;Calculate water-level change using a regression equation (Whittemore et al., 2016)
 
   set patch-change (gw-change * 170 / aquifer-thickness)                                            ;Convert water-level change to patch change
 
