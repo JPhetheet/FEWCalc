@@ -692,23 +692,47 @@ to food-calculation_1-2                                                         
   calculate-net-income                                                                              ;Calculate farm net income
 
   ifelse corn-tot-income > corn-guarantee                                                           ;Apply crop insurance?
-    [set corn-tot-income corn-tot-income]
+    [set corn-tot-income corn-tot-income
+     ask patch 16 -27 [
+      set plabel " "]]
     [set corn-tot-income corn-guarantee
+     ask patch 16 -27 [
+      set plabel "INSURANCE"
+      set plabel-color red
+      ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies corn insurance")]                  ;Print message in the Command Center
 
   ifelse wheat-tot-income > wheat-guarantee                                                         ;Apply crop insurance?
-    [set wheat-tot-income wheat-tot-income]
+    [set wheat-tot-income wheat-tot-income
+     ask patch 0 56 [
+      set plabel " "]]
     [set wheat-tot-income wheat-guarantee
+     ask patch 0 56 [
+      set plabel "INSURANCE"
+      set plabel-color red
+      ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]                 ;Print message in the Command Center
 
   ifelse soybean-tot-income > soybean-guarantee                                                     ;Apply crop insurance?
-    [set soybean-tot-income soybean-tot-income]
+    [set soybean-tot-income soybean-tot-income
+     ask patch -34 -79 [
+      set plabel " "]]
     [set soybean-tot-income soybean-guarantee
+     ask patch -34 -79 [
+      set plabel "INSURANCE"
+      set plabel-color red
+      ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies soybean insurance")]               ;Print message in the Command Center
 
   ifelse milo-tot-income > milo-guarantee                                                           ;Apply crop insurance?
-    [set milo-tot-income milo-tot-income]
+    [set milo-tot-income milo-tot-income
+     ask patch -34 -12 [
+      set plabel " "]]
     [set milo-tot-income milo-guarantee
+     ask patch -34 -12 [
+      set plabel "INSURANCE"
+      set plabel-color red
+      ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies milo insurance")]                  ;Print message in the Command Center
 end
 
@@ -755,23 +779,48 @@ to food-calculation_2                                                           
   calculate-net-income                                                                              ;Calculate farm net income
 
   ifelse corn-tot-income > corn-guarantee                                                           ;Apply crop insurance?
-    [set corn-tot-income corn-tot-income]
+    [set corn-tot-income corn-tot-income
+     ask patch 16 -27 [
+      set plabel " "]]
     [set corn-tot-income corn-guarantee
+     ask patch 16 -27 [
+      set plabel "INSURANCE"
+      set plabel-color red
+    ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies corn insurance")]                  ;Print message in the Command Center
 
+
   ifelse wheat-tot-income > wheat-guarantee                                                         ;Apply crop insurance?
-    [set wheat-tot-income wheat-tot-income]
+    [set wheat-tot-income wheat-tot-income
+     ask patch 0 56 [
+      set plabel " "]]
     [set wheat-tot-income wheat-guarantee
+     ask patch 0 56 [
+      set plabel "INSURANCE"
+      set plabel-color red
+    ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]                 ;Print message in the Command Center
 
   ifelse soybean-tot-income > soybean-guarantee                                                     ;Apply crop insurance?
-    [set soybean-tot-income soybean-tot-income]
+    [set soybean-tot-income soybean-tot-income
+     ask patch -34 -79 [
+      set plabel " "]]
     [set soybean-tot-income soybean-guarantee
+     ask patch -34 -79 [
+      set plabel "INSURANCE"
+      set plabel-color red
+    ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies soybean insurance")]               ;Print message in the Command Center
 
   ifelse milo-tot-income > milo-guarantee                                                           ;Apply crop insurance?
-    [set milo-tot-income milo-tot-income]
+    [set milo-tot-income milo-tot-income
+     ask patch -34 -12 [
+      set plabel " "]]
     [set milo-tot-income milo-guarantee
+     ask patch -34 -12 [
+      set plabel "INSURANCE"
+      set plabel-color red
+    ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies milo insurance")]                  ;Print message in the Command Center
 end
 
@@ -818,23 +867,47 @@ to food-calculation_3                                                           
   calculate-net-income                                                                              ;Calculate farm net income
 
   ifelse corn-tot-income > corn-guarantee                                                           ;Apply crop insurance?
-    [set corn-tot-income corn-tot-income]
+    [set corn-tot-income corn-tot-income
+     ask patch 16 -27 [
+      set plabel " "]]
     [set corn-tot-income corn-guarantee
+     ask patch 16 -27 [
+      set plabel "INSURANCE"
+      set plabel-color red
+      ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies corn insurance")]                  ;Print message in the Command Center
 
   ifelse wheat-tot-income > wheat-guarantee                                                         ;Apply crop insurance?
-    [set wheat-tot-income wheat-tot-income]
+    [set wheat-tot-income wheat-tot-income
+     ask patch 0 56 [
+      set plabel " "]]
     [set wheat-tot-income wheat-guarantee
+     ask patch 0 56 [
+      set plabel "INSURANCE"
+      set plabel-color red
+      ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]                 ;Print message in the Command Center
 
   ifelse soybean-tot-income > soybean-guarantee                                                     ;Apply crop insurance?
-    [set soybean-tot-income soybean-tot-income]
+    [set soybean-tot-income soybean-tot-income
+     ask patch -34 -79 [
+      set plabel " "]]
     [set soybean-tot-income soybean-guarantee
+     ask patch -34 -79 [
+      set plabel "INSURANCE"
+      set plabel-color red
+      ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies soybean insurance")]               ;Print message in the Command Center
 
   ifelse milo-tot-income > milo-guarantee                                                           ;Apply crop insurance?
-    [set milo-tot-income milo-tot-income]
+    [set milo-tot-income milo-tot-income
+     ask patch -34 -12 [
+      set plabel " "]]
     [set milo-tot-income milo-guarantee
+     ask patch -34 -12 [
+      set plabel "INSURANCE"
+      set plabel-color red
+      ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies milo insurance")]                  ;Print message in the Command Center
 end
 
@@ -876,23 +949,47 @@ to food-calculation_4                                                           
   calculate-net-income                                                                              ;Calculate farm net income
 
   ifelse corn-tot-income > corn-guarantee                                                           ;Apply crop insurance?
-    [set corn-tot-income corn-tot-income]
+    [set corn-tot-income corn-tot-income
+     ask patch 16 -27 [
+      set plabel " "]]
     [set corn-tot-income corn-guarantee
+     ask patch 16 -27 [
+      set plabel "INSURANCE"
+      set plabel-color red
+      ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies corn insurance")]                  ;Print message in the Command Center
 
   ifelse wheat-tot-income > wheat-guarantee                                                         ;Apply crop insurance?
-    [set wheat-tot-income wheat-tot-income]
+    [set wheat-tot-income wheat-tot-income
+     ask patch 0 56 [
+      set plabel " "]]
     [set wheat-tot-income wheat-guarantee
+     ask patch 0 56 [
+      set plabel "INSURANCE"
+      set plabel-color red
+      ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]                 ;Print message in the Command Center
 
   ifelse soybean-tot-income > soybean-guarantee                                                     ;Apply crop insurance?
-    [set soybean-tot-income soybean-tot-income]
+    [set soybean-tot-income soybean-tot-income
+     ask patch -34 -79 [
+      set plabel " "]]
     [set soybean-tot-income soybean-guarantee
+     ask patch -34 -79 [
+      set plabel "INSURANCE"
+      set plabel-color red
+      ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies soybean insurance")]               ;Print message in the Command Center
 
   ifelse milo-tot-income > milo-guarantee                                                           ;Apply crop insurance?
-    [set milo-tot-income milo-tot-income]
+    [set milo-tot-income milo-tot-income
+     ask patch -34 -12 [
+      set plabel " "]]
     [set milo-tot-income milo-guarantee
+     ask patch -34 -12 [
+      set plabel "INSURANCE"
+      set plabel-color red
+      ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies milo insurance")]                  ;Print message in the Command Center
 end
 
@@ -928,23 +1025,47 @@ to dryland-farming_1
   calculate-net-income                                                                              ;Calculate farm net income
 
   ifelse corn-tot-income > corn-guarantee                                                           ;Apply crop insurance?
-    [set corn-tot-income corn-tot-income]
+    [set corn-tot-income corn-tot-income
+     ask patch 16 -27 [
+      set plabel " "]]
     [set corn-tot-income corn-guarantee
+     ask patch 16 -27 [
+      set plabel "INSURANCE"
+      set plabel-color red
+      ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies corn insurance")]                  ;Print message in the Command Center
 
   ifelse wheat-tot-income > wheat-guarantee                                                         ;Apply crop insurance?
-    [set wheat-tot-income wheat-tot-income]
+    [set wheat-tot-income wheat-tot-income
+     ask patch 0 56 [
+      set plabel " "]]
     [set wheat-tot-income wheat-guarantee
+     ask patch 0 56 [
+      set plabel "INSURANCE"
+      set plabel-color red
+      ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]                 ;Print message in the Command Center
 
   ifelse soybean-tot-income > soybean-guarantee                                                     ;Apply crop insurance?
-    [set soybean-tot-income soybean-tot-income]
+    [set soybean-tot-income soybean-tot-income
+     ask patch -34 -79 [
+      set plabel " "]]
     [set soybean-tot-income soybean-guarantee
+     ask patch -34 -79 [
+      set plabel "INSURANCE"
+      set plabel-color red
+      ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies soybean insurance")]               ;Print message in the Command Center
 
   ifelse milo-tot-income > milo-guarantee                                                           ;Apply crop insurance?
-    [set milo-tot-income milo-tot-income]
+    [set milo-tot-income milo-tot-income
+     ask patch -34 -12 [
+      set plabel " "]]
     [set milo-tot-income milo-guarantee
+     ask patch -34 -12 [
+      set plabel "INSURANCE"
+      set plabel-color red
+      ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies milo insurance")]                  ;Print message in the Command Center
 
   let k ticks
@@ -995,23 +1116,47 @@ to dryland-farming_2
   calculate-net-income                                                                              ;Calculate farm net income
 
   ifelse corn-tot-income > corn-guarantee                                                           ;Apply crop insurance?
-    [set corn-tot-income corn-tot-income]
+    [set corn-tot-income corn-tot-income
+     ask patch 16 -27 [
+      set plabel " "]]
     [set corn-tot-income corn-guarantee
+     ask patch 16 -27 [
+      set plabel "INSURANCE"
+      set plabel-color red
+      ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies corn insurance")]                  ;Print message in the Command Center
 
   ifelse wheat-tot-income > wheat-guarantee                                                         ;Apply crop insurance?
-    [set wheat-tot-income wheat-tot-income]
+    [set wheat-tot-income wheat-tot-income
+     ask patch 0 56 [
+      set plabel " "]]
     [set wheat-tot-income wheat-guarantee
+     ask patch 0 56 [
+      set plabel "INSURANCE"
+      set plabel-color red
+      ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]                 ;Print message in the Command Center
 
   ifelse soybean-tot-income > soybean-guarantee                                                     ;Apply crop insurance?
-    [set soybean-tot-income soybean-tot-income]
+    [set soybean-tot-income soybean-tot-income
+     ask patch -34 -79 [
+      set plabel " "]]
     [set soybean-tot-income soybean-guarantee
+     ask patch -34 -79 [
+      set plabel "INSURANCE"
+      set plabel-color red
+      ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies soybean insurance")]               ;Print message in the Command Center
 
   ifelse milo-tot-income > milo-guarantee                                                           ;Apply crop insurance?
-    [set milo-tot-income milo-tot-income]
+    [set milo-tot-income milo-tot-income
+     ask patch -34 -12 [
+      set plabel " "]]
     [set milo-tot-income milo-guarantee
+     ask patch -34 -12 [
+      set plabel "INSURANCE"
+      set plabel-color red
+      ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies milo insurance")]                  ;Print message in the Command Center
 
   let k ticks
@@ -1062,23 +1207,47 @@ to dryland-farming_3
   calculate-net-income                                                                              ;Calculate farm net income
 
   ifelse corn-tot-income > corn-guarantee                                                           ;Apply crop insurance?
-    [set corn-tot-income corn-tot-income]
+    [set corn-tot-income corn-tot-income
+     ask patch 16 -27 [
+      set plabel " "]]
     [set corn-tot-income corn-guarantee
+     ask patch 16 -27 [
+      set plabel "INSURANCE"
+      set plabel-color red
+      ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies corn insurance")]                  ;Print message in the Command Center
 
   ifelse wheat-tot-income > wheat-guarantee                                                         ;Apply crop insurance?
-    [set wheat-tot-income wheat-tot-income]
+    [set wheat-tot-income wheat-tot-income
+     ask patch 0 56 [
+      set plabel " "]]
     [set wheat-tot-income wheat-guarantee
+     ask patch 0 56 [
+      set plabel "INSURANCE"
+      set plabel-color red
+      ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]                 ;Print message in the Command Center
 
   ifelse soybean-tot-income > soybean-guarantee                                                     ;Apply crop insurance?
-    [set soybean-tot-income soybean-tot-income]
+    [set soybean-tot-income soybean-tot-income
+     ask patch -34 -79 [
+      set plabel " "]]
     [set soybean-tot-income soybean-guarantee
+     ask patch -34 -79 [
+      set plabel "INSURANCE"
+      set plabel-color red
+      ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies soybean insurance")]               ;Print message in the Command Center
 
   ifelse milo-tot-income > milo-guarantee                                                           ;Apply crop insurance?
-    [set milo-tot-income milo-tot-income]
+    [set milo-tot-income milo-tot-income
+     ask patch -34 -12 [
+      set plabel " "]]
     [set milo-tot-income milo-guarantee
+     ask patch -34 -12 [
+      set plabel "INSURANCE"
+      set plabel-color red
+      ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies milo insurance")]                  ;Print message in the Command Center
 
   let k ticks
@@ -1124,23 +1293,47 @@ to dryland-farming_4
   calculate-net-income                                                                              ;Calculate farm net income
 
   ifelse corn-tot-income > corn-guarantee                                                           ;Apply crop insurance?
-    [set corn-tot-income corn-tot-income]
+    [set corn-tot-income corn-tot-income
+     ask patch 16 -27 [
+      set plabel " "]]
     [set corn-tot-income corn-guarantee
+     ask patch 16 -27 [
+      set plabel "INSURANCE"
+      set plabel-color red
+      ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies corn insurance")]                  ;Print message in the Command Center
 
   ifelse wheat-tot-income > wheat-guarantee                                                         ;Apply crop insurance?
-    [set wheat-tot-income wheat-tot-income]
+    [set wheat-tot-income wheat-tot-income
+     ask patch 0 56 [
+      set plabel " "]]
     [set wheat-tot-income wheat-guarantee
+     ask patch 0 56 [
+      set plabel "INSURANCE"
+      set plabel-color red
+      ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]                 ;Print message in the Command Center
 
   ifelse soybean-tot-income > soybean-guarantee                                                     ;Apply crop insurance?
-    [set soybean-tot-income soybean-tot-income]
+    [set soybean-tot-income soybean-tot-income
+     ask patch -34 -79 [
+      set plabel " "]]
     [set soybean-tot-income soybean-guarantee
+     ask patch -34 -79 [
+      set plabel "INSURANCE"
+      set plabel-color red
+      ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies soybean insurance")]               ;Print message in the Command Center
 
   ifelse milo-tot-income > milo-guarantee                                                           ;Apply crop insurance?
-    [set milo-tot-income milo-tot-income]
+    [set milo-tot-income milo-tot-income
+     ask patch -34 -12 [
+      set plabel " "]]
     [set milo-tot-income milo-guarantee
+     ask patch -34 -12 [
+      set plabel "INSURANCE"
+      set plabel-color red
+      ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies milo insurance")]                  ;Print message in the Command Center
 
   let k ticks
@@ -1374,7 +1567,7 @@ to treatment                                                                    
 end
 
 to reset-symbols                                                                                      ;Reset number of wind turbines and solar panels every tick
-  ask turtles [die]                                                                                 ;It is similar to "setup" procedure showing above
+  ask turtles [die]                                                                                   ;It is similar to "setup" procedure showing above
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;;;;;;;;;;;;;;;;;;;;; Wind icons ;;;;;;;;;;;;;;;;;;;;;
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1458,10 +1651,10 @@ to reset-symbols                                                                
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-358
-33
-815
-491
+348
+30
+805
+488
 -1
 -1
 2.234
@@ -1502,10 +1695,10 @@ NIL
 1
 
 INPUTBOX
-6
-134
-80
-194
+8
+109
+82
+169
 Corn-area
 125.0
 1
@@ -1513,10 +1706,10 @@ Corn-area
 Number
 
 INPUTBOX
-83
-134
-157
-194
+85
+109
+159
+169
 Wheat-area
 125.0
 1
@@ -1524,10 +1717,10 @@ Wheat-area
 Number
 
 INPUTBOX
-160
-134
-242
-194
+162
+109
+244
+169
 Soybean-area
 125.0
 1
@@ -1535,42 +1728,31 @@ Soybean-area
 Number
 
 INPUTBOX
-245
-134
-319
-194
+247
+109
+321
+169
 Milo-area
 125.0
 1
 0
 Number
 
-INPUTBOX
-7
-49
-81
-109
-Input-years
-60.0
-1
-0
-Number
-
 TEXTBOX
-7
-114
-344
-138
-Agriculture --------------------------------\n
+9
+89
+346
+113
+Agriculture -------------------------------\n
 13
 63.0
 1
 
 PLOT
-1118
-176
-1402
-296
+1112
+30
+1396
+150
 Ag Net Income
 Years
 $
@@ -1606,30 +1788,30 @@ NIL
 1
 
 TEXTBOX
-6
-390
-344
-409
-Water -------------------------------------
+7
+365
+345
+384
+Water ------------------------------------
 13
 95.0
 1
 
 TEXTBOX
-6
+8
+195
+347
 215
-345
-235
-Energy ------------------------------------
+Energy -----------------------------------
 13
 25.0
 1
 
 PLOT
-1118
-34
-1402
-154
+824
+316
+1108
+436
 Crop Groundwater Irrigation
 Years
 Inches
@@ -1647,10 +1829,10 @@ PENS
 "Milo" 1.0 0 -12440034 true "" "ifelse milo-area = 0 \n  [set milo-use-in 0\n   plot milo-use-in]\n  [plot milo-use-in]"
 
 PLOT
-831
-176
-1115
-296
+824
+30
+1108
+150
 Crop Production
 Years
 Bu/ac
@@ -1668,9 +1850,9 @@ PENS
 "Milo" 1.0 0 -12440034 true "" "ifelse milo-area = 0 \n  [set milo-tot-yield 0\n   plot milo-tot-yield]\n  [plot milo-tot-yield]"
 
 BUTTON
-161
+160
 10
-224
+223
 43
 NIL
 Go
@@ -1685,10 +1867,10 @@ NIL
 1
 
 SLIDER
-71
-351
-213
-384
+18
+321
+159
+354
 #Wind_turbines
 #Wind_turbines
 0
@@ -1700,10 +1882,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-85
-49
-274
-82
+137
+48
+321
+81
 Aquifer-thickness
 Aquifer-thickness
 0
@@ -1715,10 +1897,10 @@ Feet
 HORIZONTAL
 
 SLIDER
-71
-289
-213
-322
+162
+249
+304
+282
 Panel_power
 Panel_power
 0
@@ -1730,22 +1912,22 @@ Watts
 HORIZONTAL
 
 TEXTBOX
-71
-237
-213
-265
+17
+233
+159
+261
 1 set = 1000 solar panels
 11
 0.0
 1
 
 SLIDER
-71
-253
-213
-286
-#Solar_Panel_Sets
-#Solar_Panel_Sets
+17
+249
+159
+282
+#Solar_panel_sets
+#Solar_panel_sets
 0
 8
 3.0
@@ -1753,17 +1935,6 @@ SLIDER
 1
 NIL
 HORIZONTAL
-
-MONITOR
-219
-253
-324
-298
-Total Solar Panels
-#Solar_panels
-17
-1
-11
 
 MONITOR
 87
@@ -1876,20 +2047,20 @@ round solar-net-income
 11
 
 TEXTBOX
-7
-197
-233
-223
+9
+172
+235
+190
 Circles show proportional crop areas (acres)
 10
 0.0
 1
 
 PLOT
-831
-319
-1115
-439
+824
+173
+1108
+293
 Farm Energy Production
 Years
 MWh
@@ -1925,40 +2096,40 @@ Wind outputs
 1
 
 TEXTBOX
-5
-445
-350
-475
-Climate Scenario -----------------------------------
+7
+428
+353
+446
+Climate Scenario ---------------------------------
 12
 0.0
 1
 
 CHOOSER
-69
-466
-272
-511
+7
+449
+210
+494
 Future_Process
 Future_Process
 "Repeat Historical" "Wetter Future" "Dryer Future" "Impose T, P, & S Changes"
-0
+3
 
 TEXTBOX
-71
-335
-184
-353
+18
+305
+131
+323
 2-MW Wind Turbine
 11
 0.0
 1
 
 PLOT
-831
-34
-1115
-154
+824
+460
+1108
+580
 Total Net Income
 Years
 $
@@ -1976,30 +2147,30 @@ PENS
 "$0" 1.0 2 -8053223 true "" "plot zero-line"
 
 TEXTBOX
-5
-334
-42
-362
+9
+290
+46
+318
 • Wind
 11
 25.0
 1
 
 TEXTBOX
-7
-238
-47
-256
+9
+218
+49
+236
 • Solar
 11
 25.0
 1
 
 PLOT
-1118
-319
-1402
-439
+1112
+173
+1396
+293
 Energy Income
 Years
 $
@@ -2015,53 +2186,53 @@ PENS
 "Wind" 1.0 0 -14070903 true "" "ifelse ticks = 0 [set wind-net-income 0\nplot (wind-net-income)]\n[plot (wind-net-income)]"
 
 TEXTBOX
-832
-156
-1409
-179
+825
+10
+1402
+33
 Agriculture ------------------------------------------------------
 15
 63.0
 1
 
 TEXTBOX
-830
-298
-1409
-317
+823
+152
+1402
+171
 Energy ----------------------------------------------------------
 15
 25.0
 1
 
 TEXTBOX
-1117
-13
-1399
-33
-Water --------------------------
+824
+295
+1398
+314
+Water ----------------------------------------------------------
 15
 95.0
 1
 
 TEXTBOX
-357
-494
-850
-529
+347
+491
+802
+526
 *First 10 years use historical data from 2008 to 2017, subsequent years apply Future Process.
 10
 5.0
 1
 
 TEXTBOX
-71
-407
-342
-437
-Water is assumed to come from groundwater pumping. Effects on water quality are represented.
+8
+388
+313
+418
+• Water is assumed to come from groundwater pumping. • Effects on water quality are represented.
 11
-0.0
+95.0
 1
 
 MONITOR
@@ -2109,20 +2280,20 @@ water-use-feet
 11
 
 TEXTBOX
-358
-507
-824
-525
+348
+504
+803
+522
 **Year in these plots represents a sequential year, i.e., year 1 is year 2008.
 10
 5.0
 1
 
 PLOT
-831
-444
-1402
-564
+1112
+316
+1396
+436
 Water-level Change
 Years
 Feet
@@ -2132,20 +2303,55 @@ Feet
 5.0
 true
 true
-"" ""
+"set-plot-background-color 88" ""
 PENS
-"Water-level" 1.0 0 -14454117 true "" "plot gw-change"
-"Zero" 1.0 2 -8053223 true "" "plot zero-line"
+"Level      " 1.0 0 -14454117 true "" "plot gw-change"
+"0 ft" 1.0 2 -8053223 true "" "plot zero-line"
 
 TEXTBOX
-1062
-533
-1320
-551
-Note: water declines if water use > 0.978 ft
-12
-104.0
+1156
+407
+1344
+425
+Water declines if water use > 0.978 ft
+9
+105.0
 1
+
+TEXTBOX
+349
+10
+499
+29
+World
+15
+0.0
+1
+
+TEXTBOX
+824
+438
+1109
+457
+Farm Economy -------------------
+15
+0.0
+1
+
+SLIDER
+8
+48
+134
+81
+Input-years
+Input-years
+0
+200
+60.0
+5
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 # FEWCalc
