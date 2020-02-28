@@ -526,7 +526,7 @@ if Future_Process = "Repeat Historical"                                         
         energy-calculation
         gw-depletion_1]
 
-       [ifelse current-elev > -66                                                                   ;Is aquifer thickness greater that 20% of its initial thickness?
+       [ifelse current-elev > -74                                                                   ;Is aquifer thickness greater that 20% of its initial thickness?
          [set corn-N-use corn-N-use_1
           set wheat-N-use wheat-N-use_1
           set soybean-N-use soybean-N-use_1
@@ -556,7 +556,7 @@ if Future_Process = "Repeat Historical"                                         
         energy-calculation
         gw-depletion_1]
 
-       [ifelse current-elev > -66                                                                   ;Is aquifer thickness greater that 20% of its initial thickness?
+       [ifelse current-elev > -74                                                                   ;Is aquifer thickness greater that 20% of its initial thickness?
           [set corn-N-use corn-N-use_1
            set wheat-N-use wheat-N-use_1
            set soybean-N-use soybean-N-use_1
@@ -586,7 +586,7 @@ if Future_Process = "Repeat Historical"                                         
         energy-calculation
         gw-depletion_1]
 
-       [ifelse current-elev > -66                                                                   ;Is aquifer thickness greater that 20% of its initial thickness?
+       [ifelse current-elev > -74                                                                   ;Is aquifer thickness greater that 20% of its initial thickness?
           [set corn-N-use corn-N-use_1
            set wheat-N-use wheat-N-use_1
            set soybean-N-use soybean-N-use_1
@@ -616,7 +616,7 @@ if Future_Process = "Repeat Historical"                                         
         energy-calculation
         gw-depletion_1]
 
-       [ifelse current-elev > -66                                                                   ;Is aquifer thickness greater that 20% of its initial thickness?
+       [ifelse current-elev > -74                                                                   ;Is aquifer thickness greater that 20% of its initial thickness?
           [set corn-N-use corn-N-use_3
            set wheat-N-use wheat-N-use_3
            set soybean-N-use soybean-N-use_3
@@ -697,44 +697,44 @@ to food-calculation_1-2                                                         
 
   ifelse corn-tot-income > corn-guarantee                                                           ;Apply crop insurance?
     [set corn-tot-income corn-tot-income
-     ask patch 16 -27 [
+     ask patch 12 -27 [
       set plabel " "]]
     [set corn-tot-income corn-guarantee
-     ask patch 16 -27 [
-      set plabel "INSURANCE"
+     ask patch 12 -27 [
+      set plabel "INSURED"
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies corn insurance")]                  ;Print message in the Command Center
 
   ifelse wheat-tot-income > wheat-guarantee                                                         ;Apply crop insurance?
     [set wheat-tot-income wheat-tot-income
-     ask patch 0 56 [
+     ask patch -5 56 [
       set plabel " "]]
     [set wheat-tot-income wheat-guarantee
-     ask patch 0 56 [
-      set plabel "INSURANCE"
+     ask patch -5 56 [
+      set plabel "INSURED"
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]                 ;Print message in the Command Center
 
   ifelse soybean-tot-income > soybean-guarantee                                                     ;Apply crop insurance?
     [set soybean-tot-income soybean-tot-income
-     ask patch -34 -79 [
+     ask patch -39 -79 [
       set plabel " "]]
     [set soybean-tot-income soybean-guarantee
-     ask patch -34 -79 [
-      set plabel "INSURANCE"
+     ask patch -39 -79 [
+      set plabel "INSURED"
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies soybean insurance")]               ;Print message in the Command Center
 
   ifelse milo-tot-income > milo-guarantee                                                           ;Apply crop insurance?
     [set milo-tot-income milo-tot-income
-     ask patch -34 -12 [
+     ask patch -39 -12 [
       set plabel " "]]
     [set milo-tot-income milo-guarantee
-     ask patch -34 -12 [
-      set plabel "INSURANCE"
+     ask patch -39 -12 [
+      set plabel "INSURED"
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies milo insurance")]                  ;Print message in the Command Center
@@ -784,11 +784,11 @@ to food-calculation_2                                                           
 
   ifelse corn-tot-income > corn-guarantee                                                           ;Apply crop insurance?
     [set corn-tot-income corn-tot-income
-     ask patch 16 -27 [
+     ask patch 12 -27 [
       set plabel " "]]
     [set corn-tot-income corn-guarantee
-     ask patch 16 -27 [
-      set plabel "INSURANCE"
+     ask patch 12 -27 [
+      set plabel "INSURED"
       set plabel-color red
     ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies corn insurance")]                  ;Print message in the Command Center
@@ -796,33 +796,33 @@ to food-calculation_2                                                           
 
   ifelse wheat-tot-income > wheat-guarantee                                                         ;Apply crop insurance?
     [set wheat-tot-income wheat-tot-income
-     ask patch 0 56 [
+     ask patch -5 56 [
       set plabel " "]]
     [set wheat-tot-income wheat-guarantee
-     ask patch 0 56 [
-      set plabel "INSURANCE"
+     ask patch -5 56 [
+      set plabel "INSURED"
       set plabel-color red
     ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]                 ;Print message in the Command Center
 
   ifelse soybean-tot-income > soybean-guarantee                                                     ;Apply crop insurance?
     [set soybean-tot-income soybean-tot-income
-     ask patch -34 -79 [
+     ask patch -39 -79 [
       set plabel " "]]
     [set soybean-tot-income soybean-guarantee
-     ask patch -34 -79 [
-      set plabel "INSURANCE"
+     ask patch -39 -79 [
+      set plabel "INSURED"
       set plabel-color red
     ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies soybean insurance")]               ;Print message in the Command Center
 
   ifelse milo-tot-income > milo-guarantee                                                           ;Apply crop insurance?
     [set milo-tot-income milo-tot-income
-     ask patch -34 -12 [
+     ask patch -39 -12 [
       set plabel " "]]
     [set milo-tot-income milo-guarantee
-     ask patch -34 -12 [
-      set plabel "INSURANCE"
+     ask patch -39 -12 [
+      set plabel "INSURED"
       set plabel-color red
     ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies milo insurance")]                  ;Print message in the Command Center
@@ -872,44 +872,44 @@ to food-calculation_3                                                           
 
   ifelse corn-tot-income > corn-guarantee                                                           ;Apply crop insurance?
     [set corn-tot-income corn-tot-income
-     ask patch 16 -27 [
+     ask patch 12 -27 [
       set plabel " "]]
     [set corn-tot-income corn-guarantee
-     ask patch 16 -27 [
-      set plabel "INSURANCE"
+     ask patch 12 -27 [
+      set plabel "INSURED"
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies corn insurance")]                  ;Print message in the Command Center
 
   ifelse wheat-tot-income > wheat-guarantee                                                         ;Apply crop insurance?
     [set wheat-tot-income wheat-tot-income
-     ask patch 0 56 [
+     ask patch -5 56 [
       set plabel " "]]
     [set wheat-tot-income wheat-guarantee
-     ask patch 0 56 [
-      set plabel "INSURANCE"
+     ask patch -5 56 [
+      set plabel "INSURED"
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]                 ;Print message in the Command Center
 
   ifelse soybean-tot-income > soybean-guarantee                                                     ;Apply crop insurance?
     [set soybean-tot-income soybean-tot-income
-     ask patch -34 -79 [
+     ask patch -39 -79 [
       set plabel " "]]
     [set soybean-tot-income soybean-guarantee
-     ask patch -34 -79 [
-      set plabel "INSURANCE"
+     ask patch -39 -79 [
+      set plabel "INSURED"
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies soybean insurance")]               ;Print message in the Command Center
 
   ifelse milo-tot-income > milo-guarantee                                                           ;Apply crop insurance?
     [set milo-tot-income milo-tot-income
-     ask patch -34 -12 [
+     ask patch -39 -12 [
       set plabel " "]]
     [set milo-tot-income milo-guarantee
-     ask patch -34 -12 [
-      set plabel "INSURANCE"
+     ask patch -39 -12 [
+      set plabel "INSURED"
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies milo insurance")]                  ;Print message in the Command Center
@@ -954,44 +954,44 @@ to food-calculation_4                                                           
 
   ifelse corn-tot-income > corn-guarantee                                                           ;Apply crop insurance?
     [set corn-tot-income corn-tot-income
-     ask patch 16 -27 [
+     ask patch 12 -27 [
       set plabel " "]]
     [set corn-tot-income corn-guarantee
-     ask patch 16 -27 [
-      set plabel "INSURANCE"
+     ask patch 12 -27 [
+      set plabel "INSURED"
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies corn insurance")]                  ;Print message in the Command Center
 
   ifelse wheat-tot-income > wheat-guarantee                                                         ;Apply crop insurance?
     [set wheat-tot-income wheat-tot-income
-     ask patch 0 56 [
+     ask patch -5 56 [
       set plabel " "]]
     [set wheat-tot-income wheat-guarantee
-     ask patch 0 56 [
-      set plabel "INSURANCE"
+     ask patch -5 56 [
+      set plabel "INSURED"
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]                 ;Print message in the Command Center
 
   ifelse soybean-tot-income > soybean-guarantee                                                     ;Apply crop insurance?
     [set soybean-tot-income soybean-tot-income
-     ask patch -34 -79 [
+     ask patch -39 -79 [
       set plabel " "]]
     [set soybean-tot-income soybean-guarantee
-     ask patch -34 -79 [
-      set plabel "INSURANCE"
+     ask patch -39 -79 [
+      set plabel "INSURED"
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies soybean insurance")]               ;Print message in the Command Center
 
   ifelse milo-tot-income > milo-guarantee                                                           ;Apply crop insurance?
     [set milo-tot-income milo-tot-income
-     ask patch -34 -12 [
+     ask patch -39 -12 [
       set plabel " "]]
     [set milo-tot-income milo-guarantee
-     ask patch -34 -12 [
-      set plabel "INSURANCE"
+     ask patch -39 -12 [
+      set plabel "INSURED"
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies milo insurance")]                  ;Print message in the Command Center
@@ -1030,44 +1030,44 @@ to dryland-farming_1
 
   ifelse corn-tot-income > corn-guarantee                                                           ;Apply crop insurance?
     [set corn-tot-income corn-tot-income
-     ask patch 16 -27 [
+     ask patch 12 -27 [
       set plabel " "]]
     [set corn-tot-income corn-guarantee
-     ask patch 16 -27 [
-      set plabel "INSURANCE"
+     ask patch 12 -27 [
+      set plabel "INSURED"
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies corn insurance")]                  ;Print message in the Command Center
 
   ifelse wheat-tot-income > wheat-guarantee                                                         ;Apply crop insurance?
     [set wheat-tot-income wheat-tot-income
-     ask patch 0 56 [
+     ask patch -5 56 [
       set plabel " "]]
     [set wheat-tot-income wheat-guarantee
-     ask patch 0 56 [
-      set plabel "INSURANCE"
+     ask patch -5 56 [
+      set plabel "INSURED"
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]                 ;Print message in the Command Center
 
   ifelse soybean-tot-income > soybean-guarantee                                                     ;Apply crop insurance?
     [set soybean-tot-income soybean-tot-income
-     ask patch -34 -79 [
+     ask patch -39 -79 [
       set plabel " "]]
     [set soybean-tot-income soybean-guarantee
-     ask patch -34 -79 [
-      set plabel "INSURANCE"
+     ask patch -39 -79 [
+      set plabel "INSURED"
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies soybean insurance")]               ;Print message in the Command Center
 
   ifelse milo-tot-income > milo-guarantee                                                           ;Apply crop insurance?
     [set milo-tot-income milo-tot-income
-     ask patch -34 -12 [
+     ask patch -39 -12 [
       set plabel " "]]
     [set milo-tot-income milo-guarantee
-     ask patch -34 -12 [
-      set plabel "INSURANCE"
+     ask patch -39 -12 [
+      set plabel "INSURED"
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies milo insurance")]                  ;Print message in the Command Center
@@ -1121,44 +1121,44 @@ to dryland-farming_2
 
   ifelse corn-tot-income > corn-guarantee                                                           ;Apply crop insurance?
     [set corn-tot-income corn-tot-income
-     ask patch 16 -27 [
+     ask patch 12 -27 [
       set plabel " "]]
     [set corn-tot-income corn-guarantee
-     ask patch 16 -27 [
-      set plabel "INSURANCE"
+     ask patch 12 -27 [
+      set plabel "INSURED"
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies corn insurance")]                  ;Print message in the Command Center
 
   ifelse wheat-tot-income > wheat-guarantee                                                         ;Apply crop insurance?
     [set wheat-tot-income wheat-tot-income
-     ask patch 0 56 [
+     ask patch -5 56 [
       set plabel " "]]
     [set wheat-tot-income wheat-guarantee
-     ask patch 0 56 [
-      set plabel "INSURANCE"
+     ask patch -5 56 [
+      set plabel "INSURED"
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]                 ;Print message in the Command Center
 
   ifelse soybean-tot-income > soybean-guarantee                                                     ;Apply crop insurance?
     [set soybean-tot-income soybean-tot-income
-     ask patch -34 -79 [
+     ask patch -39 -79 [
       set plabel " "]]
     [set soybean-tot-income soybean-guarantee
-     ask patch -34 -79 [
-      set plabel "INSURANCE"
+     ask patch -39 -79 [
+      set plabel "INSURED"
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies soybean insurance")]               ;Print message in the Command Center
 
   ifelse milo-tot-income > milo-guarantee                                                           ;Apply crop insurance?
     [set milo-tot-income milo-tot-income
-     ask patch -34 -12 [
+     ask patch -39 -12 [
       set plabel " "]]
     [set milo-tot-income milo-guarantee
-     ask patch -34 -12 [
-      set plabel "INSURANCE"
+     ask patch -39 -12 [
+      set plabel "INSURED"
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies milo insurance")]                  ;Print message in the Command Center
@@ -1212,44 +1212,44 @@ to dryland-farming_3
 
   ifelse corn-tot-income > corn-guarantee                                                           ;Apply crop insurance?
     [set corn-tot-income corn-tot-income
-     ask patch 16 -27 [
+     ask patch 12 -27 [
       set plabel " "]]
     [set corn-tot-income corn-guarantee
-     ask patch 16 -27 [
-      set plabel "INSURANCE"
+     ask patch 12 -27 [
+      set plabel "INSURED"
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies corn insurance")]                  ;Print message in the Command Center
 
   ifelse wheat-tot-income > wheat-guarantee                                                         ;Apply crop insurance?
     [set wheat-tot-income wheat-tot-income
-     ask patch 0 56 [
+     ask patch -5 56 [
       set plabel " "]]
     [set wheat-tot-income wheat-guarantee
-     ask patch 0 56 [
-      set plabel "INSURANCE"
+     ask patch -5 56 [
+      set plabel "INSURED"
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]                 ;Print message in the Command Center
 
   ifelse soybean-tot-income > soybean-guarantee                                                     ;Apply crop insurance?
     [set soybean-tot-income soybean-tot-income
-     ask patch -34 -79 [
+     ask patch -39 -79 [
       set plabel " "]]
     [set soybean-tot-income soybean-guarantee
-     ask patch -34 -79 [
-      set plabel "INSURANCE"
+     ask patch -39 -79 [
+      set plabel "INSURED"
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies soybean insurance")]               ;Print message in the Command Center
 
   ifelse milo-tot-income > milo-guarantee                                                           ;Apply crop insurance?
     [set milo-tot-income milo-tot-income
-     ask patch -34 -12 [
+     ask patch -39 -12 [
       set plabel " "]]
     [set milo-tot-income milo-guarantee
-     ask patch -34 -12 [
-      set plabel "INSURANCE"
+     ask patch -39 -12 [
+      set plabel "INSURED"
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies milo insurance")]                  ;Print message in the Command Center
@@ -1298,44 +1298,44 @@ to dryland-farming_4
 
   ifelse corn-tot-income > corn-guarantee                                                           ;Apply crop insurance?
     [set corn-tot-income corn-tot-income
-     ask patch 16 -27 [
+     ask patch 12 -27 [
       set plabel " "]]
     [set corn-tot-income corn-guarantee
-     ask patch 16 -27 [
-      set plabel "INSURANCE"
+     ask patch 12 -27 [
+      set plabel "INSURED"
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies corn insurance")]                  ;Print message in the Command Center
 
   ifelse wheat-tot-income > wheat-guarantee                                                         ;Apply crop insurance?
     [set wheat-tot-income wheat-tot-income
-     ask patch 0 56 [
+     ask patch -5 56 [
       set plabel " "]]
     [set wheat-tot-income wheat-guarantee
-     ask patch 0 56 [
-      set plabel "INSURANCE"
+     ask patch -5 56 [
+      set plabel "INSURED"
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]                 ;Print message in the Command Center
 
   ifelse soybean-tot-income > soybean-guarantee                                                     ;Apply crop insurance?
     [set soybean-tot-income soybean-tot-income
-     ask patch -34 -79 [
+     ask patch -39 -79 [
       set plabel " "]]
     [set soybean-tot-income soybean-guarantee
-     ask patch -34 -79 [
-      set plabel "INSURANCE"
+     ask patch -39 -79 [
+      set plabel "INSURED"
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies soybean insurance")]               ;Print message in the Command Center
 
   ifelse milo-tot-income > milo-guarantee                                                           ;Apply crop insurance?
     [set milo-tot-income milo-tot-income
-     ask patch -34 -12 [
+     ask patch -39 -12 [
       set plabel " "]]
     [set milo-tot-income milo-guarantee
-     ask patch -34 -12 [
-      set plabel "INSURANCE"
+     ask patch -39 -12 [
+      set plabel "INSURED"
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies milo insurance")]                  ;Print message in the Command Center
@@ -1393,7 +1393,7 @@ to gw-depletion_1
   set current-elev (current-elev + patch-change)                                                    ;Set new current elevation (new top of aquifer)
   if current-elev > 69 [set current-elev 69]                                                        ;Exceed capacity
 
-  if current-elev < -66 [                                                                           ;Is the top of aquifer below 80% of initial thickness?
+  if current-elev < -74 [                                                                           ;Is the top of aquifer below 80% of initial thickness?
     ask aquifer-patches with [pycor < current-elev] [                                               ;Yes
       set pcolor 14]                                                                                ;Set "aquifer-patches" to be red
   ]
@@ -1423,7 +1423,7 @@ to gw-depletion_2
   set current-elev (current-elev + patch-change)                                                    ;Set new current elevation (new top of aquifer)
   if current-elev > 69 [set current-elev 69]                                                        ;Exceed capacity
 
-  if current-elev < -66 [                                                                           ;Is the top of aquifer below 80% of initial thickness?
+  if current-elev < -74 [                                                                           ;Is the top of aquifer below 80% of initial thickness?
     ask aquifer-patches with [pycor < current-elev] [                                               ;Yes
       set pcolor 14]                                                                                ;Set "aquifer-patches" to be red
   ]
@@ -1453,7 +1453,7 @@ to gw-depletion_3
   set current-elev (current-elev + patch-change)                                                    ;Set new current elevation (new top of aquifer)
   if current-elev > 69 [set current-elev 69]                                                        ;Exceed capacity
 
-  if current-elev < -66 [                                                                           ;Is the top of aquifer below 80% of initial thickness?
+  if current-elev < -74 [                                                                           ;Is the top of aquifer below 80% of initial thickness?
     ask aquifer-patches with [pycor < current-elev] [                                               ;Yes
       set pcolor 14]                                                                                ;Set "aquifer-patches" to be red
   ]
@@ -1483,7 +1483,7 @@ to gw-depletion_4
   set current-elev (current-elev + patch-change)                                                    ;Set new current elevation (new top of aquifer)
   if current-elev > 69 [set current-elev 69]                                                        ;Exceed capacity
 
-  if current-elev < -66 [                                                                           ;Is the top of aquifer below 80% of initial thickness?
+  if current-elev < -74 [                                                                           ;Is the top of aquifer below 80% of initial thickness?
     ask aquifer-patches with [pycor < current-elev] [                                               ;Yes
       set pcolor 14]                                                                                ;Set "aquifer-patches" to be red
   ]
@@ -1513,7 +1513,7 @@ to gw-depletion_dryland
   set current-elev (current-elev + patch-change)                                                    ;Set new current elevation (new top of aquifer)
   if current-elev > 69 [set current-elev 69]                                                        ;Exceed capacity
 
-  if current-elev < -66 [                                                                           ;Is the top of aquifer below 80% of initial thickness?
+  if current-elev < -74 [                                                                           ;Is the top of aquifer below 80% of initial thickness?
     ask aquifer-patches with [pycor < current-elev] [                                               ;Yes
       set pcolor 14]                                                                                ;Set "aquifer-patches" to be red
   ]
