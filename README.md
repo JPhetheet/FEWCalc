@@ -1,4 +1,4 @@
-# FEWCALc
+# FEWCalc
 
 FEWCalc is the Food-Energy-Water Calculator assembled by Jirapat Phetheet and Professor Mary C. Hill from Department of Geology, the University of Kansas.
 
