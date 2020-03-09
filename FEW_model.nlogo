@@ -19,6 +19,8 @@ globals [
   corn-guarantee wheat-guarantee soybeans-guarantee milo-guarantee
   corn-mean-yield wheat-mean-yield soybeans-mean-yield milo-mean-yield
   corn-tot-yield wheat-tot-yield soybeans-tot-yield milo-tot-yield
+  corn-yield-increment wheat-yield-increment soybeans-yield-increment milo-yield-increment inc-item
+  corn-irrig-increment wheat-irrig-increment soybeans-irrig-increment milo-irrig-increment
   corn-use-in wheat-use-in soybeans-use-in milo-use-in water-use-feet gw-change calibrated-water-use dryland-check?
   corn-N-app wheat-N-app soybeans-N-app milo-N-app N-accu
   corn-N-use wheat-N-use soybeans-N-use milo-N-use
@@ -964,19 +966,60 @@ to food-calculation_3                                                           
      print (word "Seq " ticks ", year " (ticks + 2008) " applies milo insurance")]                  ;Print message in the Command Center
 end
 
+to yield-increment-irrigation
+  set corn-yield-increment (((item (inc-item + 1) corn-yield_3) - (item inc-item corn-yield_3)) / 10)
+  set wheat-yield-increment (((item (inc-item + 1) wheat-yield_3) - (item inc-item wheat-yield_3)) / 10)
+  set soybeans-yield-increment (((item (inc-item + 1) soybeans-yield_3) - (item inc-item soybeans-yield_3)) / 10)
+  set milo-yield-increment (((item (inc-item + 1) milo-yield_3) - (item inc-item milo-yield_3)) / 10)
+
+  set corn-tot-yield ((item inc-item corn-yield_3) + ((ticks mod 10) * corn-yield-increment))
+  set wheat-tot-yield ((item inc-item wheat-yield_3) + ((ticks mod 10) * wheat-yield-increment))
+  set soybeans-tot-yield ((item inc-item soybeans-yield_3) + ((ticks mod 10) * soybeans-yield-increment))
+  set milo-tot-yield ((item inc-item milo-yield_3) + ((ticks mod 10) * milo-yield-increment))
+
+  print (word "year" ticks ": corn yield = " corn-tot-yield)
+  print (word "year" ticks ": wheat yield = " wheat-tot-yield)
+  print (word "year" ticks ": soybeans yield = " soybeans-tot-yield)
+  print (word "year" ticks ": milo yield = " milo-tot-yield)
+end
+
 to food-calculation_4                                                                               ;Randomly choose data from GCMs
-  if (ticks mod 10) = 0                                                                             ;Shuffle yrs-seq every 10 years
-  [set yrs-seq [0 1 2 3 4 5 6 7 8 9]                                                                ;List of data
-   set yrs-seq shuffle yrs-seq]                                                                     ;Shuffle command
-
-  let n (ticks mod 10)
-
-  ;print (word "food" yrs-seq)  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-  set corn-tot-yield (item (item n yrs-seq) corn-yield_3)                                           ;Each tick, corn yield will be accessed from a "corn-yield_3" list
-  set wheat-tot-yield (item (item n yrs-seq) wheat-yield_3)                                         ;Each tick, wheat yield will be accessed from a "wheat-yield_3" list
-  set soybeans-tot-yield (item (item n yrs-seq) soybeans-yield_3)                                     ;Each tick, soybeans yield will be accessed from a "soybeans-yield_3" list
-  set milo-tot-yield (item (item n yrs-seq) milo-yield_3)                                           ;Each tick, milo yield will be accessed from a "milo-yield_3" list
+  ifelse ticks >= 10 and ticks < 20
+    [set inc-item 1
+     yield-increment-irrigation]
+    [ifelse ticks >= 20 and ticks < 30
+      [set inc-item 2
+       yield-increment-irrigation]
+      [ifelse ticks >= 30 and ticks < 40
+        [set inc-item 3
+         yield-increment-irrigation]
+        [ifelse ticks >= 40 and ticks < 50
+          [set inc-item 4
+           yield-increment-irrigation]
+          [ifelse ticks >= 50 and ticks < 60
+            [set inc-item 5
+             yield-increment-irrigation]
+            [ifelse ticks >= 60 and ticks < 70
+              [set inc-item 6
+               yield-increment-irrigation]
+              [ifelse ticks >= 70 and ticks < 80
+                [set inc-item 7
+                 yield-increment-irrigation]
+                [ifelse ticks >= 80 and ticks < 90
+                  [set inc-item 8
+                   yield-increment-irrigation]
+                  [set inc-item 9
+                   set corn-tot-yield (item inc-item corn-yield_4)
+                   set wheat-tot-yield (item inc-item wheat-yield_4)
+                   set soybeans-tot-yield (item inc-item soybeans-yield_4)
+                   set milo-tot-yield (item inc-item milo-yield_4)]
+              ]
+            ]
+          ]
+        ]
+      ]
+    ]
+  ]
 
   set corn-history lput corn-tot-yield but-first corn-history                                       ;Add the most recent yield in a "corn-history" list and remove the oldest one
   set wheat-history lput wheat-tot-yield but-first wheat-history                                    ;Add the most recent yield in a "wheat-history" list and remove the oldest one
@@ -993,10 +1036,10 @@ to food-calculation_4                                                           
   set soybeans-guarantee ((soybeans-mean-yield * soybeans-coverage * soybeans-base-price) * soybeans-area)
   set milo-guarantee ((milo-mean-yield * milo-coverage * milo-base-price) * milo-area)
 
-  set corn-tot-income (item (item n yrs-seq) corn-yield_3 * item (item n yrs-seq) corn-price * corn-area)                ;Calculate farm gross income
-  set wheat-tot-income (item (item n yrs-seq) wheat-yield_3 * item (item n yrs-seq) wheat-price * wheat-area)
-  set soybeans-tot-income (item (item n yrs-seq) soybeans-yield_3 * item (item n yrs-seq) soybeans-price * soybeans-area)
-  set milo-tot-income (item (item n yrs-seq) milo-yield_3 * item (item n yrs-seq) milo-price * milo-area)
+  set corn-tot-income (corn-tot-yield * (one-of corn-price) * corn-area)                            ;Calculate farm gross income
+  set wheat-tot-income (wheat-tot-yield * (one-of wheat-price) * wheat-area)
+  set soybeans-tot-income (soybeans-tot-yield * (one-of soybeans-price) * soybeans-area)
+  set milo-tot-income (milo-tot-yield * (one-of milo-price) * milo-area)
 
   calculate-expenses_yield_3                                                                        ;Get farm expenses -- Link to "calculate-expenses_yield_3"
   calculate-net-income                                                                              ;Calculate farm net income
@@ -1023,7 +1066,7 @@ to food-calculation_4                                                           
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]                 ;Print message in the Command Center
 
-  ifelse soybeans-tot-income > soybeans-guarantee                                                     ;Apply crop insurance?
+  ifelse soybeans-tot-income > soybeans-guarantee                                                   ;Apply crop insurance?
     [set soybeans-tot-income soybeans-tot-income
      ask patch -37 -79 [
       set plabel " "]]
@@ -1032,7 +1075,7 @@ to food-calculation_4                                                           
       set plabel "Ins. Claim"
       set plabel-color red
       ]
-     print (word "Seq " ticks ", year " (ticks + 2008) " applies soybeans insurance")]               ;Print message in the Command Center
+     print (word "Seq " ticks ", year " (ticks + 2008) " applies soybeans insurance")]              ;Print message in the Command Center
 
   ifelse milo-tot-income > milo-guarantee                                                           ;Apply crop insurance?
     [set milo-tot-income milo-tot-income
@@ -1310,17 +1353,60 @@ to dryland-farming_3
   set milo-use-in item (k mod 10) milo-irrig_2                                                      ;Each tick, irrigation will be accessed from a "milo-irrig_2" list
 end
 
+to yield-increment-dryland
+  set corn-yield-increment (((item (inc-item + 1) corn-yield_4) - (item inc-item corn-yield_4)) / 10)
+  set wheat-yield-increment (((item (inc-item + 1) wheat-yield_4) - (item inc-item wheat-yield_4)) / 10)
+  set soybeans-yield-increment (((item (inc-item + 1) soybeans-yield_4) - (item inc-item soybeans-yield_4)) / 10)
+  set milo-yield-increment (((item (inc-item + 1) milo-yield_4) - (item inc-item milo-yield_4)) / 10)
+
+  set corn-tot-yield ((item inc-item corn-yield_4) + ((ticks mod 10) * corn-yield-increment))
+  set wheat-tot-yield ((item inc-item wheat-yield_4) + ((ticks mod 10) * wheat-yield-increment))
+  set soybeans-tot-yield ((item inc-item soybeans-yield_4) + ((ticks mod 10) * soybeans-yield-increment))
+  set milo-tot-yield ((item inc-item milo-yield_4) + ((ticks mod 10) * milo-yield-increment))
+
+  print (word "year" ticks ": corn yield = " corn-tot-yield)
+  print (word "year" ticks ": wheat yield = " wheat-tot-yield)
+  print (word "year" ticks ": soybeans yield = " soybeans-tot-yield)
+  print (word "year" ticks ": milo yield = " milo-tot-yield)
+end
+
 to dryland-farming_4
-  if (ticks mod 10) = 0                                                                             ;Shuffle yrs-seq every 10 years
-  [ set yrs-seq [0 1 2 3 4 5 6 7 8 9]                                                               ;List of data (must be the same seq as "food-calculation_4")
-    set yrs-seq shuffle yrs-seq]                                                                    ;Shuffle command
-
-  let n (ticks mod 10)
-
-  set corn-tot-yield (item (item n yrs-seq) corn-yield_4)                                           ;Each tick, corn yield will be accessed from a "corn-yield_4" list
-  set wheat-tot-yield (item (item n yrs-seq) wheat-yield_4)                                         ;Each tick, wheat yield will be accessed from a "wheat-yield_4" list
-  set soybeans-tot-yield (item (item n yrs-seq) soybeans-yield_4)                                     ;Each tick, soybeans yield will be accessed from a "soybeans-yield_4" list
-  set milo-tot-yield (item (item n yrs-seq) milo-yield_4)                                           ;Each tick, milo yield will be accessed from a "milo-yield_4" list
+  ifelse ticks >= 10 and ticks < 20
+    [set inc-item 1
+     yield-increment-dryland]
+    [ifelse ticks >= 20 and ticks < 30
+      [set inc-item 2
+       yield-increment-dryland]
+      [ifelse ticks >= 30 and ticks < 40
+        [set inc-item 3
+         yield-increment-dryland]
+        [ifelse ticks >= 40 and ticks < 50
+          [set inc-item 4
+           yield-increment-dryland]
+          [ifelse ticks >= 50 and ticks < 60
+            [set inc-item 5
+             yield-increment-dryland]
+            [ifelse ticks >= 60 and ticks < 70
+              [set inc-item 6
+               yield-increment-dryland]
+              [ifelse ticks >= 70 and ticks < 80
+                [set inc-item 7
+                 yield-increment-dryland]
+                [ifelse ticks >= 80 and ticks < 90
+                  [set inc-item 8
+                   yield-increment-dryland]
+                  [set inc-item 9
+                   set corn-tot-yield (item inc-item corn-yield_4)
+                   set wheat-tot-yield (item inc-item wheat-yield_4)
+                   set soybeans-tot-yield (item inc-item soybeans-yield_4)
+                   set milo-tot-yield (item inc-item milo-yield_4)]
+              ]
+            ]
+          ]
+        ]
+      ]
+    ]
+  ]
 
   set corn-history lput corn-tot-yield but-first corn-history                                       ;Add the most recent yield in a "corn-history" list and remove the oldest one
   set wheat-history lput wheat-tot-yield but-first wheat-history                                    ;Add the most recent yield in a "wheat-history" list and remove the oldest one
@@ -1337,10 +1423,10 @@ to dryland-farming_4
   set soybeans-guarantee ((soybeans-mean-yield * soybeans-coverage * soybeans-base-price) * soybeans-area)
   set milo-guarantee ((milo-mean-yield * milo-coverage * milo-base-price) * milo-area)
 
-  set corn-tot-income (item (item n yrs-seq) corn-yield_4 * item (item n yrs-seq) corn-price * corn-area)                 ;Calculate farm gross income
-  set wheat-tot-income (item (item n yrs-seq) wheat-yield_4 * item (item n yrs-seq) wheat-price * wheat-area)
-  set soybeans-tot-income (item (item n yrs-seq) soybeans-yield_4 * item (item n yrs-seq) soybeans-price * soybeans-area)
-  set milo-tot-income (item (item n yrs-seq) milo-yield_4 * item (item n yrs-seq) milo-price * milo-area)
+  set corn-tot-income (corn-tot-yield * (one-of corn-price) * corn-area)                 ;Calculate farm gross income
+  set wheat-tot-income (wheat-tot-yield * (one-of wheat-price) * wheat-area)
+  set soybeans-tot-income (soybeans-tot-yield * (one-of soybeans-price) * soybeans-area)
+  set milo-tot-income (milo-tot-yield * (one-of milo-price) * milo-area)
 
   calculate-expenses_yield_4                                                                        ;Get farm expenses -- Link to "calculate-expenses_yield_4"
   calculate-net-income                                                                              ;Calculate farm net income
@@ -1511,14 +1597,62 @@ to gw-depletion_3
   ]
 end
 
-to gw-depletion_4
-  let k (ticks mod 10)                                                                              ;Set a temporary variable
-  set corn-use-in item (item k yrs-seq) corn-irrig_3                                                ;Irrigation will be accessed from a "corn-irrig_3" list (seq is linked to "food_calculation_3")
-  set wheat-use-in item (item k yrs-seq) wheat-irrig_3                                              ;Irrigation will be accessed from a "wheat-irrig_3" list (seq is linked to "food_calculation_3")
-  set soybeans-use-in item (item k yrs-seq) soybeans-irrig_3                                          ;Irrigation will be accessed from a "soybeans-irrig_3" list (seq is linked to "food_calculation_3")
-  set milo-use-in item (item k yrs-seq) milo-irrig_3                                                ;Irrigation will be accessed from a "milo-irrig_1" list (seq is linked to "food_calculation_3")
+to irrigation-increment
+  set corn-irrig-increment (((item (inc-item + 1) corn-irrig_3) - (item inc-item corn-irrig_3)) / 10)
+  set wheat-irrig-increment (((item (inc-item + 1) wheat-irrig_3) - (item inc-item wheat-irrig_3)) / 10)
+  set soybeans-irrig-increment (((item (inc-item + 1) soybeans-irrig_3) - (item inc-item soybeans-irrig_3)) / 10)
+  set milo-irrig-increment (((item (inc-item + 1) milo-irrig_3) - (item inc-item milo-irrig_3)) / 10)
 
-  ;print (word "gw" yrs-seq)  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  set corn-use-in ((item inc-item corn-irrig_3) + ((ticks mod 10) * corn-irrig-increment))
+  set wheat-use-in ((item inc-item wheat-irrig_3) + ((ticks mod 10) * wheat-irrig-increment))
+  set soybeans-use-in ((item inc-item soybeans-irrig_3) + ((ticks mod 10) * soybeans-irrig-increment))
+  set milo-use-in ((item inc-item milo-irrig_3) + ((ticks mod 10) * milo-irrig-increment))
+
+  print (word "year" ticks ": corn irrig = " corn-use-in)
+  print (word "year" ticks ": wheat irrig = " wheat-use-in)
+  print (word "year" ticks ": soybeans irrig = " soybeans-use-in)
+  print (word "year" ticks ": milo irrig = " milo-use-in)
+end
+
+to gw-depletion_4
+  ifelse ticks >= 10 and ticks < 20
+    [set inc-item 1
+     irrigation-increment]
+    [ifelse ticks >= 20 and ticks < 30
+      [set inc-item 2
+       irrigation-increment]
+      [ifelse ticks >= 30 and ticks < 40
+        [set inc-item 3
+         irrigation-increment]
+        [ifelse ticks >= 40 and ticks < 50
+          [set inc-item 4
+           irrigation-increment]
+          [ifelse ticks >= 50 and ticks < 60
+            [set inc-item 5
+             irrigation-increment]
+            [ifelse ticks >= 60 and ticks < 70
+              [set inc-item 6
+               irrigation-increment]
+              [ifelse ticks >= 70 and ticks < 80
+                [set inc-item 7
+                 irrigation-increment]
+                [ifelse ticks >= 80 and ticks < 90
+                  [set inc-item 8
+                   irrigation-increment]
+                  [set inc-item 9
+                   set corn-use-in (item inc-item corn-irrig_3)
+                   set wheat-use-in (item inc-item wheat-irrig_3)
+                   set soybeans-use-in (item inc-item soybeans-irrig_3)
+                   set milo-use-in (item inc-item milo-irrig_3)]
+              ]
+            ]
+          ]
+        ]
+      ]
+    ]
+  ]
+
+
 
   ;Normalize water use
   set water-use-feet (((corn-use-in * corn-area) + (wheat-use-in * wheat-area) + (soybeans-use-in * soybeans-area) + (milo-use-in * milo-area)) / (12 * total-area))
@@ -1543,13 +1677,11 @@ to gw-depletion_4
 end
 
 to gw-depletion_dryland
-  let k (ticks mod 10)                                                                              ;Set a temporary variable
-  set corn-use-in item (item k yrs-seq) corn-irrig_2                                                ;Irrigation will be accessed from a "corn-irrig_3" list (seq is linked to "food_calculation_3")
-  set wheat-use-in item (item k yrs-seq) wheat-irrig_2                                              ;Irrigation will be accessed from a "wheat-irrig_3" list (seq is linked to "food_calculation_3")
-  set soybeans-use-in item (item k yrs-seq) soybeans-irrig_2                                          ;Irrigation will be accessed from a "soybeans-irrig_3" list (seq is linked to "food_calculation_3")
-  set milo-use-in item (item k yrs-seq) milo-irrig_2                                                ;Irrigation will be accessed from a "milo-irrig_1" list (seq is linked to "food_calculation_3")
-
-  ;print (word "gw" yrs-seq)  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  let k (ticks mod 10)
+  set corn-use-in 0
+  set wheat-use-in 0
+  set soybeans-use-in 0
+  set milo-use-in 0
 
   ;Normalize water use
   set water-use-feet (((corn-use-in * corn-area) + (wheat-use-in * wheat-area) + (soybeans-use-in * soybeans-area) + (milo-use-in * milo-area)) / (12 * total-area))
@@ -2348,7 +2480,7 @@ PLOT
 316
 1396
 436
-Water-Level Change
+Annual Water-Level Change
 Years
 Feet
 0.0
@@ -2400,7 +2532,7 @@ SLIDER
 Input-years
 Input-years
 0
-200
+150
 60.0
 5
 1
