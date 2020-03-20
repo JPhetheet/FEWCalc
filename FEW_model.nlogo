@@ -19,9 +19,8 @@ globals [
   corn-guarantee wheat-guarantee soybeans-guarantee milo-guarantee
   corn-mean-yield wheat-mean-yield soybeans-mean-yield milo-mean-yield
   corn-tot-yield wheat-tot-yield soybeans-tot-yield milo-tot-yield
-  corn-yield-increment wheat-yield-increment soybeans-yield-increment milo-yield-increment inc-item
   corn-irrig-increment wheat-irrig-increment soybeans-irrig-increment milo-irrig-increment
-  corn-use-in wheat-use-in soybeans-use-in milo-use-in water-use-feet gw-change calibrated-water-use dryland-check?
+  corn-use-in wheat-use-in soybeans-use-in milo-use-in water-use-feet gw-change calibrated-water-use dryland-check? GCM-random-year
   corn-N-app wheat-N-app soybeans-N-app milo-N-app N-accu
   corn-N-use wheat-N-use soybeans-N-use milo-N-use
   corn-N-use_1 wheat-N-use_1 soybeans-N-use_1 milo-N-use_1
@@ -219,6 +218,8 @@ end
 to go
   if ticks = Input-years [stop]
   reset-symbols
+  set GCM-random-year (random 81)
+  print (word "random = " GCM-random-year)
   future_processes
   contaminant
   ;treatment
@@ -730,7 +731,7 @@ to food-calculation_1-2                                                         
   calculate-expenses_yield_1                                                                        ;Get farm expenses -- Link to "calculate-expenses_yield_1"
   calculate-net-income                                                                              ;Calculate farm net income
 
-  ifelse corn-tot-income > corn-guarantee                                                           ;Apply crop insurance?
+  ifelse corn-tot-yield > corn-mean-yield                                                           ;Apply crop insurance?
     [set corn-tot-income corn-tot-income
      ask patch 13 -27 [
       set plabel " "]]
@@ -741,7 +742,7 @@ to food-calculation_1-2                                                         
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies corn insurance")]                  ;Print message in the Command Center
 
-  ifelse wheat-tot-income > wheat-guarantee                                                         ;Apply crop insurance?
+  ifelse wheat-tot-yield > wheat-mean-yield                                                         ;Apply crop insurance?
     [set wheat-tot-income wheat-tot-income
      ask patch -5 56 [
       set plabel " "]]
@@ -752,7 +753,7 @@ to food-calculation_1-2                                                         
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]                 ;Print message in the Command Center
 
-  ifelse soybeans-tot-income > soybeans-guarantee                                                     ;Apply crop insurance?
+  ifelse soybeans-tot-yield > soybeans-mean-yield                                                     ;Apply crop insurance?
     [set soybeans-tot-income soybeans-tot-income
      ask patch -37 -79 [
       set plabel " "]]
@@ -763,7 +764,7 @@ to food-calculation_1-2                                                         
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies soybeans insurance")]               ;Print message in the Command Center
 
-  ifelse milo-tot-income > milo-guarantee                                                           ;Apply crop insurance?
+  ifelse milo-tot-yield > milo-mean-yield                                                           ;Apply crop insurance?
     [set milo-tot-income milo-tot-income
      ask patch -37 -12 [
       set plabel " "]]
@@ -817,7 +818,7 @@ to food-calculation_2                                                           
   calculate-expenses_yield_1                                                                        ;Get farm expenses -- Link to "calculate-expenses_yield_1"
   calculate-net-income                                                                              ;Calculate farm net income
 
-  ifelse corn-tot-income > corn-guarantee                                                           ;Apply crop insurance?
+  ifelse corn-tot-yield > corn-mean-yield                                                           ;Apply crop insurance?
     [set corn-tot-income corn-tot-income
      ask patch 13 -27 [
       set plabel " "]]
@@ -829,7 +830,7 @@ to food-calculation_2                                                           
      print (word "Seq " ticks ", year " (ticks + 2008) " applies corn insurance")]                  ;Print message in the Command Center
 
 
-  ifelse wheat-tot-income > wheat-guarantee                                                         ;Apply crop insurance?
+  ifelse wheat-tot-yield > wheat-mean-yield                                                         ;Apply crop insurance?
     [set wheat-tot-income wheat-tot-income
      ask patch -5 56 [
       set plabel " "]]
@@ -840,7 +841,7 @@ to food-calculation_2                                                           
     ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]                 ;Print message in the Command Center
 
-  ifelse soybeans-tot-income > soybeans-guarantee                                                     ;Apply crop insurance?
+  ifelse soybeans-tot-yield > soybeans-mean-yield                                                     ;Apply crop insurance?
     [set soybeans-tot-income soybeans-tot-income
      ask patch -37 -79 [
       set plabel " "]]
@@ -851,7 +852,7 @@ to food-calculation_2                                                           
     ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies soybeans insurance")]               ;Print message in the Command Center
 
-  ifelse milo-tot-income > milo-guarantee                                                           ;Apply crop insurance?
+  ifelse milo-tot-yield > milo-mean-yield                                                           ;Apply crop insurance?
     [set milo-tot-income milo-tot-income
      ask patch -37 -12 [
       set plabel " "]]
@@ -905,7 +906,7 @@ to food-calculation_3                                                           
   calculate-expenses_yield_1                                                                        ;Get farm expenses -- Link to "calculate-expenses_yield_1"
   calculate-net-income                                                                              ;Calculate farm net income
 
-  ifelse corn-tot-income > corn-guarantee                                                           ;Apply crop insurance?
+  ifelse corn-tot-yield > corn-mean-yield                                                           ;Apply crop insurance?
     [set corn-tot-income corn-tot-income
      ask patch 13 -27 [
       set plabel " "]]
@@ -916,7 +917,7 @@ to food-calculation_3                                                           
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies corn insurance")]                  ;Print message in the Command Center
 
-  ifelse wheat-tot-income > wheat-guarantee                                                         ;Apply crop insurance?
+  ifelse wheat-tot-yield > wheat-mean-yield                                                         ;Apply crop insurance?
     [set wheat-tot-income wheat-tot-income
      ask patch -5 56 [
       set plabel " "]]
@@ -927,7 +928,7 @@ to food-calculation_3                                                           
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]                 ;Print message in the Command Center
 
-  ifelse soybeans-tot-income > soybeans-guarantee                                                     ;Apply crop insurance?
+  ifelse soybeans-tot-yield > soybeans-mean-yield                                                     ;Apply crop insurance?
     [set soybeans-tot-income soybeans-tot-income
      ask patch -37 -79 [
       set plabel " "]]
@@ -938,7 +939,7 @@ to food-calculation_3                                                           
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies soybeans insurance")]               ;Print message in the Command Center
 
-  ifelse milo-tot-income > milo-guarantee                                                           ;Apply crop insurance?
+  ifelse milo-tot-yield > milo-mean-yield                                                           ;Apply crop insurance?
     [set milo-tot-income milo-tot-income
      ask patch -37 -12 [
       set plabel " "]]
@@ -950,60 +951,21 @@ to food-calculation_3                                                           
      print (word "Seq " ticks ", year " (ticks + 2008) " applies milo insurance")]                  ;Print message in the Command Center
 end
 
-to yield-increment-irrigation
-  set corn-yield-increment (((item (inc-item + 1) corn-yield_3) - (item inc-item corn-yield_3)) / 10)
-  set wheat-yield-increment (((item (inc-item + 1) wheat-yield_3) - (item inc-item wheat-yield_3)) / 10)
-  set soybeans-yield-increment (((item (inc-item + 1) soybeans-yield_3) - (item inc-item soybeans-yield_3)) / 10)
-  set milo-yield-increment (((item (inc-item + 1) milo-yield_3) - (item inc-item milo-yield_3)) / 10)
-
-  set corn-tot-yield ((item inc-item corn-yield_3) + ((ticks mod 10) * corn-yield-increment))
-  set wheat-tot-yield ((item inc-item wheat-yield_3) + ((ticks mod 10) * wheat-yield-increment))
-  set soybeans-tot-yield ((item inc-item soybeans-yield_3) + ((ticks mod 10) * soybeans-yield-increment))
-  set milo-tot-yield ((item inc-item milo-yield_3) + ((ticks mod 10) * milo-yield-increment))
-
-  print (word "year" ticks ": corn yield = " corn-tot-yield)
-  print (word "year" ticks ": wheat yield = " wheat-tot-yield)
-  print (word "year" ticks ": soybeans yield = " soybeans-tot-yield)
-  print (word "year" ticks ": milo yield = " milo-tot-yield)
-end
-
 to food-calculation_4                                                                               ;Randomly choose data from GCMs
-  ifelse ticks >= 10 and ticks < 20
-    [set inc-item 1
-     yield-increment-irrigation]
-    [ifelse ticks >= 20 and ticks < 30
-      [set inc-item 2
-       yield-increment-irrigation]
-      [ifelse ticks >= 30 and ticks < 40
-        [set inc-item 3
-         yield-increment-irrigation]
-        [ifelse ticks >= 40 and ticks < 50
-          [set inc-item 4
-           yield-increment-irrigation]
-          [ifelse ticks >= 50 and ticks < 60
-            [set inc-item 5
-             yield-increment-irrigation]
-            [ifelse ticks >= 60 and ticks < 70
-              [set inc-item 6
-               yield-increment-irrigation]
-              [ifelse ticks >= 70 and ticks < 80
-                [set inc-item 7
-                 yield-increment-irrigation]
-                [ifelse ticks >= 80 and ticks < 90
-                  [set inc-item 8
-                   yield-increment-irrigation]
-                  [set inc-item 9
-                   set corn-tot-yield (item inc-item corn-yield_4)
-                   set wheat-tot-yield (item inc-item wheat-yield_4)
-                   set soybeans-tot-yield (item inc-item soybeans-yield_4)
-                   set milo-tot-yield (item inc-item milo-yield_4)]
-              ]
-            ]
-          ]
-        ]
-      ]
-    ]
-  ]
+  ifelse ticks < 91
+  [let m (ticks - 10)
+   set corn-tot-yield (item m corn-yield_3)
+   set wheat-tot-yield (item m wheat-yield_3)
+   set soybeans-tot-yield (item m soybeans-yield_3)
+   set milo-tot-yield (item m milo-yield_3)]
+  [print ticks
+   print (word "food-cal_4 " GCM-random-year)
+   set corn-tot-yield (item GCM-random-year corn-yield_3)
+   set wheat-tot-yield (item GCM-random-year wheat-yield_3)
+   set soybeans-tot-yield (item GCM-random-year soybeans-yield_3)
+   set milo-tot-yield (item GCM-random-year milo-yield_3)]
+
+  print corn-tot-yield
 
   set corn-history lput corn-tot-yield but-first corn-history                                       ;Add the most recent yield in a "corn-history" list and remove the oldest one
   set wheat-history lput wheat-tot-yield but-first wheat-history                                    ;Add the most recent yield in a "wheat-history" list and remove the oldest one
@@ -1028,7 +990,7 @@ to food-calculation_4                                                           
   calculate-expenses_yield_3                                                                        ;Get farm expenses -- Link to "calculate-expenses_yield_3"
   calculate-net-income                                                                              ;Calculate farm net income
 
-  ifelse corn-tot-income > corn-guarantee                                                           ;Apply crop insurance?
+  ifelse corn-tot-yield > corn-mean-yield                                                           ;Apply crop insurance?
     [set corn-tot-income corn-tot-income
      ask patch 13 -27 [
       set plabel " "]]
@@ -1039,7 +1001,7 @@ to food-calculation_4                                                           
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies corn insurance")]                  ;Print message in the Command Center
 
-  ifelse wheat-tot-income > wheat-guarantee                                                         ;Apply crop insurance?
+  ifelse wheat-tot-yield > wheat-mean-yield                                                         ;Apply crop insurance?
     [set wheat-tot-income wheat-tot-income
      ask patch -5 56 [
       set plabel " "]]
@@ -1050,7 +1012,7 @@ to food-calculation_4                                                           
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]                 ;Print message in the Command Center
 
-  ifelse soybeans-tot-income > soybeans-guarantee                                                   ;Apply crop insurance?
+  ifelse soybeans-tot-yield > soybeans-mean-yield                                                  ;Apply crop insurance?
     [set soybeans-tot-income soybeans-tot-income
      ask patch -37 -79 [
       set plabel " "]]
@@ -1061,7 +1023,7 @@ to food-calculation_4                                                           
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies soybeans insurance")]              ;Print message in the Command Center
 
-  ifelse milo-tot-income > milo-guarantee                                                           ;Apply crop insurance?
+  ifelse milo-tot-yield > milo-mean-yield                                                           ;Apply crop insurance?
     [set milo-tot-income milo-tot-income
      ask patch -37 -12 [
       set plabel " "]]
@@ -1104,7 +1066,7 @@ to dryland-farming_1
   calculate-expenses_yield_2                                                                        ;Get farm expenses -- Link to "calculate-expenses_yield_1"
   calculate-net-income                                                                              ;Calculate farm net income
 
-  ifelse corn-tot-income > corn-guarantee                                                           ;Apply crop insurance?
+  ifelse corn-tot-yield > corn-mean-yield                                                           ;Apply crop insurance?
     [set corn-tot-income corn-tot-income
      ask patch 13 -27 [
       set plabel " "]]
@@ -1115,7 +1077,7 @@ to dryland-farming_1
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies corn insurance")]                  ;Print message in the Command Center
 
-  ifelse wheat-tot-income > wheat-guarantee                                                         ;Apply crop insurance?
+  ifelse wheat-tot-yield > wheat-mean-yield                                                         ;Apply crop insurance?
     [set wheat-tot-income wheat-tot-income
      ask patch -5 56 [
       set plabel " "]]
@@ -1126,7 +1088,7 @@ to dryland-farming_1
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]                 ;Print message in the Command Center
 
-  ifelse soybeans-tot-income > soybeans-guarantee                                                     ;Apply crop insurance?
+  ifelse soybeans-tot-yield > soybeans-mean-yield                                                     ;Apply crop insurance?
     [set soybeans-tot-income soybeans-tot-income
      ask patch -37 -79 [
       set plabel " "]]
@@ -1137,7 +1099,7 @@ to dryland-farming_1
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies soybeans insurance")]               ;Print message in the Command Center
 
-  ifelse milo-tot-income > milo-guarantee                                                           ;Apply crop insurance?
+  ifelse milo-tot-yield > milo-mean-yield                                                          ;Apply crop insurance?
     [set milo-tot-income milo-tot-income
      ask patch -37 -12 [
       set plabel " "]]
@@ -1195,7 +1157,7 @@ to dryland-farming_2
   calculate-expenses_yield_2                                                                        ;Get farm expenses -- Link to "calculate-expenses_yield_2"
   calculate-net-income                                                                              ;Calculate farm net income
 
-  ifelse corn-tot-income > corn-guarantee                                                           ;Apply crop insurance?
+  ifelse corn-tot-yield > corn-mean-yield                                                           ;Apply crop insurance?
     [set corn-tot-income corn-tot-income
      ask patch 13 -27 [
       set plabel " "]]
@@ -1206,7 +1168,7 @@ to dryland-farming_2
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies corn insurance")]                  ;Print message in the Command Center
 
-  ifelse wheat-tot-income > wheat-guarantee                                                         ;Apply crop insurance?
+  ifelse wheat-tot-yield > wheat-mean-yield                                                         ;Apply crop insurance?
     [set wheat-tot-income wheat-tot-income
      ask patch -5 56 [
       set plabel " "]]
@@ -1217,7 +1179,7 @@ to dryland-farming_2
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]                 ;Print message in the Command Center
 
-  ifelse soybeans-tot-income > soybeans-guarantee                                                     ;Apply crop insurance?
+  ifelse soybeans-tot-yield > soybeans-mean-yield                                                     ;Apply crop insurance?
     [set soybeans-tot-income soybeans-tot-income
      ask patch -37 -79 [
       set plabel " "]]
@@ -1228,7 +1190,7 @@ to dryland-farming_2
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies soybeans insurance")]               ;Print message in the Command Center
 
-  ifelse milo-tot-income > milo-guarantee                                                           ;Apply crop insurance?
+  ifelse milo-tot-yield > milo-mean-yield                                                           ;Apply crop insurance?
     [set milo-tot-income milo-tot-income
      ask patch -37 -12 [
       set plabel " "]]
@@ -1286,7 +1248,7 @@ to dryland-farming_3
   calculate-expenses_yield_2                                                                        ;Get farm expenses -- Link to "calculate-expenses_yield_2"
   calculate-net-income                                                                              ;Calculate farm net income
 
-  ifelse corn-tot-income > corn-guarantee                                                           ;Apply crop insurance?
+  ifelse corn-tot-yield > corn-mean-yield                                                           ;Apply crop insurance?
     [set corn-tot-income corn-tot-income
      ask patch 13 -27 [
       set plabel " "]]
@@ -1297,7 +1259,7 @@ to dryland-farming_3
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies corn insurance")]                  ;Print message in the Command Center
 
-  ifelse wheat-tot-income > wheat-guarantee                                                         ;Apply crop insurance?
+  ifelse wheat-tot-yield > wheat-mean-yield                                                         ;Apply crop insurance?
     [set wheat-tot-income wheat-tot-income
      ask patch -5 56 [
       set plabel " "]]
@@ -1308,7 +1270,7 @@ to dryland-farming_3
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]                 ;Print message in the Command Center
 
-  ifelse soybeans-tot-income > soybeans-guarantee                                                     ;Apply crop insurance?
+  ifelse soybeans-tot-yield > soybeans-mean-yield                                                     ;Apply crop insurance?
     [set soybeans-tot-income soybeans-tot-income
      ask patch -37 -79 [
       set plabel " "]]
@@ -1319,7 +1281,7 @@ to dryland-farming_3
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies soybeans insurance")]               ;Print message in the Command Center
 
-  ifelse milo-tot-income > milo-guarantee                                                           ;Apply crop insurance?
+  ifelse milo-tot-yield > milo-mean-yield                                                           ;Apply crop insurance?
     [set milo-tot-income milo-tot-income
      ask patch -37 -12 [
       set plabel " "]]
@@ -1337,60 +1299,20 @@ to dryland-farming_3
   set milo-use-in item (k mod 10) milo-irrig_2                                                      ;Each tick, irrigation will be accessed from a "milo-irrig_2" list
 end
 
-to yield-increment-dryland
-  set corn-yield-increment (((item (inc-item + 1) corn-yield_4) - (item inc-item corn-yield_4)) / 10)
-  set wheat-yield-increment (((item (inc-item + 1) wheat-yield_4) - (item inc-item wheat-yield_4)) / 10)
-  set soybeans-yield-increment (((item (inc-item + 1) soybeans-yield_4) - (item inc-item soybeans-yield_4)) / 10)
-  set milo-yield-increment (((item (inc-item + 1) milo-yield_4) - (item inc-item milo-yield_4)) / 10)
-
-  set corn-tot-yield ((item inc-item corn-yield_4) + ((ticks mod 10) * corn-yield-increment))
-  set wheat-tot-yield ((item inc-item wheat-yield_4) + ((ticks mod 10) * wheat-yield-increment))
-  set soybeans-tot-yield ((item inc-item soybeans-yield_4) + ((ticks mod 10) * soybeans-yield-increment))
-  set milo-tot-yield ((item inc-item milo-yield_4) + ((ticks mod 10) * milo-yield-increment))
-
-  print (word "year" ticks ": corn yield = " corn-tot-yield)
-  print (word "year" ticks ": wheat yield = " wheat-tot-yield)
-  print (word "year" ticks ": soybeans yield = " soybeans-tot-yield)
-  print (word "year" ticks ": milo yield = " milo-tot-yield)
-end
-
 to dryland-farming_4
-  ifelse ticks >= 10 and ticks < 20
-    [set inc-item 1
-     yield-increment-dryland]
-    [ifelse ticks >= 20 and ticks < 30
-      [set inc-item 2
-       yield-increment-dryland]
-      [ifelse ticks >= 30 and ticks < 40
-        [set inc-item 3
-         yield-increment-dryland]
-        [ifelse ticks >= 40 and ticks < 50
-          [set inc-item 4
-           yield-increment-dryland]
-          [ifelse ticks >= 50 and ticks < 60
-            [set inc-item 5
-             yield-increment-dryland]
-            [ifelse ticks >= 60 and ticks < 70
-              [set inc-item 6
-               yield-increment-dryland]
-              [ifelse ticks >= 70 and ticks < 80
-                [set inc-item 7
-                 yield-increment-dryland]
-                [ifelse ticks >= 80 and ticks < 90
-                  [set inc-item 8
-                   yield-increment-dryland]
-                  [set inc-item 9
-                   set corn-tot-yield (item inc-item corn-yield_4)
-                   set wheat-tot-yield (item inc-item wheat-yield_4)
-                   set soybeans-tot-yield (item inc-item soybeans-yield_4)
-                   set milo-tot-yield (item inc-item milo-yield_4)]
-              ]
-            ]
-          ]
-        ]
-      ]
-    ]
-  ]
+
+  ifelse ticks < 91
+  [let m (ticks - 10)
+   set corn-tot-yield (item m corn-yield_4)
+   set wheat-tot-yield (item m wheat-yield_4)
+   set soybeans-tot-yield (item m soybeans-yield_4)
+   set milo-tot-yield (item m milo-yield_4)]
+  [print ticks
+   print (word "dryland-farm_4 " GCM-random-year)
+   set corn-tot-yield (item GCM-random-year corn-yield_4)
+   set wheat-tot-yield (item GCM-random-year wheat-yield_4)
+   set soybeans-tot-yield (item GCM-random-year soybeans-yield_4)
+   set milo-tot-yield (item GCM-random-year milo-yield_4)]
 
   set corn-history lput corn-tot-yield but-first corn-history                                       ;Add the most recent yield in a "corn-history" list and remove the oldest one
   set wheat-history lput wheat-tot-yield but-first wheat-history                                    ;Add the most recent yield in a "wheat-history" list and remove the oldest one
@@ -1415,7 +1337,7 @@ to dryland-farming_4
   calculate-expenses_yield_4                                                                        ;Get farm expenses -- Link to "calculate-expenses_yield_4"
   calculate-net-income                                                                              ;Calculate farm net income
 
-  ifelse corn-tot-income > corn-guarantee                                                           ;Apply crop insurance?
+  ifelse corn-tot-yield > corn-mean-yield                                                           ;Apply crop insurance?
     [set corn-tot-income corn-tot-income
      ask patch 13 -27 [
       set plabel " "]]
@@ -1426,7 +1348,7 @@ to dryland-farming_4
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies corn insurance")]                  ;Print message in the Command Center
 
-  ifelse wheat-tot-income > wheat-guarantee                                                         ;Apply crop insurance?
+  ifelse wheat-tot-yield > wheat-mean-yield                                                         ;Apply crop insurance?
     [set wheat-tot-income wheat-tot-income
      ask patch -5 56 [
       set plabel " "]]
@@ -1437,7 +1359,7 @@ to dryland-farming_4
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]                 ;Print message in the Command Center
 
-  ifelse soybeans-tot-income > soybeans-guarantee                                                     ;Apply crop insurance?
+  ifelse soybeans-tot-yield > soybeans-mean-yield                                                     ;Apply crop insurance?
     [set soybeans-tot-income soybeans-tot-income
      ask patch -37 -79 [
       set plabel " "]]
@@ -1448,7 +1370,7 @@ to dryland-farming_4
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies soybeans insurance")]               ;Print message in the Command Center
 
-  ifelse milo-tot-income > milo-guarantee                                                           ;Apply crop insurance?
+  ifelse milo-tot-yield > milo-mean-yield                                                           ;Apply crop insurance?
     [set milo-tot-income milo-tot-income
      ask patch -37 -12 [
       set plabel " "]]
@@ -1581,62 +1503,21 @@ to gw-depletion_3
   ]
 end
 
-to irrigation-increment
-  set corn-irrig-increment (((item (inc-item + 1) corn-irrig_3) - (item inc-item corn-irrig_3)) / 10)
-  set wheat-irrig-increment (((item (inc-item + 1) wheat-irrig_3) - (item inc-item wheat-irrig_3)) / 10)
-  set soybeans-irrig-increment (((item (inc-item + 1) soybeans-irrig_3) - (item inc-item soybeans-irrig_3)) / 10)
-  set milo-irrig-increment (((item (inc-item + 1) milo-irrig_3) - (item inc-item milo-irrig_3)) / 10)
-
-  set corn-use-in ((item inc-item corn-irrig_3) + ((ticks mod 10) * corn-irrig-increment))
-  set wheat-use-in ((item inc-item wheat-irrig_3) + ((ticks mod 10) * wheat-irrig-increment))
-  set soybeans-use-in ((item inc-item soybeans-irrig_3) + ((ticks mod 10) * soybeans-irrig-increment))
-  set milo-use-in ((item inc-item milo-irrig_3) + ((ticks mod 10) * milo-irrig-increment))
-
-  print (word "year" ticks ": corn irrig = " corn-use-in)
-  print (word "year" ticks ": wheat irrig = " wheat-use-in)
-  print (word "year" ticks ": soybeans irrig = " soybeans-use-in)
-  print (word "year" ticks ": milo irrig = " milo-use-in)
-end
-
 to gw-depletion_4
-  ifelse ticks >= 10 and ticks < 20
-    [set inc-item 1
-     irrigation-increment]
-    [ifelse ticks >= 20 and ticks < 30
-      [set inc-item 2
-       irrigation-increment]
-      [ifelse ticks >= 30 and ticks < 40
-        [set inc-item 3
-         irrigation-increment]
-        [ifelse ticks >= 40 and ticks < 50
-          [set inc-item 4
-           irrigation-increment]
-          [ifelse ticks >= 50 and ticks < 60
-            [set inc-item 5
-             irrigation-increment]
-            [ifelse ticks >= 60 and ticks < 70
-              [set inc-item 6
-               irrigation-increment]
-              [ifelse ticks >= 70 and ticks < 80
-                [set inc-item 7
-                 irrigation-increment]
-                [ifelse ticks >= 80 and ticks < 90
-                  [set inc-item 8
-                   irrigation-increment]
-                  [set inc-item 9
-                   set corn-use-in (item inc-item corn-irrig_3)
-                   set wheat-use-in (item inc-item wheat-irrig_3)
-                   set soybeans-use-in (item inc-item soybeans-irrig_3)
-                   set milo-use-in (item inc-item milo-irrig_3)]
-              ]
-            ]
-          ]
-        ]
-      ]
-    ]
-  ]
 
+  ifelse ticks < 91
+  [let m (ticks - 10)
+   set corn-use-in (item m corn-irrig_3)
+   set wheat-use-in (item m wheat-irrig_3)
+   set soybeans-use-in (item m soybeans-irrig_3)
+   set milo-use-in (item m milo-irrig_3)]
+  [print (word "gw-deplet_4 " GCM-random-year)
+   set corn-use-in (item GCM-random-year corn-irrig_3)
+   set wheat-use-in (item GCM-random-year wheat-irrig_3)
+   set soybeans-use-in (item GCM-random-year soybeans-irrig_3)
+   set milo-use-in (item GCM-random-year milo-irrig_3)]
 
+  print corn-use-in
 
   ;Normalize water use
   set water-use-feet (((corn-use-in * corn-area) + (wheat-use-in * wheat-area) + (soybeans-use-in * soybeans-area) + (milo-use-in * milo-area)) / (12 * total-area))
@@ -2060,7 +1941,7 @@ Aquifer-thickness
 Aquifer-thickness
 0
 300
-200.0
+120.0
 10
 1
 Feet
@@ -2450,9 +2331,9 @@ water-use-feet
 11
 
 TEXTBOX
-348
+347
 504
-803
+802
 522
 **Year in these plots represents a sequential year. Year 1 is 2008 and year 60 is 2067.
 10
@@ -2512,6 +2393,16 @@ Input-years
 1
 NIL
 HORIZONTAL
+
+TEXTBOX
+347
+517
+806
+535
+***Scenario 4, GCM data is available to year 91 (2098). It will be randomized after that year.
+10
+5.0
+1
 
 @#$#@#$#@
 # FEWCalc
