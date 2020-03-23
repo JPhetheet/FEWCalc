@@ -21,7 +21,7 @@ globals [
   corn-tot-yield wheat-tot-yield soybeans-tot-yield milo-tot-yield
   corn-irrig-increment wheat-irrig-increment soybeans-irrig-increment milo-irrig-increment
   corn-use-in wheat-use-in soybeans-use-in milo-use-in water-use-feet gw-change calibrated-water-use dryland-check? GCM-random-year
-  corn-N-app wheat-N-app soybeans-N-app milo-N-app N-accu
+  corn-N-app wheat-N-app soybeans-N-app milo-N-app N-accu N-accu-temp
   corn-N-use wheat-N-use soybeans-N-use milo-N-use
   corn-N-use_1 wheat-N-use_1 soybeans-N-use_1 milo-N-use_1
   corn-N-use_2 wheat-N-use_2 soybeans-N-use_2 milo-N-use_2
@@ -1572,14 +1572,14 @@ end
 
 to contaminant                                                                                      ;Surface water contamination
   let k (ticks mod 10)
-  let N-accu-temp (0.07 * (((item (item k yrs-seq) corn-N-app) * corn-area) + ((item (item k yrs-seq) wheat-N-app) * wheat-area) + ((item (item k yrs-seq) soybeans-N-app) * soybeans-area) + ((item (item k yrs-seq) milo-N-app) * milo-area) / 1.12)) ;1.12 (convert from kg/ha to pound/ac)
+  set N-accu-temp (0.1 * (((item (item k yrs-seq) corn-N-app) * corn-area) + ((item (item k yrs-seq) wheat-N-app) * wheat-area) + ((item (item k yrs-seq) soybeans-N-app) * soybeans-area) + ((item (item k yrs-seq) milo-N-app) * milo-area) / 1.12)) ;1.12 (convert from kg/ha to pound/ac)
 
   set N-accu (N-accu + N-accu-temp)
 
-  ask patch -1 0 [ask n-of (0.07 * (item (item k yrs-seq) corn-N-app) / 1.12) patches in-radius (item 0 radius-of-%area) [set pcolor brown]]        ;show dots in lbs/ac
-  ask patch -18 84 [ask n-of (0.07 * (item (item k yrs-seq) corn-N-app) / 1.12) patches in-radius (item 0 radius-of-%area) [set pcolor brown]]      ;show dots in lbs/ac
-  ask patch -51.5 -51 [ask n-of (0.07 * (item (item k yrs-seq) corn-N-app) / 1.12) patches in-radius (item 0 radius-of-%area) [set pcolor brown]]   ;show dots in lbs/ac
-  ask patch -52 16 [ask n-of (0.07 * (item (item k yrs-seq) corn-N-app) / 1.12) patches in-radius (item 0 radius-of-%area) [set pcolor brown]]      ;show dots in lbs/ac
+  ask patch -1 0 [ask n-of (0.1 * (item (item k yrs-seq) corn-N-app) / 1.12) patches in-radius (item 0 radius-of-%area) [set pcolor brown]]        ;show dots in lbs/ac
+  ask patch -18 84 [ask n-of (0.1 * (item (item k yrs-seq) corn-N-app) / 1.12) patches in-radius (item 0 radius-of-%area) [set pcolor brown]]      ;show dots in lbs/ac
+  ask patch -51.5 -51 [ask n-of (0.1 * (item (item k yrs-seq) corn-N-app) / 1.12) patches in-radius (item 0 radius-of-%area) [set pcolor brown]]   ;show dots in lbs/ac
+  ask patch -52 16 [ask n-of (0.1 * (item (item k yrs-seq) corn-N-app) / 1.12) patches in-radius (item 0 radius-of-%area) [set pcolor brown]]      ;show dots in lbs/ac
 
   if (item k yrs-seq) = 7 or (item k yrs-seq) = 8 or (item k yrs-seq) = 9 [
     ask up-to-n-of (0.001 * N-accu) river-patches with [pcolor = 87] [set pcolor brown]                   ;0.001 is a scaling factor
@@ -1941,7 +1941,7 @@ Aquifer-thickness
 Aquifer-thickness
 0
 300
-120.0
+200.0
 10
 1
 Feet
@@ -2164,7 +2164,7 @@ CHOOSER
 Future_Process
 Future_Process
 "Repeat Historical" "Wetter Future" "Dryer Future" "Impose T, P, & S Changes"
-3
+0
 
 TEXTBOX
 18
