@@ -219,7 +219,6 @@ to go
   if ticks = Input-years [stop]
   reset-symbols
   set GCM-random-year (random 81)
-  print (word "random = " GCM-random-year)
   future_processes
   contaminant
   ;treatment
@@ -536,7 +535,7 @@ if Future_Process = "Repeat Historical"                                         
              set wheat-N-use wheat-N-use_2
              set soybeans-N-use soybeans-N-use_2
              set milo-N-use milo-N-use_2
-             print (word "Seq " ticks ", year " (ticks + 2008) " dryland farming")
+             print (word "Seq " ticks ", year " (ticks + 2007) " dryland farming")
              dryland-farming_1
              gw-depletion_dryland
              energy-calculation
@@ -778,7 +777,7 @@ end
 
 to food-calculation_2                                                                               ;Randomly choose wet year
   if (ticks mod 10) = 0                                                                             ;Shuffle yrs-seq every 10 years
-  [set yrs-seq [0 9 9 9 9 0 6 7 8 9]                                                                ;List of wetter years
+  [set yrs-seq [0 7 7 7 7 0 6 7 8 9]                                                                ;List of wetter years
    set yrs-seq shuffle yrs-seq]                                                                     ;Shuffle command
 
   ;print (word "food" yrs-seq)  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -958,14 +957,10 @@ to food-calculation_4                                                           
    set wheat-tot-yield (item m wheat-yield_3)
    set soybeans-tot-yield (item m soybeans-yield_3)
    set milo-tot-yield (item m milo-yield_3)]
-  [print ticks
-   print (word "food-cal_4 " GCM-random-year)
-   set corn-tot-yield (item GCM-random-year corn-yield_3)
+  [set corn-tot-yield (item GCM-random-year corn-yield_3)
    set wheat-tot-yield (item GCM-random-year wheat-yield_3)
    set soybeans-tot-yield (item GCM-random-year soybeans-yield_3)
    set milo-tot-yield (item GCM-random-year milo-yield_3)]
-
-  print corn-tot-yield
 
   set corn-history lput corn-tot-yield but-first corn-history                                       ;Add the most recent yield in a "corn-history" list and remove the oldest one
   set wheat-history lput wheat-tot-yield but-first wheat-history                                    ;Add the most recent yield in a "wheat-history" list and remove the oldest one
@@ -1119,7 +1114,7 @@ end
 
 to dryland-farming_2
   if (ticks mod 10) = 0                                                                             ;Shuffle yrs-seq every 10 years
-  [set yrs-seq [0 9 9 9 9 0 6 7 8 9]                                                                ;List of wetter years (must be the same seq as "food-calculation_2")
+  [set yrs-seq [0 7 7 7 7 0 6 7 8 9]                                                                ;List of wetter years (must be the same seq as "food-calculation_2")
    set yrs-seq shuffle yrs-seq]                                                                     ;Shuffle command
 
   let n (ticks mod 10)
@@ -1308,7 +1303,6 @@ to dryland-farming_4
    set soybeans-tot-yield (item m soybeans-yield_4)
    set milo-tot-yield (item m milo-yield_4)]
   [print ticks
-   print (word "dryland-farm_4 " GCM-random-year)
    set corn-tot-yield (item GCM-random-year corn-yield_4)
    set wheat-tot-yield (item GCM-random-year wheat-yield_4)
    set soybeans-tot-yield (item GCM-random-year soybeans-yield_4)
@@ -1511,13 +1505,10 @@ to gw-depletion_4
    set wheat-use-in (item m wheat-irrig_3)
    set soybeans-use-in (item m soybeans-irrig_3)
    set milo-use-in (item m milo-irrig_3)]
-  [print (word "gw-deplet_4 " GCM-random-year)
-   set corn-use-in (item GCM-random-year corn-irrig_3)
+  [set corn-use-in (item GCM-random-year corn-irrig_3)
    set wheat-use-in (item GCM-random-year wheat-irrig_3)
    set soybeans-use-in (item GCM-random-year soybeans-irrig_3)
    set milo-use-in (item GCM-random-year milo-irrig_3)]
-
-  print corn-use-in
 
   ;Normalize water use
   set water-use-feet (((corn-use-in * corn-area) + (wheat-use-in * wheat-area) + (soybeans-use-in * soybeans-area) + (milo-use-in * milo-area)) / (12 * total-area))
@@ -1956,7 +1947,7 @@ Panel_power
 Panel_power
 0
 300
-250.0
+0.5
 10
 1
 Watts
@@ -1981,7 +1972,7 @@ SLIDER
 #Solar_panel_sets
 0
 8
-3.0
+1.0
 1
 1
 NIL
@@ -2164,7 +2155,7 @@ CHOOSER
 Future_Process
 Future_Process
 "Repeat Historical" "Wetter Future" "Dryer Future" "Impose T, P, & S Changes"
-0
+1
 
 TEXTBOX
 18
@@ -2345,7 +2336,7 @@ PLOT
 316
 1396
 436
-Annual Water-Level Change
+Water-Level Change
 Years
 Feet
 0.0
@@ -2388,7 +2379,7 @@ Input-years
 Input-years
 0
 150
-60.0
+70.0
 5
 1
 NIL
@@ -2887,6 +2878,46 @@ NetLogo 6.1.1
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
+<experiments>
+  <experiment name="100 runs of Wetter Future" repetitions="100" runMetricsEveryStep="true">
+    <setup>setup</setup>
+    <go>go</go>
+    <metric>corn-use-in</metric>
+    <metric>wheat-use-in</metric>
+    <metric>soybeans-use-in</metric>
+    <metric>milo-use-in</metric>
+    <enumeratedValueSet variable="Aquifer-thickness">
+      <value value="200"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Soybeans-area">
+      <value value="125"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="#Solar_panel_sets">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Corn-area">
+      <value value="125"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Wheat-area">
+      <value value="125"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Panel_power">
+      <value value="250"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="#Wind_turbines">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Future_Process">
+      <value value="&quot;Wetter Future&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Input-years">
+      <value value="60"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Milo-area">
+      <value value="125"/>
+    </enumeratedValueSet>
+  </experiment>
+</experiments>
 @#$#@#$#@
 @#$#@#$#@
 default
