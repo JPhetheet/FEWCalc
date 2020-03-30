@@ -2395,6 +2395,37 @@ TEXTBOX
 5.0
 1
 
+PLOT
+1112
+460
+1396
+580
+Income from Crop Insurance
+NIL
+$
+0.0
+60.0
+0.0
+10.0
+true
+true
+"" ""
+PENS
+"Corn" 1.0 2 -4079321 true "" "ifelse corn-tot-yield < corn-mean-yield [\nplot corn-guarantee]\n[plot zero-line]"
+"Wheat" 1.0 2 -3844592 true "" "ifelse wheat-tot-yield < wheat-mean-yield [\nplot wheat-guarantee]\n[plot zero-line]"
+"Soybeans" 1.0 2 -13210332 true "" "ifelse soybeans-tot-yield < soybeans-mean-yield [\nplot soybeans-guarantee]\n[plot zero-line]"
+"Milo" 1.0 2 -12440034 true "" "ifelse milo-tot-yield < milo-mean-yield [\nplot milo-guarantee]\n[plot zero-line]"
+
+TEXTBOX
+1112
+438
+1410
+458
+Crop Insurance -------------------
+15
+0.0
+1
+
 @#$#@#$#@
 # FEWCalc
 **FEWCalc** is the **Food-Energy-Water Calculator** assembled by Jirapat Phetheet and Professor Mary C. Hill from Department of Geology, the University of Kansas. 
