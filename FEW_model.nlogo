@@ -777,7 +777,7 @@ end
 
 to food-calculation_2                                                                               ;Randomly choose wet year
   if (ticks mod 10) = 0                                                                             ;Shuffle yrs-seq every 10 years
-  [set yrs-seq [0 7 7 7 7 0 6 7 8 9]                                                                ;List of wetter years
+  [set yrs-seq [0 7 7 7 7 0 6 7 8 9]                                                                ;List of wetter years. Year 7, 8, 9 are wet years; year 0, 6 are normal years.
    set yrs-seq shuffle yrs-seq]                                                                     ;Shuffle command
 
   ;print (word "food" yrs-seq)  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -786,17 +786,17 @@ to food-calculation_2                                                           
 
   set corn-tot-yield (item (item n yrs-seq) corn-yield_1)                                           ;Each tick, corn yield will be accessed from a "corn-yield_1" list
   set wheat-tot-yield (item (item n yrs-seq) wheat-yield_1)                                         ;Each tick, wheat yield will be accessed from a "wheat-yield_1" list
-  set soybeans-tot-yield (item (item n yrs-seq) soybeans-yield_1)                                     ;Each tick, soybeans yield will be accessed from a "soybeans-yield_1" list
+  set soybeans-tot-yield (item (item n yrs-seq) soybeans-yield_1)                                   ;Each tick, soybeans yield will be accessed from a "soybeans-yield_1" list
   set milo-tot-yield (item (item n yrs-seq) milo-yield_1)                                           ;Each tick, milo yield will be accessed from a "milo-yield_1" list
 
   set corn-history lput corn-tot-yield but-first corn-history                                       ;Add the most recent yield in a "corn-history" list and remove the oldest one
   set wheat-history lput wheat-tot-yield but-first wheat-history                                    ;Add the most recent yield in a "wheat-history" list and remove the oldest one
-  set soybeans-history lput soybeans-tot-yield but-first soybeans-history                              ;Add the most recent yield in a "soybeans-history" list and remove the oldest one
+  set soybeans-history lput soybeans-tot-yield but-first soybeans-history                           ;Add the most recent yield in a "soybeans-history" list and remove the oldest one
   set milo-history lput milo-tot-yield but-first milo-history                                       ;Add the most recent yield in a "milo-history" list and remove the oldest one
 
   set corn-mean-yield mean corn-history                                                             ;Average corn production for the last 10 years
   set wheat-mean-yield mean wheat-history                                                           ;Average wheat production for the last 10 years
-  set soybeans-mean-yield mean soybeans-history                                                       ;Average soybeans production for the last 10 years
+  set soybeans-mean-yield mean soybeans-history                                                     ;Average soybeans production for the last 10 years
   set milo-mean-yield mean milo-history                                                             ;Average milo production for the last 10 years
 
   set corn-guarantee ((corn-mean-yield * corn-coverage * corn-base-price) * corn-area)              ;Calculate guarantee price
@@ -1567,12 +1567,12 @@ to contaminant                                                                  
 
   set N-accu (N-accu + N-accu-temp)
 
-  ask patch -1 0 [ask n-of (0.1 * (item (item k yrs-seq) corn-N-app) / 1.12) patches in-radius (item 0 radius-of-%area) [set pcolor brown]]        ;show dots in lbs/ac
-  ask patch -18 84 [ask n-of (0.1 * (item (item k yrs-seq) corn-N-app) / 1.12) patches in-radius (item 0 radius-of-%area) [set pcolor brown]]      ;show dots in lbs/ac
-  ask patch -51.5 -51 [ask n-of (0.1 * (item (item k yrs-seq) corn-N-app) / 1.12) patches in-radius (item 0 radius-of-%area) [set pcolor brown]]   ;show dots in lbs/ac
-  ask patch -52 16 [ask n-of (0.1 * (item (item k yrs-seq) corn-N-app) / 1.12) patches in-radius (item 0 radius-of-%area) [set pcolor brown]]      ;show dots in lbs/ac
+  ask patch -1 0 [ask n-of (0.1 * (item (item k yrs-seq) corn-N-app) / 1.12) patches in-radius (item 0 radius-of-%area) [set pcolor brown]]            ;show dots in lbs/ac
+  ask patch -18 84 [ask n-of (0.1 * (item (item k yrs-seq) wheat-N-app) / 1.12) patches in-radius (item 0 radius-of-%area) [set pcolor brown]]         ;show dots in lbs/ac
+  ask patch -51.5 -51 [ask n-of (0.1 * (item (item k yrs-seq) soybeans-N-app) / 1.12) patches in-radius (item 0 radius-of-%area) [set pcolor brown]]   ;show dots in lbs/ac
+  ask patch -52 16 [ask n-of (0.1 * (item (item k yrs-seq) milo-N-app) / 1.12) patches in-radius (item 0 radius-of-%area) [set pcolor brown]]          ;show dots in lbs/ac
 
-  if (item k yrs-seq) = 7 or (item k yrs-seq) = 8 or (item k yrs-seq) = 9 [
+  if (item k yrs-seq) = 7 or (item k yrs-seq) = 8 or (item k yrs-seq) = 9 [                               ;
     ask up-to-n-of (0.001 * N-accu) river-patches with [pcolor = 87] [set pcolor brown]                   ;0.001 is a scaling factor
 
     set N-accu 0
@@ -2116,6 +2116,7 @@ true
 PENS
 "Solar      " 1.0 0 -5298144 true "" "ifelse ticks = 0 [set solar-production 0\nplot solar-production]\n[plot solar-production]"
 "Wind      " 1.0 0 -14070903 true "" "ifelse ticks = 0 [set wind-production 0\nplot wind-production]\n[plot wind-production]"
+"$0" 1.0 0 -10873583 true "" "plot zero-line"
 
 TEXTBOX
 88
