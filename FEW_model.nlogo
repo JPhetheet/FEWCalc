@@ -1947,7 +1947,7 @@ Panel_power
 Panel_power
 0
 300
-0.5
+250.0
 10
 1
 Watts
@@ -1972,7 +1972,7 @@ SLIDER
 #Solar_panel_sets
 0
 8
-1.0
+3.0
 1
 1
 NIL
@@ -2379,7 +2379,7 @@ Input-years
 Input-years
 0
 150
-70.0
+60.0
 5
 1
 NIL
