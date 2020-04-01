@@ -5,7 +5,7 @@ extensions [csv bitmap]
 globals [
   cropland-patches aquifer-patches river-patches wind-bar solar-bar wind-patches solar-patches corn-patches
   crop-area crop-color radius-of-%area total-area area-multiplier crop-background
-  precip_raw current-elev patch-change yrs-seq zero-line turbine_size
+  precip_raw current-elev patch-change yrs-seq zero-line turbine_size precip_GCM
   corn-data corn-GCMs corn-sum_1 corn-sum_2 corn-price corn-yield_1 corn-irrig_1 corn-yield_2 corn-irrig_2 corn-yield_3 corn-irrig_3 corn-yield_4 corn-irrig_4
   wheat-data wheat-GCMs wheat-sum_1 wheat-sum_2 wheat-price wheat-yield_1 wheat-irrig_1 wheat-yield_2 wheat-irrig_2 wheat-yield_3 wheat-irrig_3 wheat-yield_4 wheat-irrig_4
   soybeans-data soybeans-GCMs soybeans-sum_1 soybeans-sum_2 soybeans-price soybeans-yield_1 soybeans-irrig_1 soybeans-yield_2 soybeans-irrig_2 soybeans-yield_3 soybeans-irrig_3 soybeans-yield_4 soybeans-irrig_4
@@ -21,7 +21,7 @@ globals [
   corn-tot-yield wheat-tot-yield soybeans-tot-yield milo-tot-yield
   corn-irrig-increment wheat-irrig-increment soybeans-irrig-increment milo-irrig-increment
   corn-use-in wheat-use-in soybeans-use-in milo-use-in water-use-feet gw-change calibrated-water-use dryland-check? GCM-random-year
-  corn-N-app wheat-N-app soybeans-N-app milo-N-app N-accu N-accu-temp
+  corn-N-app wheat-N-app soybeans-N-app milo-N-app N-accu N-accu2 N-accu-temp
   corn-N-use wheat-N-use soybeans-N-use milo-N-use
   corn-N-use_1 wheat-N-use_1 soybeans-N-use_1 milo-N-use_1
   corn-N-use_2 wheat-N-use_2 soybeans-N-use_2 milo-N-use_2
@@ -48,6 +48,7 @@ to setup
   set soybeans-base-price 9.39                                                                      ;Base price for crop insurance calculation
   set milo-base-price 3.14                                                                          ;Base price for crop insurance calculation
   set N-accu 0                                                                                      ;Assume there is no N accumulation in soil (fertilizer)
+  set N-accu2 0                                                                                     ;Assume there is no N accumulation in soil (fertilizer)
   set dryland-check? 1                                                                              ;dryland-check? = 1 means yes, it's the first dryland farming
 
 
@@ -136,6 +137,18 @@ to setup
     set plabel "Solar"
     set plabel-color black]
 
+  ask patch 64 96 [
+    set plabel "Nitrate     "
+    set plabel-color white]
+
+  ask patch 64 89 [
+    set plabel "accum, lb"
+    set plabel-color white]
+
+  ask patch 64 81 [
+    set plabel round (N-accu2)
+    set plabel-color white]
+
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;;;;;;;;;;;;;;;;;;;; Wind patches ;;;;;;;;;;;;;;;;;;;;
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -192,20 +205,20 @@ to setup
     repeat #solar_panel_sets [                                                                      ;Place solar panels as a grid within "solar-patches"
       ifelse t < 5 [
         crt 1 [
-        setxy 56 (93 - (t * 12))
+        setxy 56 (65 - (t * 12))
         set shape "solar"
         set size 20
         set t (t + 1)]
       ]
        [ifelse t < 10 [
          crt 1 [
-         setxy 37 (93 - ((t - 5) * 12))
+         setxy 37 (65 - ((t - 5) * 12))
          set shape "solar"
          set size 20
          set t (t + 1)]
        ]
         [crt 1 [
-          setxy 18 (93 - ((t - 10) * 12))
+          setxy 18 (65 - ((t - 10) * 12))
           set shape "solar"
           set size 20
           set t (t + 1)]
@@ -227,6 +240,7 @@ end
 
 to import-data                                                                                      ;Create a number of lists to store values from csv files
   set precip_raw []                                                                                 ;A list for precipitation data
+  set precip_GCM []                                                                                 ;A list for GCM precipitation data
   set corn-data []                                                                                  ;All crop data including headings of the table
   set corn-GCMs []                                                                                  ;All crop data including headings of the table
   set corn-sum_1 []                                                                                 ;All crop data excluding headings of the table
@@ -367,10 +381,11 @@ to import-data                                                                  
 let n 1                                                                                             ;Set a temporary variable
   while [n < 82] [                                                                                  ;10 loops for 10-year data
     foreach corn-GCMs [x -> set corn-sum_2 lput item n x corn-sum_2]                                ;Get rid of headings of the table (starting from item 1 instead of item 0)
-      foreach corn-sum_2 [y -> set corn-yield_3 lput item 1 y corn-yield_3]                         ;Item 1 of a csv file is yield_3
-      foreach corn-sum_2 [y -> set corn-irrig_3 lput item 2 y corn-irrig_3]                         ;Item 2 of a csv file is irrig_3
-      foreach corn-sum_2 [y -> set corn-yield_4 lput item 3 y corn-yield_4]                         ;Item 3 of a csv file is yield_4
-      foreach corn-sum_2 [y -> set corn-irrig_4 lput item 4 y corn-irrig_4]                         ;Item 4 of a csv file is irrig_4
+      foreach corn-sum_2 [y -> set precip_GCM lput item 1 y precip_GCM]                             ;Item 1 of a csv file is precipitation
+      foreach corn-sum_2 [y -> set corn-yield_3 lput item 2 y corn-yield_3]                         ;Item 2 of a csv file is yield_3
+      foreach corn-sum_2 [y -> set corn-irrig_3 lput item 3 y corn-irrig_3]                         ;Item 3 of a csv file is irrig_3
+      foreach corn-sum_2 [y -> set corn-yield_4 lput item 4 y corn-yield_4]                         ;Item 4 of a csv file is yield_4
+      foreach corn-sum_2 [y -> set corn-irrig_4 lput item 5 y corn-irrig_4]                         ;Item 5 of a csv file is irrig_4
 
     foreach wheat-GCMs [x -> set wheat-sum_2 lput item n x wheat-sum_2]                             ;See above
       foreach wheat-sum_2 [y -> set wheat-yield_3 lput item 1 y wheat-yield_3]
@@ -390,6 +405,7 @@ let n 1                                                                         
       foreach milo-sum_2 [y -> set milo-yield_4 lput item 3 y milo-yield_4]
       foreach milo-sum_2 [y -> set milo-irrig_4 lput item 4 y milo-irrig_4]
 
+        if length precip_GCM != 81 [set precip_GCM []]
         if length corn-yield_3 != 81 [set corn-yield_3 []]
         if length corn-irrig_3 != 81 [set corn-irrig_3 []]
         if length corn-yield_4 != 81 [set corn-yield_4 []]
@@ -505,33 +521,33 @@ end
 to future_processes
 if Future_Process = "Repeat Historical"                                                             ;Repeat historical scenario
    [ifelse ticks <= 9                                                                               ;First 10 year data based on history
-     [set corn-N-use corn-N-use_1                                                                 ;Classify nitrogen uses into different scenario
-      set wheat-N-use wheat-N-use_1                                                               ;Classify nitrogen uses into different scenario
+     [set corn-N-use corn-N-use_1                                                                   ;Classify nitrogen uses into different scenario
+      set wheat-N-use wheat-N-use_1                                                                 ;Classify nitrogen uses into different scenario
       set soybeans-N-use soybeans-N-use_1                                                           ;Classify nitrogen uses into different scenario
-      set milo-N-use milo-N-use_1                                                                 ;Classify nitrogen uses into different scenario
+      set milo-N-use milo-N-use_1                                                                   ;Classify nitrogen uses into different scenario
       food-calculation_1-1
       energy-calculation
       gw-depletion_1]
 
-     [ifelse current-elev > -49
+     [ifelse current-elev > -49                                                                     ;Irrigated farming
        [set corn-N-use corn-N-use_1
         set wheat-N-use wheat-N-use_1
         set soybeans-N-use soybeans-N-use_1
         set milo-N-use milo-N-use_1
-        food-calculation_1-2                                                                      ;Irrigated farming
+        food-calculation_1-2
         energy-calculation
         gw-depletion_1]
 
-       [ifelse current-elev > -66 and dryland-check? = 1
+       [ifelse current-elev > -66 and dryland-check? = 1                                            ;Irrigated farming
          [set corn-N-use corn-N-use_1
           set wheat-N-use wheat-N-use_1
           set soybeans-N-use soybeans-N-use_1
           set milo-N-use milo-N-use_1
-          food-calculation_1-2                                                                      ;Irrigated farming
+          food-calculation_1-2
           energy-calculation
           gw-depletion_1]
 
-            [set corn-N-use corn-N-use_2                                                               ;Dryland farming
+            [set corn-N-use corn-N-use_2                                                            ;Dryland farming
              set wheat-N-use wheat-N-use_2
              set soybeans-N-use soybeans-N-use_2
              set milo-N-use milo-N-use_2
@@ -547,33 +563,33 @@ if Future_Process = "Repeat Historical"                                         
 
   if Future_Process = "Wetter Future"                                                               ;Wetter years scenario
    [ifelse ticks <= 9                                                                               ;First 10 year data based on history
-     [set corn-N-use corn-N-use_1                                                                 ;Classify nitrogen uses into different scenario
-      set wheat-N-use wheat-N-use_1                                                               ;Classify nitrogen uses into different scenario
+     [set corn-N-use corn-N-use_1                                                                   ;Classify nitrogen uses into different scenario
+      set wheat-N-use wheat-N-use_1                                                                 ;Classify nitrogen uses into different scenario
       set soybeans-N-use soybeans-N-use_1                                                           ;Classify nitrogen uses into different scenario
-      set milo-N-use milo-N-use_1                                                                 ;Classify nitrogen uses into different scenario
+      set milo-N-use milo-N-use_1                                                                   ;Classify nitrogen uses into different scenario
       food-calculation_1-1
       energy-calculation
       gw-depletion_1]
 
-     [ifelse current-elev > -49
+     [ifelse current-elev > -49                                                                     ;Irrigated farming
        [set corn-N-use corn-N-use_1
         set wheat-N-use wheat-N-use_1
         set soybeans-N-use soybeans-N-use_1
         set milo-N-use milo-N-use_1
-        food-calculation_2                                                                      ;Irrigated farming
+        food-calculation_2
         energy-calculation
         gw-depletion_2]
 
-       [ifelse current-elev > -66 and dryland-check? = 1
+       [ifelse current-elev > -66 and dryland-check? = 1                                            ;Irrigated farming
          [set corn-N-use corn-N-use_1
           set wheat-N-use wheat-N-use_1
           set soybeans-N-use soybeans-N-use_1
           set milo-N-use milo-N-use_1
-          food-calculation_2                                                                      ;Irrigated farming
+          food-calculation_2
           energy-calculation
           gw-depletion_2]
 
-            [set corn-N-use corn-N-use_2                                                               ;Dryland farming
+            [set corn-N-use corn-N-use_2                                                            ;Dryland farming
              set wheat-N-use wheat-N-use_2
              set soybeans-N-use soybeans-N-use_2
              set milo-N-use milo-N-use_2
@@ -587,35 +603,35 @@ if Future_Process = "Repeat Historical"                                         
      ]
   ]
 
-  if Future_Process = "Dryer Future"                                                                 ;Dryer years scenario
+  if Future_Process = "Dryer Future"                                                                ;Dryer years scenario
    [ifelse ticks <= 9                                                                               ;First 10 year data based on history
-     [set corn-N-use corn-N-use_1                                                                 ;Classify nitrogen uses into different scenario
-      set wheat-N-use wheat-N-use_1                                                               ;Classify nitrogen uses into different scenario
+     [set corn-N-use corn-N-use_1                                                                   ;Classify nitrogen uses into different scenario
+      set wheat-N-use wheat-N-use_1                                                                 ;Classify nitrogen uses into different scenario
       set soybeans-N-use soybeans-N-use_1                                                           ;Classify nitrogen uses into different scenario
-      set milo-N-use milo-N-use_1                                                                 ;Classify nitrogen uses into different scenario
+      set milo-N-use milo-N-use_1                                                                   ;Classify nitrogen uses into different scenario
       food-calculation_1-1
       energy-calculation
       gw-depletion_1]
 
-     [ifelse current-elev > -49
+     [ifelse current-elev > -49                                                                     ;Irrigated farming
        [set corn-N-use corn-N-use_1
         set wheat-N-use wheat-N-use_1
         set soybeans-N-use soybeans-N-use_1
         set milo-N-use milo-N-use_1
-        food-calculation_3                                                                      ;Irrigated farming
+        food-calculation_3
         energy-calculation
         gw-depletion_3]
 
-       [ifelse current-elev > -66 and dryland-check? = 1
+       [ifelse current-elev > -66 and dryland-check? = 1                                            ;Irrigated farming
          [set corn-N-use corn-N-use_1
           set wheat-N-use wheat-N-use_1
           set soybeans-N-use soybeans-N-use_1
           set milo-N-use milo-N-use_1
-          food-calculation_3                                                                      ;Irrigated farming
+          food-calculation_3
           energy-calculation
           gw-depletion_3]
 
-            [set corn-N-use corn-N-use_2                                                               ;Dryland farming
+            [set corn-N-use corn-N-use_2                                                            ;Dryland farming
              set wheat-N-use wheat-N-use_2
              set soybeans-N-use soybeans-N-use_2
              set milo-N-use milo-N-use_2
@@ -631,33 +647,33 @@ if Future_Process = "Repeat Historical"                                         
 
   if Future_Process = "Impose T, P, & S Changes"                                                    ;Climate projection scenario
    [ifelse ticks <= 9                                                                               ;First 10 year data based on history
-     [set corn-N-use corn-N-use_1                                                                 ;Classify nitrogen uses into different scenario
-      set wheat-N-use wheat-N-use_1                                                               ;Classify nitrogen uses into different scenario
+     [set corn-N-use corn-N-use_1                                                                   ;Classify nitrogen uses into different scenario
+      set wheat-N-use wheat-N-use_1                                                                 ;Classify nitrogen uses into different scenario
       set soybeans-N-use soybeans-N-use_1                                                           ;Classify nitrogen uses into different scenario
-      set milo-N-use milo-N-use_1                                                                 ;Classify nitrogen uses into different scenario
+      set milo-N-use milo-N-use_1                                                                   ;Classify nitrogen uses into different scenario
       food-calculation_1-1
       energy-calculation
       gw-depletion_1]
 
-     [ifelse current-elev > -49
+     [ifelse current-elev > -49                                                                     ;Irrigated farming
        [set corn-N-use corn-N-use_3
         set wheat-N-use wheat-N-use_3
         set soybeans-N-use soybeans-N-use_3
         set milo-N-use milo-N-use_3
-        food-calculation_4                                                                      ;Irrigated farming
+        food-calculation_4
         energy-calculation
         gw-depletion_4]
 
-       [ifelse current-elev > -66 and dryland-check? = 1
+       [ifelse current-elev > -66 and dryland-check? = 1                                            ;Irrigated farming
          [set corn-N-use corn-N-use_3
           set wheat-N-use wheat-N-use_3
           set soybeans-N-use soybeans-N-use_3
           set milo-N-use milo-N-use_3
-          food-calculation_4                                                                      ;Irrigated farming
+          food-calculation_4
           energy-calculation
           gw-depletion_4]
 
-            [set corn-N-use corn-N-use_4                                                               ;Dryland farming
+            [set corn-N-use corn-N-use_4                                                            ;Dryland farming
              set wheat-N-use wheat-N-use_4
              set soybeans-N-use soybeans-N-use_4
              set milo-N-use milo-N-use_4
@@ -704,17 +720,17 @@ to food-calculation_1-2                                                         
 
   set corn-tot-yield (item (n mod 10) corn-yield_1)                                                 ;Each tick, corn yield will be accessed from a "corn-yield_1" list
   set wheat-tot-yield (item (n mod 10) wheat-yield_1)                                               ;Each tick, wheat yield will be accessed from a "wheat-yield_1" list
-  set soybeans-tot-yield (item (n mod 10) soybeans-yield_1)                                           ;Each tick, soybeans yield will be accessed from a "soybeans-yield_1" list
+  set soybeans-tot-yield (item (n mod 10) soybeans-yield_1)                                         ;Each tick, soybeans yield will be accessed from a "soybeans-yield_1" list
   set milo-tot-yield (item (n mod 10) milo-yield_1)                                                 ;Each tick, milo yield will be accessed from a "milo-yield_1" list
 
   set corn-history lput corn-tot-yield but-first corn-history                                       ;Add the most recent yield in a "corn-history" list and remove the oldest one
   set wheat-history lput wheat-tot-yield but-first wheat-history                                    ;Add the most recent yield in a "wheat-history" list and remove the oldest one
-  set soybeans-history lput soybeans-tot-yield but-first soybeans-history                              ;Add the most recent yield in a "soybeans-history" list and remove the oldest one
+  set soybeans-history lput soybeans-tot-yield but-first soybeans-history                           ;Add the most recent yield in a "soybeans-history" list and remove the oldest one
   set milo-history lput milo-tot-yield but-first milo-history                                       ;Add the most recent yield in a "milo-history" list and remove the oldest one
 
   set corn-mean-yield mean corn-history                                                             ;Average corn production for the last 10 years
   set wheat-mean-yield mean wheat-history                                                           ;Average wheat production for the last 10 years
-  set soybeans-mean-yield mean soybeans-history                                                       ;Average soybeans production for the last 10 years
+  set soybeans-mean-yield mean soybeans-history                                                     ;Average soybeans production for the last 10 years
   set milo-mean-yield mean milo-history                                                             ;Average milo production for the last 10 years
 
   set corn-guarantee ((corn-mean-yield * corn-coverage * corn-base-price) * corn-area)              ;Calculate guarantee price
@@ -752,7 +768,7 @@ to food-calculation_1-2                                                         
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]                 ;Print message in the Command Center
 
-  ifelse soybeans-tot-yield > soybeans-mean-yield                                                     ;Apply crop insurance?
+  ifelse soybeans-tot-yield > soybeans-mean-yield                                                   ;Apply crop insurance?
     [set soybeans-tot-income soybeans-tot-income
      ask patch -37 -79 [
       set plabel " "]]
@@ -761,7 +777,7 @@ to food-calculation_1-2                                                         
       set plabel "Ins. Claim"
       set plabel-color red
       ]
-     print (word "Seq " ticks ", year " (ticks + 2008) " applies soybeans insurance")]               ;Print message in the Command Center
+     print (word "Seq " ticks ", year " (ticks + 2008) " applies soybeans insurance")]              ;Print message in the Command Center
 
   ifelse milo-tot-yield > milo-mean-yield                                                           ;Apply crop insurance?
     [set milo-tot-income milo-tot-income
@@ -840,7 +856,7 @@ to food-calculation_2                                                           
     ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]                 ;Print message in the Command Center
 
-  ifelse soybeans-tot-yield > soybeans-mean-yield                                                     ;Apply crop insurance?
+  ifelse soybeans-tot-yield > soybeans-mean-yield                                                   ;Apply crop insurance?
     [set soybeans-tot-income soybeans-tot-income
      ask patch -37 -79 [
       set plabel " "]]
@@ -849,7 +865,7 @@ to food-calculation_2                                                           
       set plabel "Ins. Claim"
       set plabel-color red
     ]
-     print (word "Seq " ticks ", year " (ticks + 2008) " applies soybeans insurance")]               ;Print message in the Command Center
+     print (word "Seq " ticks ", year " (ticks + 2008) " applies soybeans insurance")]              ;Print message in the Command Center
 
   ifelse milo-tot-yield > milo-mean-yield                                                           ;Apply crop insurance?
     [set milo-tot-income milo-tot-income
@@ -874,17 +890,17 @@ to food-calculation_3                                                           
 
   set corn-tot-yield (item (item n yrs-seq) corn-yield_1)                                           ;Each tick, corn yield will be accessed from a "corn-yield_1" list
   set wheat-tot-yield (item (item n yrs-seq) wheat-yield_1)                                         ;Each tick, wheat yield will be accessed from a "wheat-yield_1" list
-  set soybeans-tot-yield (item (item n yrs-seq) soybeans-yield_1)                                     ;Each tick, soybeans yield will be accessed from a "soybeans-yield_1" list
+  set soybeans-tot-yield (item (item n yrs-seq) soybeans-yield_1)                                   ;Each tick, soybeans yield will be accessed from a "soybeans-yield_1" list
   set milo-tot-yield (item (item n yrs-seq) milo-yield_1)                                           ;Each tick, milo yield will be accessed from a "milo-yield_1" list
 
   set corn-history lput corn-tot-yield but-first corn-history                                       ;Add the most recent yield in a "corn-history" list and remove the oldest one
   set wheat-history lput wheat-tot-yield but-first wheat-history                                    ;Add the most recent yield in a "wheat-history" list and remove the oldest one
-  set soybeans-history lput soybeans-tot-yield but-first soybeans-history                              ;Add the most recent yield in a "soybeans-history" list and remove the oldest one
+  set soybeans-history lput soybeans-tot-yield but-first soybeans-history                           ;Add the most recent yield in a "soybeans-history" list and remove the oldest one
   set milo-history lput milo-tot-yield but-first milo-history                                       ;Add the most recent yield in a "milo-history" list and remove the oldest one
 
   set corn-mean-yield mean corn-history                                                             ;Average corn production for the last 10 years
   set wheat-mean-yield mean wheat-history                                                           ;Average wheat production for the last 10 years
-  set soybeans-mean-yield mean soybeans-history                                                       ;Average soybeans production for the last 10 years
+  set soybeans-mean-yield mean soybeans-history                                                     ;Average soybeans production for the last 10 years
   set milo-mean-yield mean milo-history                                                             ;Average milo production for the last 10 years
 
   set corn-guarantee ((corn-mean-yield * corn-coverage * corn-base-price) * corn-area)              ;Calculate guarantee price
@@ -927,7 +943,7 @@ to food-calculation_3                                                           
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]                 ;Print message in the Command Center
 
-  ifelse soybeans-tot-yield > soybeans-mean-yield                                                     ;Apply crop insurance?
+  ifelse soybeans-tot-yield > soybeans-mean-yield                                                   ;Apply crop insurance?
     [set soybeans-tot-income soybeans-tot-income
      ask patch -37 -79 [
       set plabel " "]]
@@ -936,7 +952,7 @@ to food-calculation_3                                                           
       set plabel "Ins. Claim"
       set plabel-color red
       ]
-     print (word "Seq " ticks ", year " (ticks + 2008) " applies soybeans insurance")]               ;Print message in the Command Center
+     print (word "Seq " ticks ", year " (ticks + 2008) " applies soybeans insurance")]              ;Print message in the Command Center
 
   ifelse milo-tot-yield > milo-mean-yield                                                           ;Apply crop insurance?
     [set milo-tot-income milo-tot-income
@@ -964,12 +980,12 @@ to food-calculation_4                                                           
 
   set corn-history lput corn-tot-yield but-first corn-history                                       ;Add the most recent yield in a "corn-history" list and remove the oldest one
   set wheat-history lput wheat-tot-yield but-first wheat-history                                    ;Add the most recent yield in a "wheat-history" list and remove the oldest one
-  set soybeans-history lput soybeans-tot-yield but-first soybeans-history                              ;Add the most recent yield in a "soybeans-history" list and remove the oldest one
+  set soybeans-history lput soybeans-tot-yield but-first soybeans-history                           ;Add the most recent yield in a "soybeans-history" list and remove the oldest one
   set milo-history lput milo-tot-yield but-first milo-history                                       ;Add the most recent yield in a "milo-history" list and remove the oldest one
 
   set corn-mean-yield mean corn-history                                                             ;Average corn production for the last 10 years
   set wheat-mean-yield mean wheat-history                                                           ;Average wheat production for the last 10 years
-  set soybeans-mean-yield mean soybeans-history                                                       ;Average soybeans production for the last 10 years
+  set soybeans-mean-yield mean soybeans-history                                                     ;Average soybeans production for the last 10 years
   set milo-mean-yield mean milo-history                                                             ;Average milo production for the last 10 years
 
   set corn-guarantee ((corn-mean-yield * corn-coverage * corn-base-price) * corn-area)              ;Calculate guarantee price
@@ -1005,7 +1021,7 @@ to food-calculation_4                                                           
       set plabel "Ins. Claim"
       set plabel-color red
       ]
-     print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]                 ;Print message in the Command Center
+     print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]                ;Print message in the Command Center
 
   ifelse soybeans-tot-yield > soybeans-mean-yield                                                  ;Apply crop insurance?
     [set soybeans-tot-income soybeans-tot-income
@@ -1035,17 +1051,17 @@ to dryland-farming_1
 
   set corn-tot-yield (item (n mod 10) corn-yield_2)                                                 ;Each tick, corn yield will be accessed from a "corn-yield_2" list
   set wheat-tot-yield (item (n mod 10) wheat-yield_2)                                               ;Each tick, wheat yield will be accessed from a "wheat-yield_2" list
-  set soybeans-tot-yield (item (n mod 10) soybeans-yield_2)                                           ;Each tick, soybeans yield will be accessed from a "soybeans-yield_2" list
+  set soybeans-tot-yield (item (n mod 10) soybeans-yield_2)                                         ;Each tick, soybeans yield will be accessed from a "soybeans-yield_2" list
   set milo-tot-yield (item (n mod 10) milo-yield_2)                                                 ;Each tick, milo yield will be accessed from a "milo-yield_2" list
 
   set corn-history lput corn-tot-yield but-first corn-history                                       ;Add the most recent yield in a "corn-history" list and remove the oldest one
   set wheat-history lput wheat-tot-yield but-first wheat-history                                    ;Add the most recent yield in a "wheat-history" list and remove the oldest one
-  set soybeans-history lput soybeans-tot-yield but-first soybeans-history                              ;Add the most recent yield in a "soybeans-history" list and remove the oldest one
+  set soybeans-history lput soybeans-tot-yield but-first soybeans-history                           ;Add the most recent yield in a "soybeans-history" list and remove the oldest one
   set milo-history lput milo-tot-yield but-first milo-history                                       ;Add the most recent yield in a "milo-history" list and remove the oldest one
 
   set corn-mean-yield mean corn-history                                                             ;Average corn production for the last 10 years
   set wheat-mean-yield mean wheat-history                                                           ;Average wheat production for the last 10 years
-  set soybeans-mean-yield mean soybeans-history                                                       ;Average soybeans production for the last 10 years
+  set soybeans-mean-yield mean soybeans-history                                                     ;Average soybeans production for the last 10 years
   set milo-mean-yield mean milo-history                                                             ;Average milo production for the last 10 years
 
   set corn-guarantee ((corn-mean-yield * corn-coverage * corn-base-price) * corn-area)              ;Calculate guarantee price
@@ -1083,7 +1099,7 @@ to dryland-farming_1
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]                 ;Print message in the Command Center
 
-  ifelse soybeans-tot-yield > soybeans-mean-yield                                                     ;Apply crop insurance?
+  ifelse soybeans-tot-yield > soybeans-mean-yield                                                   ;Apply crop insurance?
     [set soybeans-tot-income soybeans-tot-income
      ask patch -37 -79 [
       set plabel " "]]
@@ -1092,7 +1108,7 @@ to dryland-farming_1
       set plabel "Ins. Claim"
       set plabel-color red
       ]
-     print (word "Seq " ticks ", year " (ticks + 2008) " applies soybeans insurance")]               ;Print message in the Command Center
+     print (word "Seq " ticks ", year " (ticks + 2008) " applies soybeans insurance")]             ;Print message in the Command Center
 
   ifelse milo-tot-yield > milo-mean-yield                                                          ;Apply crop insurance?
     [set milo-tot-income milo-tot-income
@@ -1108,7 +1124,7 @@ to dryland-farming_1
   let k ticks
   set corn-use-in item (k mod 10) corn-irrig_2                                                      ;Each tick, irrigation will be accessed from a "corn-irrig_2" list
   set wheat-use-in item (k mod 10) wheat-irrig_2                                                    ;Each tick, irrigation will be accessed from a "wheat-irrig_2" list
-  set soybeans-use-in item (k mod 10) soybeans-irrig_2                                                ;Each tick, irrigation will be accessed from a "soybeans-irrig_2" list
+  set soybeans-use-in item (k mod 10) soybeans-irrig_2                                              ;Each tick, irrigation will be accessed from a "soybeans-irrig_2" list
   set milo-use-in item (k mod 10) milo-irrig_2                                                      ;Each tick, irrigation will be accessed from a "milo-irrig_2" list
 end
 
@@ -1121,12 +1137,12 @@ to dryland-farming_2
 
   set corn-tot-yield (item (item n yrs-seq) corn-yield_2)                                           ;Each tick, corn yield will be accessed from a "corn-yield_2" list
   set wheat-tot-yield (item (item n yrs-seq) wheat-yield_2)                                         ;Each tick, wheat yield will be accessed from a "wheat-yield_2" list
-  set soybeans-tot-yield (item (item n yrs-seq) soybeans-yield_2)                                     ;Each tick, soybeans yield will be accessed from a "soybeans-yield_2" list
+  set soybeans-tot-yield (item (item n yrs-seq) soybeans-yield_2)                                   ;Each tick, soybeans yield will be accessed from a "soybeans-yield_2" list
   set milo-tot-yield (item (item n yrs-seq) milo-yield_2)                                           ;Each tick, milo yield will be accessed from a "milo-yield_2" list
 
   set corn-history lput corn-tot-yield but-first corn-history                                       ;Add the most recent yield in a "corn-history" list and remove the oldest one
   set wheat-history lput wheat-tot-yield but-first wheat-history                                    ;Add the most recent yield in a "wheat-history" list and remove the oldest one
-  set soybeans-history lput soybeans-tot-yield but-first soybeans-history                              ;Add the most recent yield in a "soybeans-history" list and remove the oldest one
+  set soybeans-history lput soybeans-tot-yield but-first soybeans-history                           ;Add the most recent yield in a "soybeans-history" list and remove the oldest one
   set milo-history lput milo-tot-yield but-first milo-history                                       ;Add the most recent yield in a "milo-history" list and remove the oldest one
 
   set corn-mean-yield mean corn-history                                                             ;Average corn production for the last 10 years
@@ -1174,7 +1190,7 @@ to dryland-farming_2
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]                 ;Print message in the Command Center
 
-  ifelse soybeans-tot-yield > soybeans-mean-yield                                                     ;Apply crop insurance?
+  ifelse soybeans-tot-yield > soybeans-mean-yield                                                   ;Apply crop insurance?
     [set soybeans-tot-income soybeans-tot-income
      ask patch -37 -79 [
       set plabel " "]]
@@ -1183,7 +1199,7 @@ to dryland-farming_2
       set plabel "Ins. Claim"
       set plabel-color red
       ]
-     print (word "Seq " ticks ", year " (ticks + 2008) " applies soybeans insurance")]               ;Print message in the Command Center
+     print (word "Seq " ticks ", year " (ticks + 2008) " applies soybeans insurance")]              ;Print message in the Command Center
 
   ifelse milo-tot-yield > milo-mean-yield                                                           ;Apply crop insurance?
     [set milo-tot-income milo-tot-income
@@ -1199,7 +1215,7 @@ to dryland-farming_2
   let k ticks
   set corn-use-in item (k mod 10) corn-irrig_2                                                      ;Each tick, irrigation will be accessed from a "corn-irrig_2" list
   set wheat-use-in item (k mod 10) wheat-irrig_2                                                    ;Each tick, irrigation will be accessed from a "wheat-irrig_2" list
-  set soybeans-use-in item (k mod 10) soybeans-irrig_2                                                ;Each tick, irrigation will be accessed from a "soybeans-irrig_2" list
+  set soybeans-use-in item (k mod 10) soybeans-irrig_2                                              ;Each tick, irrigation will be accessed from a "soybeans-irrig_2" list
   set milo-use-in item (k mod 10) milo-irrig_2                                                      ;Each tick, irrigation will be accessed from a "milo-irrig_2" list
 end
 
@@ -1212,17 +1228,17 @@ to dryland-farming_3
 
   set corn-tot-yield (item (item n yrs-seq) corn-yield_2)                                           ;Each tick, corn yield will be accessed from a "corn-yield_2" list
   set wheat-tot-yield (item (item n yrs-seq) wheat-yield_2)                                         ;Each tick, wheat yield will be accessed from a "wheat-yield_2" list
-  set soybeans-tot-yield (item (item n yrs-seq) soybeans-yield_2)                                     ;Each tick, soybeans yield will be accessed from a "soybeans-yield_2" list
+  set soybeans-tot-yield (item (item n yrs-seq) soybeans-yield_2)                                   ;Each tick, soybeans yield will be accessed from a "soybeans-yield_2" list
   set milo-tot-yield (item (item n yrs-seq) milo-yield_2)                                           ;Each tick, milo yield will be accessed from a "milo-yield_2" list
 
   set corn-history lput corn-tot-yield but-first corn-history                                       ;Add the most recent yield in a "corn-history" list and remove the oldest one
   set wheat-history lput wheat-tot-yield but-first wheat-history                                    ;Add the most recent yield in a "wheat-history" list and remove the oldest one
-  set soybeans-history lput soybeans-tot-yield but-first soybeans-history                              ;Add the most recent yield in a "soybeans-history" list and remove the oldest one
+  set soybeans-history lput soybeans-tot-yield but-first soybeans-history                           ;Add the most recent yield in a "soybeans-history" list and remove the oldest one
   set milo-history lput milo-tot-yield but-first milo-history                                       ;Add the most recent yield in a "milo-history" list and remove the oldest one
 
   set corn-mean-yield mean corn-history                                                             ;Average corn production for the last 10 years
   set wheat-mean-yield mean wheat-history                                                           ;Average wheat production for the last 10 years
-  set soybeans-mean-yield mean soybeans-history                                                       ;Average soybeans production for the last 10 years
+  set soybeans-mean-yield mean soybeans-history                                                     ;Average soybeans production for the last 10 years
   set milo-mean-yield mean milo-history                                                             ;Average milo production for the last 10 years
 
   set corn-guarantee ((corn-mean-yield * corn-coverage * corn-base-price) * corn-area)              ;Calculate guarantee price
@@ -1235,7 +1251,7 @@ to dryland-farming_3
 ;  set soybeans-tot-income (item (item n yrs-seq) soybeans-yield_2 * item (item n yrs-seq) soybeans-price * soybeans-area)
 ;  set milo-tot-income (item (item n yrs-seq) milo-yield_2 * item (item n yrs-seq) milo-price * milo-area)
 
-  set corn-tot-income (item (item n yrs-seq) corn-yield_2 * one-of corn-price * corn-area)                 ;Calculate farm gross income
+  set corn-tot-income (item (item n yrs-seq) corn-yield_2 * one-of corn-price * corn-area)          ;Calculate farm gross income
   set wheat-tot-income (item (item n yrs-seq) wheat-yield_2 * one-of wheat-price * wheat-area)
   set soybeans-tot-income (item (item n yrs-seq) soybeans-yield_2 * one-of soybeans-price * soybeans-area)
   set milo-tot-income (item (item n yrs-seq) milo-yield_2 * one-of milo-price * milo-area)
@@ -1265,7 +1281,7 @@ to dryland-farming_3
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]                 ;Print message in the Command Center
 
-  ifelse soybeans-tot-yield > soybeans-mean-yield                                                     ;Apply crop insurance?
+  ifelse soybeans-tot-yield > soybeans-mean-yield                                                   ;Apply crop insurance?
     [set soybeans-tot-income soybeans-tot-income
      ask patch -37 -79 [
       set plabel " "]]
@@ -1274,7 +1290,7 @@ to dryland-farming_3
       set plabel "Ins. Claim"
       set plabel-color red
       ]
-     print (word "Seq " ticks ", year " (ticks + 2008) " applies soybeans insurance")]               ;Print message in the Command Center
+     print (word "Seq " ticks ", year " (ticks + 2008) " applies soybeans insurance")]              ;Print message in the Command Center
 
   ifelse milo-tot-yield > milo-mean-yield                                                           ;Apply crop insurance?
     [set milo-tot-income milo-tot-income
@@ -1290,7 +1306,7 @@ to dryland-farming_3
   let k ticks
   set corn-use-in item (k mod 10) corn-irrig_2                                                      ;Each tick, irrigation will be accessed from a "corn-irrig_2" list
   set wheat-use-in item (k mod 10) wheat-irrig_2                                                    ;Each tick, irrigation will be accessed from a "wheat-irrig_2" list
-  set soybeans-use-in item (k mod 10) soybeans-irrig_2                                                ;Each tick, irrigation will be accessed from a "soybeans-irrig_2" list
+  set soybeans-use-in item (k mod 10) soybeans-irrig_2                                              ;Each tick, irrigation will be accessed from a "soybeans-irrig_2" list
   set milo-use-in item (k mod 10) milo-irrig_2                                                      ;Each tick, irrigation will be accessed from a "milo-irrig_2" list
 end
 
@@ -1310,12 +1326,12 @@ to dryland-farming_4
 
   set corn-history lput corn-tot-yield but-first corn-history                                       ;Add the most recent yield in a "corn-history" list and remove the oldest one
   set wheat-history lput wheat-tot-yield but-first wheat-history                                    ;Add the most recent yield in a "wheat-history" list and remove the oldest one
-  set soybeans-history lput soybeans-tot-yield but-first soybeans-history                              ;Add the most recent yield in a "soybeans-history" list and remove the oldest one
+  set soybeans-history lput soybeans-tot-yield but-first soybeans-history                           ;Add the most recent yield in a "soybeans-history" list and remove the oldest one
   set milo-history lput milo-tot-yield but-first milo-history                                       ;Add the most recent yield in a "milo-history" list and remove the oldest one
 
   set corn-mean-yield mean corn-history                                                             ;Average corn production for the last 10 years
   set wheat-mean-yield mean wheat-history                                                           ;Average wheat production for the last 10 years
-  set soybeans-mean-yield mean soybeans-history                                                       ;Average soybeans production for the last 10 years
+  set soybeans-mean-yield mean soybeans-history                                                     ;Average soybeans production for the last 10 years
   set milo-mean-yield mean milo-history                                                             ;Average milo production for the last 10 years
 
   set corn-guarantee ((corn-mean-yield * corn-coverage * corn-base-price) * corn-area)              ;Calculate guarantee price
@@ -1353,7 +1369,7 @@ to dryland-farming_4
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]                 ;Print message in the Command Center
 
-  ifelse soybeans-tot-yield > soybeans-mean-yield                                                     ;Apply crop insurance?
+  ifelse soybeans-tot-yield > soybeans-mean-yield                                                   ;Apply crop insurance?
     [set soybeans-tot-income soybeans-tot-income
      ask patch -37 -79 [
       set plabel " "]]
@@ -1362,7 +1378,7 @@ to dryland-farming_4
       set plabel "Ins. Claim"
       set plabel-color red
       ]
-     print (word "Seq " ticks ", year " (ticks + 2008) " applies soybeans insurance")]               ;Print message in the Command Center
+     print (word "Seq " ticks ", year " (ticks + 2008) " applies soybeans insurance")]              ;Print message in the Command Center
 
   ifelse milo-tot-yield > milo-mean-yield                                                           ;Apply crop insurance?
     [set milo-tot-income milo-tot-income
@@ -1378,7 +1394,7 @@ to dryland-farming_4
   let k ticks
   set corn-use-in item (k mod 10) corn-irrig_4                                                      ;Each tick, irrigation will be accessed from a "corn-irrig_4" list
   set wheat-use-in item (k mod 10) wheat-irrig_4                                                    ;Each tick, irrigation will be accessed from a "wheat-irrig_4" list
-  set soybeans-use-in item (k mod 10) soybeans-irrig_4                                                ;Each tick, irrigation will be accessed from a "soybeans-irrig_4" list
+  set soybeans-use-in item (k mod 10) soybeans-irrig_4                                              ;Each tick, irrigation will be accessed from a "soybeans-irrig_4" list
   set milo-use-in item (k mod 10) milo-irrig_4                                                      ;Each tick, irrigation will be accessed from a "milo-irrig_4" list
 end
 
@@ -1563,24 +1579,52 @@ end
 
 to contaminant                                                                                      ;Surface water contamination
   let k (ticks mod 10)
-  set N-accu-temp (0.1 * (((item (item k yrs-seq) corn-N-app) * corn-area) + ((item (item k yrs-seq) wheat-N-app) * wheat-area) + ((item (item k yrs-seq) soybeans-N-app) * soybeans-area) + ((item (item k yrs-seq) milo-N-app) * milo-area) / 1.12)) ;1.12 (convert from kg/ha to pound/ac)
+  set N-accu-temp (0.1 * 2.205 * (((item (item k yrs-seq) corn-N-app) * corn-area) + ((item (item k yrs-seq) wheat-N-app) * wheat-area) + ((item (item k yrs-seq) soybeans-N-app) * soybeans-area) + ((item (item k yrs-seq) milo-N-app) * milo-area))) ;convert from kg to pound, multiply the mass value by 2.205
 
-  set N-accu (N-accu + N-accu-temp)
+  print N-accu-temp
 
-  ask patch -1 0 [ask n-of (0.1 * (item (item k yrs-seq) corn-N-app) / 1.12) patches in-radius (item 0 radius-of-%area) [set pcolor brown]]            ;show dots in lbs/ac
-  ask patch -18 84 [ask n-of (0.1 * (item (item k yrs-seq) wheat-N-app) / 1.12) patches in-radius (item 0 radius-of-%area) [set pcolor brown]]         ;show dots in lbs/ac
-  ask patch -51.5 -51 [ask n-of (0.1 * (item (item k yrs-seq) soybeans-N-app) / 1.12) patches in-radius (item 0 radius-of-%area) [set pcolor brown]]   ;show dots in lbs/ac
-  ask patch -52 16 [ask n-of (0.1 * (item (item k yrs-seq) milo-N-app) / 1.12) patches in-radius (item 0 radius-of-%area) [set pcolor brown]]          ;show dots in lbs/ac
+  set N-accu (N-accu + N-accu-temp)                                                                 ;N accumulation before transporting to the stream
+  print N-accu
 
-  if (item k yrs-seq) = 7 or (item k yrs-seq) = 8 or (item k yrs-seq) = 9 [                               ;
-    ask up-to-n-of (0.001 * N-accu) river-patches with [pcolor = 87] [set pcolor brown]                   ;0.001 is a scaling factor
+  ask patch -1 0 [ask n-of (0.1 * (item (item k yrs-seq) corn-N-app) / 1.12) patches in-radius (item 0 radius-of-%area) [set pcolor brown]]            ;dots shown in a circle are in a unit area (lbs/ac); kg/ha to lb/ac, dividing by 1.12
+  ask patch -18 84 [ask n-of (0.1 * (item (item k yrs-seq) wheat-N-app) / 1.12) patches in-radius (item 0 radius-of-%area) [set pcolor brown]]         ;dots shown in a circle are in a unit area (lbs/ac); kg/ha to lb/ac, dividing by 1.12
+  ask patch -51.5 -51 [ask n-of (0.1 * (item (item k yrs-seq) soybeans-N-app) / 1.12) patches in-radius (item 0 radius-of-%area) [set pcolor brown]]   ;dots shown in a circle are in a unit area (lbs/ac); kg/ha to lb/ac, dividing by 1.12
+  ask patch -52 16 [ask n-of (0.1 * (item (item k yrs-seq) milo-N-app) / 1.12) patches in-radius (item 0 radius-of-%area) [set pcolor brown]]          ;dots shown in a circle are in a unit area (lbs/ac); kg/ha to lb/ac, dividing by 1.12
 
-    set N-accu 0
+  ifelse Future_Process = "Repeat Historical" or Future_Process = "Wetter Future" or Future_Process = "Dryer Future"
+  [if (item k yrs-seq) = 7 or (item k yrs-seq) = 8 or (item k yrs-seq) = 9 [                         ;yrs-seq = 7, 8, and 9 are wet years
+    ask up-to-n-of (0.0001 * N-accu) river-patches with [pcolor = 87] [set pcolor brown]            ;0.0001 is a scaling factor, graphically used to reduce number of dots in stream
+
+    set N-accu2 (N-accu2 + N-accu)                                                                  ;N-accu2 is amount of nitrate in the stream
+    print N-accu2
+
+    ask patch 64 81 [                                                                               ;Show a number in the World
+    set plabel round (N-accu2)
+    set plabel-color white]
+
+    set N-accu 0                                                                                    ;N-accu (in crop circles) is reset because nitrate is transported into the river
     ask patch -1 0 [ask patches in-radius (item 0 radius-of-%area) [set pcolor 37]]
     ask patch -18 84 [ask patches in-radius (item 1 radius-of-%area) [set pcolor 22]]
     ask patch -51.5 -51 [ask patches in-radius (item 2 radius-of-%area) [set pcolor 36]]
     ask patch -52 16 [ask patches in-radius (item 3 radius-of-%area) [set pcolor 34]]
-  ]
+  ]]
+
+  [if (item (ticks) precip_GCM) >= 20 [                                                             ;Years that precip >= 20 inches are wet years
+    ask up-to-n-of (0.0001 * N-accu) river-patches with [pcolor = 87] [set pcolor brown]            ;0.0001 is a scaling factor, graphically used to reduce number of dots in stream
+
+    set N-accu2 (N-accu2 + N-accu)                                                                  ;N-accu2 is amount of nitrate in the stream
+    print N-accu2
+
+    ask patch 64 81 [                                                                               ;Show a number in the World
+    set plabel round (N-accu2)
+    set plabel-color white]
+
+    set N-accu 0                                                                                    ;N-accu (in crop circles) is reset because nitrate is transported into the river
+    ask patch -1 0 [ask patches in-radius (item 0 radius-of-%area) [set pcolor 37]]
+    ask patch -18 84 [ask patches in-radius (item 1 radius-of-%area) [set pcolor 22]]
+    ask patch -51.5 -51 [ask patches in-radius (item 2 radius-of-%area) [set pcolor 36]]
+    ask patch -52 16 [ask patches in-radius (item 3 radius-of-%area) [set pcolor 34]]
+  ]]
 
   ;print (word "Temp. var. k: " k)  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;print (word "corn-N-use" corn-N-use)  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1597,7 +1641,7 @@ to contaminant                                                                  
 
 end
 
-to treatment                                                                                          ;Treatment
+to treatment                                                                                        ;Treatment
   if random 10 = 1 [                                                                                ;10% chance
     ask river-patches [
       if any? river-patches with [pcolor = brown] [
@@ -1649,20 +1693,20 @@ to reset-symbols                                                                
 
       ifelse t < 5 [
         crt 1 [
-        setxy 56 (93 - (t * 12))
+        setxy 56 (65 - (t * 12))
         set shape "solar"
         set size 20
         set t (t + 1)]
       ]
       [ifelse t < 10 [
         crt 1 [
-        setxy 37 (93 - ((t - 5) * 12))
+        setxy 37 (65 - ((t - 5) * 12))
         set shape "solar"
         set size 20
         set t (t + 1)]
       ]
       [crt 1 [
-        setxy 18 (93 - ((t - 10) * 12))
+        setxy 18 (65 - ((t - 10) * 12))
         set shape "solar"
         set size 20
         set t (t + 1)]
@@ -1690,6 +1734,19 @@ to reset-symbols                                                                
   set wind-bar patches with [pxcor > 83]
     ask wind-bar with [pycor < (-100 + (2 * %Wind-production))] [
     set pcolor yellow]
+
+  ask patch 64 96 [
+    set plabel "Nitrate     "
+    set plabel-color white]
+
+  ask patch 64 89 [
+    set plabel "accum, lb"
+    set plabel-color white]
+
+  ask patch 64 81 [
+    set plabel round (N-accu2)
+    set plabel-color white]
+
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -1979,10 +2036,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-87
-715
-228
-760
+71
+819
+212
+864
 solar-production (MWh)
 round solar-production
 17
@@ -1990,10 +2047,10 @@ round solar-production
 11
 
 MONITOR
-87
-784
-228
-829
+71
+888
+212
+933
 Wind-production (MWh)
 round Wind-production
 17
@@ -2001,10 +2058,10 @@ round Wind-production
 11
 
 MONITOR
-234
-715
-319
-760
+218
+819
+303
+864
 solar-cost ($)
 solar-cost
 17
@@ -2012,10 +2069,10 @@ solar-cost
 11
 
 MONITOR
-489
-715
-616
-760
+473
+819
+600
+864
 solar-sell ($ per year)
 solar-sell
 17
@@ -2023,10 +2080,10 @@ solar-sell
 11
 
 MONITOR
-234
-784
-319
-829
+218
+888
+303
+933
 wind-cost ($)
 wind-cost
 17
@@ -2034,10 +2091,10 @@ wind-cost
 11
 
 MONITOR
-489
-784
-615
-829
+473
+888
+599
+933
 wind-sell ($ per year)
 round wind-sell
 17
@@ -2045,10 +2102,10 @@ round wind-sell
 11
 
 MONITOR
-325
-715
-483
-760
+309
+819
+467
+864
 Solar-cost / 30 ($ per year)
 round (Solar-cost / 30)
 17
@@ -2056,10 +2113,10 @@ round (Solar-cost / 30)
 11
 
 MONITOR
-325
-784
-484
-829
+309
+888
+468
+933
 wind-cost / 30 ($ per year)
 wind-cost / 30
 17
@@ -2067,10 +2124,10 @@ wind-cost / 30
 11
 
 MONITOR
-621
-785
-730
-830
+605
+889
+714
+934
 wind-net-income
 round wind-net-income
 17
@@ -2078,10 +2135,10 @@ round wind-net-income
 11
 
 MONITOR
-621
-715
-730
-760
+605
+819
+714
+864
 solar-net-income
 round solar-net-income
 17
@@ -2114,25 +2171,25 @@ true
 true
 "set-plot-background-color 28" ""
 PENS
-"Solar      " 1.0 0 -5298144 true "" "ifelse ticks = 0 [set solar-production 0\nplot solar-production]\n[plot solar-production]"
+"Solar        " 1.0 0 -5298144 true "" "ifelse ticks = 0 [set solar-production 0\nplot solar-production]\n[plot solar-production]"
 "Wind      " 1.0 0 -14070903 true "" "ifelse ticks = 0 [set wind-production 0\nplot wind-production]\n[plot wind-production]"
-"$0" 1.0 0 -10873583 true "" "plot zero-line"
+"$0" 1.0 2 -8053223 true "" "plot zero-line"
 
 TEXTBOX
-88
-695
-238
-713
+72
+799
+222
+817
 Solar outputs
 11
 0.0
 1
 
 TEXTBOX
-89
-767
-239
-785
+73
+871
+223
+889
 Wind outputs
 11
 0.0
@@ -2156,7 +2213,7 @@ CHOOSER
 Future_Process
 Future_Process
 "Repeat Historical" "Wetter Future" "Dryer Future" "Impose T, P, & S Changes"
-1
+3
 
 TEXTBOX
 18
@@ -2185,7 +2242,7 @@ true
 "" ""
 PENS
 "Crop" 1.0 0 -12087248 true "" "ifelse ticks = 0 [set corn-expenses 0\nset wheat-expenses 0\nset soybeans-expenses 0\nset milo-expenses 0]\n[plot (corn-tot-income - corn-expenses) + (wheat-tot-income - wheat-expenses) + (soybeans-tot-income - soybeans-expenses) + (milo-tot-income - milo-expenses)]"
-"Energy  " 1.0 0 -955883 true "" "ifelse ticks = 0 [set energy-net-income 0\nplot energy-net-income]\n[plot energy-net-income]"
+"Energy     " 1.0 0 -955883 true "" "ifelse ticks = 0 [set energy-net-income 0\nplot energy-net-income]\n[plot energy-net-income]"
 "All" 1.0 0 -16777216 true "" "ifelse ticks = 0 [set energy-net-income 0\nplot (energy-net-income) + (corn-tot-income - corn-expenses) + (wheat-tot-income - wheat-expenses) + (soybeans-tot-income - soybeans-expenses) + (milo-tot-income - milo-expenses)]\n[plot (energy-net-income) + (corn-tot-income - corn-expenses) + (wheat-tot-income - wheat-expenses) + (soybeans-tot-income - soybeans-expenses) + (milo-tot-income - milo-expenses)]"
 "$0" 1.0 2 -8053223 true "" "plot zero-line"
 
@@ -2225,8 +2282,9 @@ true
 true
 "set-plot-background-color 28" ""
 PENS
-"Solar      " 1.0 0 -5298144 true "" "ifelse ticks = 0 [set solar-net-income 0\nplot (solar-net-income)]\n[plot (solar-net-income)]"
+"Solar        " 1.0 0 -5298144 true "" "ifelse ticks = 0 [set solar-net-income 0\nplot (solar-net-income)]\n[plot (solar-net-income)]"
 "Wind" 1.0 0 -14070903 true "" "ifelse ticks = 0 [set wind-net-income 0\nplot (wind-net-income)]\n[plot (wind-net-income)]"
+"$0" 1.0 2 -8053223 true "" "plot zero-line"
 
 TEXTBOX
 825
@@ -2279,10 +2337,10 @@ TEXTBOX
 1
 
 MONITOR
-933
-716
-1012
-761
+917
+820
+996
+865
 NIL
 current-elev
 3
@@ -2290,10 +2348,10 @@ current-elev
 11
 
 MONITOR
-1091
-716
-1181
-761
+1075
+820
+1165
+865
 NIL
 patch-change
 3
@@ -2301,10 +2359,10 @@ patch-change
 11
 
 MONITOR
-1015
-716
-1088
-761
+999
+820
+1072
+865
 NIL
 gw-change
 3
@@ -2312,10 +2370,10 @@ gw-change
 11
 
 MONITOR
-837
-716
-930
-761
+821
+820
+914
+865
 NIL
 water-use-feet
 3
@@ -2348,7 +2406,7 @@ true
 true
 "set-plot-background-color 88" ""
 PENS
-"Level      " 1.0 0 -14454117 true "" "plot gw-change"
+"Level        " 1.0 0 -14454117 true "" "plot gw-change"
 "0 ft" 1.0 2 -8053223 true "" "plot zero-line"
 
 TEXTBOX
@@ -2426,6 +2484,24 @@ Crop Insurance -------------------
 15
 0.0
 1
+
+PLOT
+8
+675
+292
+795
+N Accumulation
+NIL
+lbs
+0.0
+60.0
+0.0
+10.0
+true
+true
+"" ""
+PENS
+"N in SW " 1.0 0 -15973838 true "" "plot N-accu2"
 
 @#$#@#$#@
 # FEWCalc
