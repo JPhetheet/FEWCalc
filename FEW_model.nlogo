@@ -5,7 +5,7 @@ extensions [csv bitmap]
 globals [
   cropland-patches aquifer-patches river-patches wind-bar solar-bar wind-patches solar-patches corn-patches
   crop-area crop-color radius-of-%area total-area area-multiplier crop-background
-  precip_raw current-elev patch-change yrs-seq zero-line turbine_size precip_GCM
+  precip_raw current-elev patch-change yrs-seq zero-line turbine_size precip_GCM gw-level
   corn-data corn-GCMs corn-sum_1 corn-sum_2 corn-price corn-yield_1 corn-irrig_1 corn-yield_2 corn-irrig_2 corn-yield_3 corn-irrig_3 corn-yield_4 corn-irrig_4
   wheat-data wheat-GCMs wheat-sum_1 wheat-sum_2 wheat-price wheat-yield_1 wheat-irrig_1 wheat-yield_2 wheat-irrig_2 wheat-yield_3 wheat-irrig_3 wheat-yield_4 wheat-irrig_4
   soybeans-data soybeans-GCMs soybeans-sum_1 soybeans-sum_2 soybeans-price soybeans-yield_1 soybeans-irrig_1 soybeans-yield_2 soybeans-irrig_2 soybeans-yield_3 soybeans-irrig_3 soybeans-yield_4 soybeans-irrig_4
@@ -49,7 +49,8 @@ to setup
   set milo-base-price 3.14                                                                          ;Base price for crop insurance calculation
   set N-accu 0                                                                                      ;Assume there is no N accumulation in soil (fertilizer)
   set N-accu2 0                                                                                     ;Assume there is no N accumulation in soil (fertilizer)
-  set dryland-check? 1                                                                              ;dryland-check? = 1 means yes, it's the first dryland farming
+  set dryland-check? 1                                                                              ;Dryland-check? = 1 means yes, it's the first dryland farming
+  set gw-level Aquifer-thickness                                                                    ;Initialize gw-level variable
 
 
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1402,7 +1403,7 @@ to energy-calculation
   ;Bob Johnson (bobjohnson@centurylink.net), Earnie Lehman (earnielehman@gmail.com), and Hongyu Wu (hongyuwu@ksu.edu)
   ;assuming the cost spreads over 30 years with no interest
   set #Solar_panels (#solar_panel_sets * 1000)
-  set solar-production (#Solar_Panels * Panel_power * 5 * 365 / 1000000)                            ;MWh = power(Watt) * 5hrs/day * 365days/year / 1000000
+  set solar-production (#Solar_Panels * Panel_power * 5.6 * 365 / 1000000)                          ;MWh = power(Watt) * 5hrs/day * 365days/year / 1000000
   set wind-production (#wind_turbines * turbine_size * 0.421 * 24 * 365)                            ;MWh = power(MW) * Kansas_wind_capacity * 24hrs/day * 365days/year, capacity 42.1% (Berkeley Lab)
   set solar-cost (#Solar_Panels * (Panel_power / 1000) * 3050 / 30)                                 ;Solar cost = #Solar_Panels * Panel_power * $3050/kW
   set solar-sell (solar-production * 38)                                                            ;Sell = MWh * $38/MWh (Bob and Mary)
@@ -1436,6 +1437,8 @@ to gw-depletion_1
 
   set patch-change (gw-change * 170 / aquifer-thickness)                                            ;Convert water-level change to patch change
 
+  groundwater_level_change
+
   ifelse patch-change < 0                                                                           ;Is water level decreasing?
     [ask aquifer-patches with [pycor > (current-elev + patch-change)] [                             ;Yes
      set pcolor 7]]                                                                                 ;Set patches above "new" level of aquifer (new current elevation) to be gray
@@ -1467,6 +1470,8 @@ to gw-depletion_2
 
   set patch-change (gw-change * 170 / aquifer-thickness)                                            ;Convert water-level change to patch change
 
+  groundwater_level_change
+
   ifelse patch-change < 0                                                                           ;Is water level decreasing?
     [ask aquifer-patches with [pycor > (current-elev + patch-change)] [                             ;Yes
      set pcolor 7]]                                                                                 ;Set patches above "new" level of aquifer (new current elevation) to be gray
@@ -1497,6 +1502,8 @@ to gw-depletion_3
   set gw-change ((-32.306 * calibrated-water-use) + 7.98)                                           ;Calculate water-level change using a regression equation (Whittemore et al., 2016)
 
   set patch-change (gw-change * 170 / aquifer-thickness)                                            ;Convert water-level change to patch change
+
+  groundwater_level_change
 
   ifelse patch-change < 0                                                                           ;Is water level decreasing?
     [ask aquifer-patches with [pycor > (current-elev + patch-change)] [                             ;Yes
@@ -1533,6 +1540,8 @@ to gw-depletion_4
 
   set patch-change (gw-change * 170 / aquifer-thickness)                                            ;Convert water-level change to patch change
 
+  groundwater_level_change
+
   ifelse patch-change < 0                                                                           ;Is water level decreasing?
     [ask aquifer-patches with [pycor > (current-elev + patch-change)] [                             ;Yes
      set pcolor 7]]                                                                                 ;Set patches above "new" level of aquifer (new current elevation) to be gray
@@ -1562,6 +1571,8 @@ to gw-depletion_dryland
 
   set patch-change (gw-change * 170 / aquifer-thickness)                                            ;Convert water-level change to patch change
 
+  groundwater_level_change
+
   ifelse patch-change < 0                                                                           ;Is water level decreasing?
     [ask aquifer-patches with [pycor > (current-elev + patch-change)] [                             ;Yes
      set pcolor 7]]                                                                                 ;Set patches above "new" level of aquifer (new current elevation) to be gray
@@ -1575,6 +1586,11 @@ to gw-depletion_dryland
     ask aquifer-patches with [pycor < current-elev] [                                               ;Yes
       set pcolor 14]                                                                                ;Set "aquifer-patches" to be red
   ]
+end
+
+to groundwater_level_change
+  set gw-level (gw-level + gw-change)
+  print (word "water level: " gw-level)
 end
 
 to contaminant                                                                                      ;Surface water contamination
@@ -1714,7 +1730,7 @@ to reset-symbols                                                                
     ]
   ]
 
-  set solar-production (#Solar_Panels * Panel_power * 5 * 365 / 1000000)
+  set solar-production (#Solar_Panels * Panel_power * 5.6 * 365 / 1000000)
   set wind-production (#wind_turbines * turbine_size * 0.425 * 24 * 365)
   set %Solar-production (Solar-production * 100 / (Solar-production + Wind-production))
   set %Wind-production (Wind-production * 100 / (Solar-production + Wind-production))
@@ -2036,10 +2052,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-71
-819
-212
-864
+70
+871
+211
+916
 solar-production (MWh)
 round solar-production
 17
@@ -2047,10 +2063,10 @@ round solar-production
 11
 
 MONITOR
-71
-888
-212
-933
+70
+940
+211
+985
 Wind-production (MWh)
 round Wind-production
 17
@@ -2058,10 +2074,10 @@ round Wind-production
 11
 
 MONITOR
-218
-819
-303
-864
+217
+871
+302
+916
 solar-cost ($)
 solar-cost
 17
@@ -2069,10 +2085,10 @@ solar-cost
 11
 
 MONITOR
-473
-819
-600
-864
+472
+871
+599
+916
 solar-sell ($ per year)
 solar-sell
 17
@@ -2080,10 +2096,10 @@ solar-sell
 11
 
 MONITOR
-218
-888
-303
-933
+217
+940
+302
+985
 wind-cost ($)
 wind-cost
 17
@@ -2091,10 +2107,10 @@ wind-cost
 11
 
 MONITOR
-473
-888
-599
-933
+472
+940
+598
+985
 wind-sell ($ per year)
 round wind-sell
 17
@@ -2102,10 +2118,10 @@ round wind-sell
 11
 
 MONITOR
-309
-819
-467
-864
+308
+871
+466
+916
 Solar-cost / 30 ($ per year)
 round (Solar-cost / 30)
 17
@@ -2113,10 +2129,10 @@ round (Solar-cost / 30)
 11
 
 MONITOR
-309
-888
-468
-933
+308
+940
+467
+985
 wind-cost / 30 ($ per year)
 wind-cost / 30
 17
@@ -2124,10 +2140,10 @@ wind-cost / 30
 11
 
 MONITOR
-605
-889
-714
-934
+604
+941
+713
+986
 wind-net-income
 round wind-net-income
 17
@@ -2135,10 +2151,10 @@ round wind-net-income
 11
 
 MONITOR
-605
-819
-714
-864
+604
+871
+713
+916
 solar-net-income
 round solar-net-income
 17
@@ -2176,20 +2192,20 @@ PENS
 "$0" 1.0 2 -8053223 true "" "plot zero-line"
 
 TEXTBOX
-72
-799
-222
-817
+71
+851
+221
+869
 Solar outputs
 11
 0.0
 1
 
 TEXTBOX
-73
-871
-223
-889
+72
+923
+222
+941
 Wind outputs
 11
 0.0
@@ -2213,7 +2229,7 @@ CHOOSER
 Future_Process
 Future_Process
 "Repeat Historical" "Wetter Future" "Dryer Future" "Impose T, P, & S Changes"
-3
+0
 
 TEXTBOX
 18
@@ -2337,10 +2353,10 @@ TEXTBOX
 1
 
 MONITOR
+916
+872
+995
 917
-820
-996
-865
 NIL
 current-elev
 3
@@ -2348,10 +2364,10 @@ current-elev
 11
 
 MONITOR
-1075
-820
-1165
-865
+1074
+872
+1164
+917
 NIL
 patch-change
 3
@@ -2359,10 +2375,10 @@ patch-change
 11
 
 MONITOR
-999
-820
-1072
-865
+998
+872
+1071
+917
 NIL
 gw-change
 3
@@ -2370,10 +2386,10 @@ gw-change
 11
 
 MONITOR
-821
 820
-914
-865
+872
+913
+917
 NIL
 water-use-feet
 3
@@ -2391,11 +2407,11 @@ TEXTBOX
 1
 
 PLOT
-1112
-316
-1396
-436
-Water-Level Change
+300
+726
+584
+846
+Groundwater-Level Change
 Years
 Feet
 0.0
@@ -2486,10 +2502,10 @@ Crop Insurance -------------------
 1
 
 PLOT
-8
-675
-292
-795
+7
+727
+291
+847
 N Accumulation
 NIL
 lbs
@@ -2502,6 +2518,35 @@ true
 "" ""
 PENS
 "N in SW " 1.0 0 -15973838 true "" "plot N-accu2"
+
+PLOT
+1112
+316
+1396
+436
+Groundwater Level
+NIL
+Feet
+0.0
+60.0
+0.0
+10.0
+true
+true
+"set-plot-background-color 88" ""
+PENS
+"GW level" 1.0 0 -14454117 true "" "plot gw-level"
+"ST = 20% " 1.0 2 -5298144 true "" "plot (Aquifer-thickness * 0.2)"
+
+TEXTBOX
+1326
+367
+1399
+389
+ST = Saturated \n        thickness
+9
+0.0
+1
 
 @#$#@#$#@
 # FEWCalc
