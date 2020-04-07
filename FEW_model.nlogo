@@ -143,7 +143,7 @@ to setup
     set plabel-color white]
 
   ask patch 64 89 [
-    set plabel "accum, lb"
+    set plabel "in SW, lbs"
     set plabel-color white]
 
   ask patch 64 81 [
@@ -1756,7 +1756,7 @@ to reset-symbols                                                                
     set plabel-color white]
 
   ask patch 64 89 [
-    set plabel "accum, lb"
+    set plabel "in SW, lbs"
     set plabel-color white]
 
   ask patch 64 81 [
@@ -2461,10 +2461,10 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-347
-517
-806
-535
+344
+701
+803
+719
 ***Scenario 4, GCM data is available to year 91 (2098). It will be randomized after that year.
 10
 5.0
@@ -2546,6 +2546,16 @@ TEXTBOX
 ST = Saturated \n        thickness
 9
 0.0
+1
+
+TEXTBOX
+347
+518
+773
+536
+***FEWCalc requires NetLogo version 6.1.0 or higher.
+10
+5.0
 1
 
 @#$#@#$#@
