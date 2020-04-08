@@ -747,6 +747,7 @@ to food-calculation_1-2                                                         
   calculate-expenses_yield_1                                                                        ;Get farm expenses -- Link to "calculate-expenses_yield_1"
   calculate-net-income                                                                              ;Calculate farm net income
 
+  if corn-area > 0 [
   ifelse corn-tot-yield > corn-mean-yield                                                           ;Apply crop insurance?
     [set corn-tot-income corn-tot-income
      ask patch 13 -27 [
@@ -757,7 +758,9 @@ to food-calculation_1-2                                                         
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies corn insurance")]                  ;Print message in the Command Center
+  ]
 
+  if wheat-area > 0 [
   ifelse wheat-tot-yield > wheat-mean-yield                                                         ;Apply crop insurance?
     [set wheat-tot-income wheat-tot-income
      ask patch -5 56 [
@@ -768,7 +771,9 @@ to food-calculation_1-2                                                         
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]                 ;Print message in the Command Center
+  ]
 
+  if soybeans-area > 0 [
   ifelse soybeans-tot-yield > soybeans-mean-yield                                                   ;Apply crop insurance?
     [set soybeans-tot-income soybeans-tot-income
      ask patch -37 -79 [
@@ -779,7 +784,9 @@ to food-calculation_1-2                                                         
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies soybeans insurance")]              ;Print message in the Command Center
+  ]
 
+  if milo-area > 0 [
   ifelse milo-tot-yield > milo-mean-yield                                                           ;Apply crop insurance?
     [set milo-tot-income milo-tot-income
      ask patch -37 -12 [
@@ -790,6 +797,7 @@ to food-calculation_1-2                                                         
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies milo insurance")]                  ;Print message in the Command Center
+  ]
 end
 
 to food-calculation_2                                                                               ;Randomly choose wet year
@@ -834,6 +842,7 @@ to food-calculation_2                                                           
   calculate-expenses_yield_1                                                                        ;Get farm expenses -- Link to "calculate-expenses_yield_1"
   calculate-net-income                                                                              ;Calculate farm net income
 
+  if corn-area > 0 [
   ifelse corn-tot-yield > corn-mean-yield                                                           ;Apply crop insurance?
     [set corn-tot-income corn-tot-income
      ask patch 13 -27 [
@@ -844,8 +853,9 @@ to food-calculation_2                                                           
       set plabel-color red
     ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies corn insurance")]                  ;Print message in the Command Center
+  ]
 
-
+  if wheat-area > 0 [
   ifelse wheat-tot-yield > wheat-mean-yield                                                         ;Apply crop insurance?
     [set wheat-tot-income wheat-tot-income
      ask patch -5 56 [
@@ -856,7 +866,9 @@ to food-calculation_2                                                           
       set plabel-color red
     ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]                 ;Print message in the Command Center
+  ]
 
+  if soybeans-area > 0 [
   ifelse soybeans-tot-yield > soybeans-mean-yield                                                   ;Apply crop insurance?
     [set soybeans-tot-income soybeans-tot-income
      ask patch -37 -79 [
@@ -867,7 +879,9 @@ to food-calculation_2                                                           
       set plabel-color red
     ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies soybeans insurance")]              ;Print message in the Command Center
+  ]
 
+  if milo-area > 0 [
   ifelse milo-tot-yield > milo-mean-yield                                                           ;Apply crop insurance?
     [set milo-tot-income milo-tot-income
      ask patch -37 -12 [
@@ -878,6 +892,7 @@ to food-calculation_2                                                           
       set plabel-color red
     ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies milo insurance")]                  ;Print message in the Command Center
+  ]
 end
 
 to food-calculation_3                                                                               ;Randomly choose dry year
@@ -922,6 +937,7 @@ to food-calculation_3                                                           
   calculate-expenses_yield_1                                                                        ;Get farm expenses -- Link to "calculate-expenses_yield_1"
   calculate-net-income                                                                              ;Calculate farm net income
 
+  if corn-area > 0 [
   ifelse corn-tot-yield > corn-mean-yield                                                           ;Apply crop insurance?
     [set corn-tot-income corn-tot-income
      ask patch 13 -27 [
@@ -932,7 +948,9 @@ to food-calculation_3                                                           
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies corn insurance")]                  ;Print message in the Command Center
+  ]
 
+  if wheat-area > 0 [
   ifelse wheat-tot-yield > wheat-mean-yield                                                         ;Apply crop insurance?
     [set wheat-tot-income wheat-tot-income
      ask patch -5 56 [
@@ -943,7 +961,9 @@ to food-calculation_3                                                           
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]                 ;Print message in the Command Center
+  ]
 
+  if soybeans-area > 0 [
   ifelse soybeans-tot-yield > soybeans-mean-yield                                                   ;Apply crop insurance?
     [set soybeans-tot-income soybeans-tot-income
      ask patch -37 -79 [
@@ -954,7 +974,9 @@ to food-calculation_3                                                           
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies soybeans insurance")]              ;Print message in the Command Center
+  ]
 
+  if milo-area > 0 [
   ifelse milo-tot-yield > milo-mean-yield                                                           ;Apply crop insurance?
     [set milo-tot-income milo-tot-income
      ask patch -37 -12 [
@@ -965,6 +987,7 @@ to food-calculation_3                                                           
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies milo insurance")]                  ;Print message in the Command Center
+  ]
 end
 
 to food-calculation_4                                                                               ;Randomly choose data from GCMs
@@ -1002,6 +1025,7 @@ to food-calculation_4                                                           
   calculate-expenses_yield_3                                                                        ;Get farm expenses -- Link to "calculate-expenses_yield_3"
   calculate-net-income                                                                              ;Calculate farm net income
 
+  if corn-area > 0 [
   ifelse corn-tot-yield > corn-mean-yield                                                           ;Apply crop insurance?
     [set corn-tot-income corn-tot-income
      ask patch 13 -27 [
@@ -1012,7 +1036,9 @@ to food-calculation_4                                                           
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies corn insurance")]                  ;Print message in the Command Center
+  ]
 
+  if wheat-area > 0 [
   ifelse wheat-tot-yield > wheat-mean-yield                                                         ;Apply crop insurance?
     [set wheat-tot-income wheat-tot-income
      ask patch -5 56 [
@@ -1023,7 +1049,9 @@ to food-calculation_4                                                           
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]                ;Print message in the Command Center
+  ]
 
+  if soybeans-area > 0 [
   ifelse soybeans-tot-yield > soybeans-mean-yield                                                  ;Apply crop insurance?
     [set soybeans-tot-income soybeans-tot-income
      ask patch -37 -79 [
@@ -1034,7 +1062,9 @@ to food-calculation_4                                                           
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies soybeans insurance")]              ;Print message in the Command Center
+  ]
 
+  if milo-area > 0 [
   ifelse milo-tot-yield > milo-mean-yield                                                           ;Apply crop insurance?
     [set milo-tot-income milo-tot-income
      ask patch -37 -12 [
@@ -1045,6 +1075,7 @@ to food-calculation_4                                                           
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies milo insurance")]                  ;Print message in the Command Center
+  ]
 end
 
 to dryland-farming_1
@@ -1078,6 +1109,7 @@ to dryland-farming_1
   calculate-expenses_yield_2                                                                        ;Get farm expenses -- Link to "calculate-expenses_yield_1"
   calculate-net-income                                                                              ;Calculate farm net income
 
+  if corn-area > 0 [
   ifelse corn-tot-yield > corn-mean-yield                                                           ;Apply crop insurance?
     [set corn-tot-income corn-tot-income
      ask patch 13 -27 [
@@ -1088,7 +1120,9 @@ to dryland-farming_1
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies corn insurance")]                  ;Print message in the Command Center
+  ]
 
+  if wheat-area > 0 [
   ifelse wheat-tot-yield > wheat-mean-yield                                                         ;Apply crop insurance?
     [set wheat-tot-income wheat-tot-income
      ask patch -5 56 [
@@ -1099,7 +1133,9 @@ to dryland-farming_1
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]                 ;Print message in the Command Center
+  ]
 
+  if soybeans-area > 0 [
   ifelse soybeans-tot-yield > soybeans-mean-yield                                                   ;Apply crop insurance?
     [set soybeans-tot-income soybeans-tot-income
      ask patch -37 -79 [
@@ -1110,7 +1146,9 @@ to dryland-farming_1
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies soybeans insurance")]             ;Print message in the Command Center
+  ]
 
+  if milo-area > 0 [
   ifelse milo-tot-yield > milo-mean-yield                                                          ;Apply crop insurance?
     [set milo-tot-income milo-tot-income
      ask patch -37 -12 [
@@ -1121,6 +1159,7 @@ to dryland-farming_1
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies milo insurance")]                  ;Print message in the Command Center
+  ]
 
   let k ticks
   set corn-use-in item (k mod 10) corn-irrig_2                                                      ;Each tick, irrigation will be accessed from a "corn-irrig_2" list
@@ -1169,6 +1208,7 @@ to dryland-farming_2
   calculate-expenses_yield_2                                                                        ;Get farm expenses -- Link to "calculate-expenses_yield_2"
   calculate-net-income                                                                              ;Calculate farm net income
 
+  if corn-area > 0 [
   ifelse corn-tot-yield > corn-mean-yield                                                           ;Apply crop insurance?
     [set corn-tot-income corn-tot-income
      ask patch 13 -27 [
@@ -1179,7 +1219,9 @@ to dryland-farming_2
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies corn insurance")]                  ;Print message in the Command Center
+  ]
 
+  if wheat-area > 0 [
   ifelse wheat-tot-yield > wheat-mean-yield                                                         ;Apply crop insurance?
     [set wheat-tot-income wheat-tot-income
      ask patch -5 56 [
@@ -1190,7 +1232,9 @@ to dryland-farming_2
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]                 ;Print message in the Command Center
+  ]
 
+  if soybeans-area > 0 [
   ifelse soybeans-tot-yield > soybeans-mean-yield                                                   ;Apply crop insurance?
     [set soybeans-tot-income soybeans-tot-income
      ask patch -37 -79 [
@@ -1201,7 +1245,9 @@ to dryland-farming_2
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies soybeans insurance")]              ;Print message in the Command Center
+  ]
 
+  if milo-area > 0 [
   ifelse milo-tot-yield > milo-mean-yield                                                           ;Apply crop insurance?
     [set milo-tot-income milo-tot-income
      ask patch -37 -12 [
@@ -1212,6 +1258,7 @@ to dryland-farming_2
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies milo insurance")]                  ;Print message in the Command Center
+  ]
 
   let k ticks
   set corn-use-in item (k mod 10) corn-irrig_2                                                      ;Each tick, irrigation will be accessed from a "corn-irrig_2" list
@@ -1260,6 +1307,7 @@ to dryland-farming_3
   calculate-expenses_yield_2                                                                        ;Get farm expenses -- Link to "calculate-expenses_yield_2"
   calculate-net-income                                                                              ;Calculate farm net income
 
+  if corn-area > 0 [
   ifelse corn-tot-yield > corn-mean-yield                                                           ;Apply crop insurance?
     [set corn-tot-income corn-tot-income
      ask patch 13 -27 [
@@ -1270,7 +1318,9 @@ to dryland-farming_3
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies corn insurance")]                  ;Print message in the Command Center
+  ]
 
+  if wheat-area > 0 [
   ifelse wheat-tot-yield > wheat-mean-yield                                                         ;Apply crop insurance?
     [set wheat-tot-income wheat-tot-income
      ask patch -5 56 [
@@ -1281,7 +1331,9 @@ to dryland-farming_3
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]                 ;Print message in the Command Center
+  ]
 
+  if soybeans-area > 0 [
   ifelse soybeans-tot-yield > soybeans-mean-yield                                                   ;Apply crop insurance?
     [set soybeans-tot-income soybeans-tot-income
      ask patch -37 -79 [
@@ -1292,7 +1344,9 @@ to dryland-farming_3
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies soybeans insurance")]              ;Print message in the Command Center
+  ]
 
+  if milo-area > 0 [
   ifelse milo-tot-yield > milo-mean-yield                                                           ;Apply crop insurance?
     [set milo-tot-income milo-tot-income
      ask patch -37 -12 [
@@ -1303,6 +1357,7 @@ to dryland-farming_3
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies milo insurance")]                  ;Print message in the Command Center
+  ]
 
   let k ticks
   set corn-use-in item (k mod 10) corn-irrig_2                                                      ;Each tick, irrigation will be accessed from a "corn-irrig_2" list
@@ -1348,6 +1403,7 @@ to dryland-farming_4
   calculate-expenses_yield_4                                                                        ;Get farm expenses -- Link to "calculate-expenses_yield_4"
   calculate-net-income                                                                              ;Calculate farm net income
 
+  if corn-area > 0 [
   ifelse corn-tot-yield > corn-mean-yield                                                           ;Apply crop insurance?
     [set corn-tot-income corn-tot-income
      ask patch 13 -27 [
@@ -1358,7 +1414,9 @@ to dryland-farming_4
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies corn insurance")]                  ;Print message in the Command Center
+  ]
 
+  if wheat-area > 0 [
   ifelse wheat-tot-yield > wheat-mean-yield                                                         ;Apply crop insurance?
     [set wheat-tot-income wheat-tot-income
      ask patch -5 56 [
@@ -1369,7 +1427,9 @@ to dryland-farming_4
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies wheat insurance")]                 ;Print message in the Command Center
+  ]
 
+  if soybeans-area > 0 [
   ifelse soybeans-tot-yield > soybeans-mean-yield                                                   ;Apply crop insurance?
     [set soybeans-tot-income soybeans-tot-income
      ask patch -37 -79 [
@@ -1380,7 +1440,9 @@ to dryland-farming_4
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies soybeans insurance")]              ;Print message in the Command Center
+  ]
 
+  if milo-area > 0 [
   ifelse milo-tot-yield > milo-mean-yield                                                           ;Apply crop insurance?
     [set milo-tot-income milo-tot-income
      ask patch -37 -12 [
@@ -1391,6 +1453,7 @@ to dryland-farming_4
       set plabel-color red
       ]
      print (word "Seq " ticks ", year " (ticks + 2008) " applies milo insurance")]                  ;Print message in the Command Center
+  ]
 
   let k ticks
   set corn-use-in item (k mod 10) corn-irrig_4                                                      ;Each tick, irrigation will be accessed from a "corn-irrig_4" list
@@ -1595,6 +1658,12 @@ end
 
 to contaminant                                                                                      ;Surface water contamination
   let k (ticks mod 10)
+
+  if corn-area = 0 [set corn-N-app [0 0 0 0 0 0 0 0 0 0]]
+  if wheat-area = 0 [set wheat-N-app [0 0 0 0 0 0 0 0 0 0]]
+  if soybeans-area = 0 [set soybeans-N-app [0 0 0 0 0 0 0 0 0 0]]
+  if milo-area = 0 [set milo-N-app [0 0 0 0 0 0 0 0 0 0]]
+
   set N-accu-temp (0.1 * 2.205 * (((item (item k yrs-seq) corn-N-app) * corn-area) + ((item (item k yrs-seq) wheat-N-app) * wheat-area) + ((item (item k yrs-seq) soybeans-N-app) * soybeans-area) + ((item (item k yrs-seq) milo-N-app) * milo-area))) ;convert from kg to pound, multiply the mass value by 2.205
 
   print N-accu-temp
@@ -1603,16 +1672,16 @@ to contaminant                                                                  
   print N-accu
 
   ask patch -1 0 [ask n-of (0.1 * (item (item k yrs-seq) corn-N-app) / 1.12) patches in-radius (item 0 radius-of-%area) [set pcolor brown]]            ;dots shown in a circle are in a unit area (lbs/ac); kg/ha to lb/ac, dividing by 1.12
-  ask patch -18 84 [ask n-of (0.1 * (item (item k yrs-seq) wheat-N-app) / 1.12) patches in-radius (item 0 radius-of-%area) [set pcolor brown]]         ;dots shown in a circle are in a unit area (lbs/ac); kg/ha to lb/ac, dividing by 1.12
-  ask patch -51.5 -51 [ask n-of (0.1 * (item (item k yrs-seq) soybeans-N-app) / 1.12) patches in-radius (item 0 radius-of-%area) [set pcolor brown]]   ;dots shown in a circle are in a unit area (lbs/ac); kg/ha to lb/ac, dividing by 1.12
-  ask patch -52 16 [ask n-of (0.1 * (item (item k yrs-seq) milo-N-app) / 1.12) patches in-radius (item 0 radius-of-%area) [set pcolor brown]]          ;dots shown in a circle are in a unit area (lbs/ac); kg/ha to lb/ac, dividing by 1.12
+  ask patch -18 84 [ask n-of (0.1 * (item (item k yrs-seq) wheat-N-app) / 1.12) patches in-radius (item 1 radius-of-%area) [set pcolor brown]]         ;dots shown in a circle are in a unit area (lbs/ac); kg/ha to lb/ac, dividing by 1.12
+  ask patch -51.5 -51 [ask n-of (0.1 * (item (item k yrs-seq) soybeans-N-app) / 1.12) patches in-radius (item 2 radius-of-%area) [set pcolor brown]]   ;dots shown in a circle are in a unit area (lbs/ac); kg/ha to lb/ac, dividing by 1.12
+  ask patch -52 16 [ask n-of (0.1 * (item (item k yrs-seq) milo-N-app) / 1.12) patches in-radius (item 3 radius-of-%area) [set pcolor brown]]          ;dots shown in a circle are in a unit area (lbs/ac); kg/ha to lb/ac, dividing by 1.12
 
   ifelse Future_Process = "Repeat Historical" or Future_Process = "Wetter Future" or Future_Process = "Dryer Future"
   [if (item k yrs-seq) = 7 or (item k yrs-seq) = 8 or (item k yrs-seq) = 9 [                         ;yrs-seq = 7, 8, and 9 are wet years
     ask up-to-n-of (0.0001 * N-accu) river-patches with [pcolor = 87] [set pcolor brown]            ;0.0001 is a scaling factor, graphically used to reduce number of dots in stream
 
     set N-accu2 (N-accu2 + N-accu)                                                                  ;N-accu2 is amount of nitrate in the stream
-    print N-accu2
+    print (word "N-accu: " N-accu2)
 
     ask patch 64 81 [                                                                               ;Show a number in the World
     set plabel round (N-accu2)
@@ -1629,7 +1698,7 @@ to contaminant                                                                  
     ask up-to-n-of (0.0001 * N-accu) river-patches with [pcolor = 87] [set pcolor brown]            ;0.0001 is a scaling factor, graphically used to reduce number of dots in stream
 
     set N-accu2 (N-accu2 + N-accu)                                                                  ;N-accu2 is amount of nitrate in the stream
-    print N-accu2
+    print (word "N-accu: " N-accu2)
 
     ask patch 64 81 [                                                                               ;Show a number in the World
     set plabel round (N-accu2)
@@ -1731,7 +1800,7 @@ to reset-symbols                                                                
   ]
 
   set solar-production (#Solar_Panels * Panel_power * 5.6 * 365 / 1000000)
-  set wind-production (#wind_turbines * turbine_size * 0.425 * 24 * 365)
+  set wind-production (#wind_turbines * turbine_size * 0.421 * 24 * 365)
   set %Solar-production (Solar-production * 100 / (Solar-production + Wind-production))
   set %Wind-production (Wind-production * 100 / (Solar-production + Wind-production))
 
@@ -1815,7 +1884,7 @@ INPUTBOX
 82
 169
 Corn-area
-125.0
+250.0
 1
 0
 Number
@@ -1837,7 +1906,7 @@ INPUTBOX
 246
 169
 Soybeans-area
-125.0
+0.0
 1
 0
 Number
