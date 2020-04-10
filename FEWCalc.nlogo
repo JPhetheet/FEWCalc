@@ -231,6 +231,7 @@ end
 
 to go
   if ticks = Input-years [stop]
+  check-area
   reset-symbols
   set GCM-random-year (random 81)
   future_processes
@@ -689,6 +690,57 @@ if Future_Process = "Repeat Historical"                                         
   ]
 end
 
+to check-area
+
+  if corn-area = 0 [
+    set corn-yield_1 (n-values 10 [0])
+    set corn-irrig_1 (n-values 10 [0])
+    set corn-yield_2 (n-values 10 [0])
+    set corn-irrig_2 (n-values 10 [0])
+    set corn-yield_3 (n-values 81 [0])
+    set corn-irrig_3 (n-values 81 [0])
+    set corn-yield_3 (n-values 81 [0])
+    set corn-irrig_3 (n-values 81 [0])
+    set corn-N-app (n-values 10 [0])
+  ]
+
+  if wheat-area = 0 [
+    set wheat-yield_1 (n-values 10 [0])
+    set wheat-irrig_1 (n-values 10 [0])
+    set wheat-yield_2 (n-values 10 [0])
+    set wheat-irrig_2 (n-values 10 [0])
+    set wheat-yield_3 (n-values 81 [0])
+    set wheat-irrig_3 (n-values 81 [0])
+    set wheat-yield_3 (n-values 81 [0])
+    set wheat-irrig_3 (n-values 81 [0])
+    set wheat-N-app (n-values 10 [0])
+  ]
+
+  if soybeans-area = 0 [
+    set soybeans-yield_1 (n-values 10 [0])
+    set soybeans-irrig_1 (n-values 10 [0])
+    set soybeans-yield_2 (n-values 10 [0])
+    set soybeans-irrig_2 (n-values 10 [0])
+    set soybeans-yield_3 (n-values 81 [0])
+    set soybeans-irrig_3 (n-values 81 [0])
+    set soybeans-yield_3 (n-values 81 [0])
+    set soybeans-irrig_3 (n-values 81 [0])
+    set soybeans-N-app (n-values 10 [0])
+  ]
+
+  if milo-area = 0 [
+    set milo-yield_1 (n-values 10 [0])
+    set milo-irrig_1 (n-values 10 [0])
+    set milo-yield_2 (n-values 10 [0])
+    set milo-irrig_2 (n-values 10 [0])
+    set milo-yield_3 (n-values 81 [0])
+    set milo-irrig_3 (n-values 81 [0])
+    set milo-yield_3 (n-values 81 [0])
+    set milo-irrig_3 (n-values 81 [0])
+    set milo-N-app (n-values 10 [0])
+  ]
+
+end
 
 ;Agricultural part -- contact: Wade Heger KU (wheger@ku.edu), Allan Andales CSU (Allan.Andales@colostate.edu), Garvey Smith CSU (Garvey.Smith@colostate.edu)
 to food-calculation_1-1                                                                             ;First 10 year data based on historical data
@@ -1659,11 +1711,6 @@ end
 to contaminant                                                                                      ;Surface water contamination
   let k (ticks mod 10)
 
-  if corn-area = 0 [set corn-N-app [0 0 0 0 0 0 0 0 0 0]]
-  if wheat-area = 0 [set wheat-N-app [0 0 0 0 0 0 0 0 0 0]]
-  if soybeans-area = 0 [set soybeans-N-app [0 0 0 0 0 0 0 0 0 0]]
-  if milo-area = 0 [set milo-N-app [0 0 0 0 0 0 0 0 0 0]]
-
   set N-accu-temp (0.1 * 2.205 * (((item (item k yrs-seq) corn-N-app) * corn-area) + ((item (item k yrs-seq) wheat-N-app) * wheat-area) + ((item (item k yrs-seq) soybeans-N-app) * soybeans-area) + ((item (item k yrs-seq) milo-N-app) * milo-area))) ;convert from kg to pound, multiply the mass value by 2.205
 
   print N-accu-temp
@@ -1884,7 +1931,7 @@ INPUTBOX
 82
 169
 Corn-area
-250.0
+200.0
 1
 0
 Number
@@ -1949,9 +1996,9 @@ true
 "set-plot-background-color 58" ""
 PENS
 "Corn" 1.0 0 -4079321 true "" "plot corn-net-income"
-"Wheat" 1.0 0 -3844592 true "" ";ifelse ticks = 0 [set wheat-expenses 0][plot (wheat-tot-income - wheat-expenses)]\nplot wheat-net-income"
+"Wheat" 1.0 0 -3844592 true "" "plot wheat-net-income"
 "Soybeans" 1.0 0 -13210332 true "" "plot soybeans-net-income"
-"Milo" 1.0 0 -12440034 true "" ";ifelse ticks = 0 [set milo-expenses 0][plot (milo-tot-income - milo-expenses)]\nplot milo-net-income"
+"Milo" 1.0 0 -12440034 true "" "plot milo-net-income"
 "$0" 1.0 2 -8053223 true "" "plot zero-line"
 
 BUTTON
@@ -2007,10 +2054,10 @@ true
 true
 "set-plot-background-color 88" ""
 PENS
-"Corn" 1.0 0 -4079321 true "" "ifelse corn-area = 0 \n  [set corn-use-in 0\n   plot corn-use-in]\n  [plot corn-use-in]"
-"Wheat" 1.0 0 -3844592 true "" "ifelse wheat-area = 0 \n  [set wheat-use-in 0\n   plot wheat-use-in]\n  [plot wheat-use-in]"
-"Soybeans" 1.0 0 -13210332 true "" "ifelse soybeans-area = 0 \n  [set soybeans-use-in 0\n   plot soybeans-use-in]\n  [plot soybeans-use-in]"
-"Milo" 1.0 0 -12440034 true "" "ifelse milo-area = 0 \n  [set milo-use-in 0\n   plot milo-use-in]\n  [plot milo-use-in]"
+"Corn" 1.0 0 -4079321 true "" "plot corn-use-in"
+"Wheat" 1.0 0 -3844592 true "" "plot wheat-use-in"
+"Soybeans" 1.0 0 -13210332 true "" "plot soybeans-use-in"
+"Milo" 1.0 0 -12440034 true "" "plot milo-use-in"
 
 PLOT
 824
@@ -2028,10 +2075,10 @@ true
 true
 "set-plot-background-color 58" ""
 PENS
-"Corn" 1.0 0 -4079321 true "" "ifelse corn-area = 0 \n  [set corn-tot-yield 0 \n   plot corn-tot-yield] \n  [plot corn-tot-yield]"
-"Wheat" 1.0 0 -3844592 true "" "ifelse wheat-area = 0 \n  [set wheat-tot-yield 0 \n   plot wheat-tot-yield] \n  [plot wheat-tot-yield]"
-"Soybeans" 1.0 0 -13210332 true "" "ifelse soybeans-area = 0 \n  [set soybeans-tot-yield 0\n   plot soybeans-tot-yield] \n  [plot soybeans-tot-yield]"
-"Milo" 1.0 0 -12440034 true "" "ifelse milo-area = 0 \n  [set milo-tot-yield 0\n   plot milo-tot-yield]\n  [plot milo-tot-yield]"
+"Corn" 1.0 0 -4079321 true "" "plot corn-tot-yield\n"
+"Wheat" 1.0 0 -3844592 true "" "plot wheat-tot-yield"
+"Soybeans" 1.0 0 -13210332 true "" "plot soybeans-tot-yield"
+"Milo" 1.0 0 -12440034 true "" "plot milo-tot-yield"
 
 BUTTON
 160
