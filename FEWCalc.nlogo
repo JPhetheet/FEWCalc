@@ -2305,7 +2305,7 @@ true
 PENS
 "Solar        " 1.0 0 -5298144 true "" "ifelse ticks = 0 [set solar-production 0\nplot solar-production]\n[plot solar-production]"
 "Wind      " 1.0 0 -14070903 true "" "ifelse ticks = 0 [set wind-production 0\nplot wind-production]\n[plot wind-production]"
-"$0" 1.0 2 -8053223 true "" "plot zero-line"
+"0 MWh" 1.0 2 -8053223 true "" "plot zero-line"
 
 TEXTBOX
 71
@@ -2653,12 +2653,13 @@ true
 PENS
 "GW level" 1.0 0 -14454117 true "" "plot gw-level"
 "ST = 20% " 1.0 2 -5298144 true "" "plot (Aquifer-thickness * 0.2)"
+"ST = 30%" 1.0 2 -7500403 true "" "plot (Aquifer-thickness * 0.3)"
 
 TEXTBOX
 1326
-367
+383
 1399
-389
+405
 ST = Saturated \n        thickness
 9
 0.0
