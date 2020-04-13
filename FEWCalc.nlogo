@@ -226,6 +226,7 @@ to setup
         ]
       ]
     ]
+
   reset-ticks                                                                                       ;Reset tick to zero
 end
 
