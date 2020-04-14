@@ -698,8 +698,8 @@ to check-area
     set corn-irrig_2 (n-values 10 [0])
     set corn-yield_3 (n-values 81 [0])
     set corn-irrig_3 (n-values 81 [0])
-    set corn-yield_3 (n-values 81 [0])
-    set corn-irrig_3 (n-values 81 [0])
+    set corn-yield_4 (n-values 81 [0])
+    set corn-irrig_4 (n-values 81 [0])
     set corn-N-app (n-values 10 [0])
   ]
 
@@ -710,8 +710,8 @@ to check-area
     set wheat-irrig_2 (n-values 10 [0])
     set wheat-yield_3 (n-values 81 [0])
     set wheat-irrig_3 (n-values 81 [0])
-    set wheat-yield_3 (n-values 81 [0])
-    set wheat-irrig_3 (n-values 81 [0])
+    set wheat-yield_4 (n-values 81 [0])
+    set wheat-irrig_4 (n-values 81 [0])
     set wheat-N-app (n-values 10 [0])
   ]
 
@@ -722,8 +722,8 @@ to check-area
     set soybeans-irrig_2 (n-values 10 [0])
     set soybeans-yield_3 (n-values 81 [0])
     set soybeans-irrig_3 (n-values 81 [0])
-    set soybeans-yield_3 (n-values 81 [0])
-    set soybeans-irrig_3 (n-values 81 [0])
+    set soybeans-yield_4 (n-values 81 [0])
+    set soybeans-irrig_4 (n-values 81 [0])
     set soybeans-N-app (n-values 10 [0])
   ]
 
@@ -734,8 +734,8 @@ to check-area
     set milo-irrig_2 (n-values 10 [0])
     set milo-yield_3 (n-values 81 [0])
     set milo-irrig_3 (n-values 81 [0])
-    set milo-yield_3 (n-values 81 [0])
-    set milo-irrig_3 (n-values 81 [0])
+    set milo-yield_4 (n-values 81 [0])
+    set milo-irrig_4 (n-values 81 [0])
     set milo-N-app (n-values 10 [0])
   ]
 
