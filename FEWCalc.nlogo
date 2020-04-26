@@ -27,14 +27,15 @@ globals [
   corn-N-use_2 wheat-N-use_2 soybeans-N-use_2 milo-N-use_2
   corn-N-use_3 wheat-N-use_3 soybeans-N-use_3 milo-N-use_3
   corn-N-use_4 wheat-N-use_4 soybeans-N-use_4 milo-N-use_4
-  #Solar_panels solar-production wind-production solar-cost solar-sell wind-cost wind-sell solar-net-income wind-net-income energy-net-income %Solar-production %Wind-production
+  #Solar_panels solar-production solar-production_temp count-solar-lifespan solar-cost solar-sell solar-net-income %Solar-production
+  wind-production wind-production_temp wind-cost wind-sell wind-net-income energy-net-income %Wind-production count-wind-lifespan count-wind-lifespan-cost
 ]
 
 to setup
   ca                                                                                                ;Clear all
   import-data                                                                                       ;Import data from csv file in the FEWCalc folder
-  set turbine_size 2                                                                                ;Set wind turbine size 2MW (change this value will affect installation and O&M costs
-  energy-calculation                                                                                ;Initialize the amount of energy
+  set turbine_size Capacity_Megawatts                                                                         ;Set wind turbine size (change this value will affect installation and O&M costs
+  initialize-energy                                                                                ;Initialize the amount of energy
   set zero-line 0                                                                                   ;Use to draw a zero line in plots
   set total-area (corn-area + wheat-area + soybeans-area + SG-area)                               ;Calculate total crop area
   set current-elev 69                                                                               ;Set top of aquifer = max pycor of "aquifer patches"
@@ -51,6 +52,9 @@ to setup
   set N-accu2 0                                                                                     ;Assume there is no N accumulation in soil (fertilizer)
   set dryland-check? 1                                                                              ;Dryland-check? = 1 means yes, it's the first dryland farming
   set gw-level Aquifer-thickness                                                                    ;Initialize gw-level variable
+  set count-solar-lifespan 0
+  set count-wind-lifespan 0
+  set count-wind-lifespan-cost 0
 
 
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1514,17 +1518,61 @@ end
 
 to energy-calculation
   ;Bob Johnson (bobjohnson@centurylink.net), Earnie Lehman (earnielehman@gmail.com), and Hongyu Wu (hongyuwu@ksu.edu)
-  ;assuming the cost spreads over 30 years with no interest
-  set #Solar_panels (#solar_panel_sets * 1000)
-  set solar-production (#Solar_Panels * Panel_power * 5.6 * 365 / 1000000)                          ;MWh = power(Watt) * 5hrs/day * 365days/year / 1000000
-  set wind-production (#wind_turbines * turbine_size * 0.421 * 24 * 365)                            ;MWh = power(MW) * Kansas_wind_capacity * 24hrs/day * 365days/year, capacity 42.1% (Berkeley Lab)
-  set solar-cost (#Solar_Panels * (Panel_power / 1000) * 3050 / 30)                                 ;Solar cost = #Solar_Panels * Panel_power * $3050/kW
+  ;assuming the cost spreads over 20 (wind) and 25 (solar) years with no interest
+  ;set #Solar_panels (#solar_panel_sets * 1000)
+
+  if count-solar-lifespan <= 25 [
+  ifelse count-solar-lifespan = 0 [
+    set solar-production_temp (#Solar_Panels * Panel_power * 5.6 * 365 / 1000000)                   ;MWh = power(Watt) * 5hrs/day * 365days/year / 1000000
+    set solar-production solar-production_temp
+    print (word ticks " New solar: solar production = " solar-production)
+    set count-solar-lifespan (count-solar-lifespan + 1)]
+
+   [set solar-production (0.995 * solar-production_temp)                                            ;0.5% degradation annually
+    set solar-production_temp (solar-production)
+    print (word "tick " ticks ": solar production = " solar-production)
+    set count-solar-lifespan (count-solar-lifespan + 1)
+    if count-solar-lifespan = 25 [set count-solar-lifespan 0]
+    ]
+  ]
+
+  if count-wind-lifespan <= 20 [
+  ifelse count-wind-lifespan <= 9 [                                                                 ;Count 10 years (0 to 9)
+    set wind-production_temp (#wind_turbines * turbine_size * 0.421 * 24 * 365)                     ;MWh = power(MW) * Kansas_wind_capacity * 24hrs/day * 365days/year, capacity 42.1% (Berkeley Lab)
+    set wind-production wind-production_temp
+    print (word ticks "100% solar production = " wind-production)
+    set count-wind-lifespan (count-wind-lifespan + 1)]
+
+   [set wind-production (0.98 * wind-production_temp)                                               ;2% degradation annually (project age beyound 10 years)
+    set wind-production_temp (wind-production)
+    print (word "tick " ticks ": solar production = " solar-production)
+    set count-wind-lifespan (count-wind-lifespan + 1)
+    if count-wind-lifespan = 20 [set count-wind-lifespan 0]
+    ]
+  ]
+
+  set solar-cost (#Solar_Panels * (Panel_power / 1000) * 3050 / 25)                                 ;Solar cost = #Solar_Panels * Panel_power * $3050/kW
+  print (word "solar prod for cost cal: " solar-production)
   set solar-sell (solar-production * 38)                                                            ;Sell = MWh * $38/MWh (Bob and Mary)
                                                                                                     ;Wholesale < Coop $65 < Retail, , (Wholesale was $22-24/MWh, Retail price is $105/MWh)
 
   ;Wind installation cost = $1000/kW or $1000000/MW, Annual O&M = 3% of installation cost
-  ;For 2MW, Wind cost = 2,000,000/30 + (60,000/yr) * #wind_turbines, (ref. Berkeley Lab, Hongyu Wu)
-  set wind-cost (((1000000 * turbine_size / 30) + (0.03 * 1000000 * turbine_size))) * #wind_turbines
+  ;For 2MW, Wind cost = $1470/kW + (O&M costs) * #wind_turbines, (ref. Berkeley Lab, Hongyu Wu)
+  ;Operations and maintenance costs: $45,000/MW for turbine aged between 0 and 10 years, and $50,000/MW beyond 10 years
+
+  if count-wind-lifespan-cost <= 20 [
+  ifelse count-wind-lifespan-cost <= 9 [
+    set wind-cost ((1470000 * turbine_size / 20) + (45000 * turbine_size)) * #wind_turbines
+    set count-wind-lifespan-cost (count-wind-lifespan-cost + 1)
+    print (word "first 10 year: " wind-cost)]
+
+    [set wind-cost ((1470000 * turbine_size / 20) + (50000 * turbine_size)) * #wind_turbines
+     print (word "Beyond 10 years: " wind-cost)
+     set count-wind-lifespan-cost (count-wind-lifespan-cost + 1)
+     if count-wind-lifespan-cost = 20 [set count-wind-lifespan-cost 0]
+    ]
+  ]
+
   set wind-sell (wind-production * 38)                                                              ;Sell = MWh * $38/MWh
   set solar-net-income (solar-sell - solar-cost)
   set wind-net-income  (wind-sell - wind-cost)
@@ -1782,6 +1830,31 @@ to treatment                                                                    
   ]
 end
 
+to initialize-energy
+  set #Solar_panels (#solar_panel_sets * 1000)
+  set solar-production (#Solar_Panels * Panel_power * 5.6 * 365 / 1000000)
+  print (word "initialize " solar-production)
+  set wind-production (#wind_turbines * turbine_size * 0.421 * 24 * 365)
+  set %Solar-production (Solar-production * 100 / (Solar-production + Wind-production))
+  set %Wind-production (Wind-production * 100 / (Solar-production + Wind-production))
+
+  ask patch 93 -91 [
+    set plabel round (%Wind-production)
+    set plabel-color black]
+
+  set solar-bar patches with [pxcor > 83]
+    ask solar-bar with [pycor > (-100 + (2 * %Wind-production))] [
+    set pcolor [255 165 0]]
+
+  ask patch 93 96 [
+    set plabel round (%Solar-production)
+    set plabel-color black]
+
+  set wind-bar patches with [pxcor > 83]
+    ask wind-bar with [pycor < (-100 + (2 * %Wind-production))] [
+    set pcolor yellow]
+end
+
 to reset-symbols                                                                                      ;Reset number of wind turbines and solar panels every tick
   ask turtles [die]                                                                                   ;It is similar to "setup" procedure showing above
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1844,8 +1917,13 @@ to reset-symbols                                                                
     ]
   ]
 
-  set solar-production (#Solar_Panels * Panel_power * 5.6 * 365 / 1000000)
-  set wind-production (#wind_turbines * turbine_size * 0.421 * 24 * 365)
+  if ticks = 0 [
+    set solar-production (#Solar_Panels * Panel_power * 5.6 * 365 / 1000000)
+    set wind-production (#wind_turbines * turbine_size * 0.421 * 24 * 365)]
+
+  set solar-production solar-production
+  print (word "reset-symbol " solar-production)
+  set wind-production wind-production
   set %Solar-production (Solar-production * 100 / (Solar-production + Wind-production))
   set %Wind-production (Wind-production * 100 / (Solar-production + Wind-production))
 
@@ -2350,7 +2428,7 @@ TEXTBOX
 305
 131
 323
-2-MW Wind Turbine
+Wind Turbine
 11
 0.0
 1
@@ -2668,7 +2746,7 @@ TEXTBOX
 518
 773
 536
-***FEWCalc requires NetLogo version 6.1.0 or later.
+***FEWCalc requires NetLogo version 6.1.0 or higher.
 10
 5.0
 1
@@ -2711,6 +2789,16 @@ TEXTBOX
 SG = Grain \nsorghum
 9
 0.0
+1
+
+CHOOSER
+162
+309
+304
+354
+Capacity_Megawatts
+Capacity_Megawatts
+1 2
 1
 
 @#$#@#$#@
