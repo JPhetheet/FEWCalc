@@ -2428,10 +2428,10 @@ Climate Scenario ---------------------------------
 1
 
 CHOOSER
-7
-449
-210
-494
+9
+478
+180
+523
 Future_Process
 Future_Process
 "Repeat Historical" "Wetter Future" "Dryer Future" "Impose T, P, & S Changes"
@@ -2607,7 +2607,7 @@ TEXTBOX
 504
 802
 522
-**Year in these plots represents a sequential year. Year 1 is 2008 and year 60 is 2067.
+**Year in the plots represents a sequential year. Year 1 is 2008 and year 60 is 2067.
 10
 5.0
 1
@@ -2813,6 +2813,16 @@ CHOOSER
 Capacity_Megawatts
 Capacity_Megawatts
 1 2
+1
+
+TEXTBOX
+15
+446
+328
+478
+Climate scenario control temperature (T), precipitation (P), and solar radiation (S) for the simulated year.
+11
+0.0
 1
 
 @#$#@#$#@
