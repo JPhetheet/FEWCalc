@@ -34,10 +34,10 @@ globals [
 to setup
   ca                                                                                                ;Clear all
   import-data                                                                                       ;Import data from csv file in the FEWCalc folder
-  set turbine_size Capacity_Megawatts                                                                         ;Set wind turbine size (change this value will affect installation and O&M costs
-  initialize-energy                                                                                ;Initialize the amount of energy
+  set turbine_size Capacity_Megawatts                                                               ;Set wind turbine size (change this value will affect installation and O&M costs
+  initialize-energy                                                                                 ;Initialize the amount of energy
   set zero-line 0                                                                                   ;Use to draw a zero line in plots
-  set total-area (corn-area + wheat-area + soybeans-area + SG-area)                               ;Calculate total crop area
+  set total-area (corn-area + wheat-area + soybeans-area + SG-area)                                 ;Calculate total crop area
   set current-elev 69                                                                               ;Set top of aquifer = max pycor of "aquifer patches"
   set area-multiplier 3000                                                                          ;Scale size of crop circles
   set corn-coverage 0.75                                                                            ;Level of coverage
@@ -800,7 +800,7 @@ to food-calculation_1-2                                                         
   set milo-tot-income (item (n mod 10) milo-yield_1 * item (n mod 10) milo-price * SG-area)
 
   calculate-expenses_yield_1                                                                        ;Get farm expenses -- Link to "calculate-expenses_yield_1"
-  calculate-net-income                                                                              ;Calculate farm net income
+
 
   if corn-area > 0 [
   ifelse corn-tot-yield > corn-mean-yield                                                           ;Apply crop insurance?
@@ -853,6 +853,8 @@ to food-calculation_1-2                                                         
       ]
     ]
   ]
+
+  calculate-net-income                                                                              ;Calculate farm net income after insurance
 end
 
 to food-calculation_2                                                                               ;Randomly choose wet year
@@ -895,7 +897,7 @@ to food-calculation_2                                                           
   set milo-tot-income (item (item n yrs-seq) milo-yield_1 * one-of milo-price * SG-area)
 
   calculate-expenses_yield_1                                                                        ;Get farm expenses -- Link to "calculate-expenses_yield_1"
-  calculate-net-income                                                                              ;Calculate farm net income
+
 
   if corn-area > 0 [
   ifelse corn-tot-yield > corn-mean-yield                                                           ;Apply crop insurance?
@@ -948,6 +950,8 @@ to food-calculation_2                                                           
     ]
   ]
   ]
+
+  calculate-net-income                                                                              ;Calculate farm net income
 end
 
 to food-calculation_3                                                                               ;Randomly choose dry year
@@ -990,7 +994,7 @@ to food-calculation_3                                                           
   set milo-tot-income (item (item n yrs-seq) milo-yield_1 * one-of milo-price * SG-area)
 
   calculate-expenses_yield_1                                                                        ;Get farm expenses -- Link to "calculate-expenses_yield_1"
-  calculate-net-income                                                                              ;Calculate farm net income
+
 
   if corn-area > 0 [
   ifelse corn-tot-yield > corn-mean-yield                                                           ;Apply crop insurance?
@@ -1043,6 +1047,7 @@ to food-calculation_3                                                           
       ]
   ]
   ]
+  calculate-net-income                                                                              ;Calculate farm net income
 end
 
 to food-calculation_4                                                                               ;Randomly choose data from GCMs
@@ -1078,7 +1083,7 @@ to food-calculation_4                                                           
   set milo-tot-income (milo-tot-yield * (one-of milo-price) * SG-area)
 
   calculate-expenses_yield_3                                                                        ;Get farm expenses -- Link to "calculate-expenses_yield_3"
-  calculate-net-income                                                                              ;Calculate farm net income
+
 
   if corn-area > 0 [
   ifelse corn-tot-yield > corn-mean-yield                                                           ;Apply crop insurance?
@@ -1131,6 +1136,8 @@ to food-calculation_4                                                           
       ]
   ]
   ]
+
+  calculate-net-income                                                                              ;Calculate farm net income
 end
 
 to dryland-farming_1
@@ -1162,7 +1169,7 @@ to dryland-farming_1
   set milo-tot-income (item (n mod 10) milo-yield_2 * item (n mod 10) milo-price * SG-area)
 
   calculate-expenses_yield_2                                                                        ;Get farm expenses -- Link to "calculate-expenses_yield_1"
-  calculate-net-income                                                                              ;Calculate farm net income
+
 
   if corn-area > 0 [
   ifelse corn-tot-yield > corn-mean-yield                                                           ;Apply crop insurance?
@@ -1315,6 +1322,8 @@ to dryland-farming_2
   ]
   ]
 
+  calculate-net-income                                                                              ;Calculate farm net income
+
   let k ticks
   set corn-use-in item (k mod 10) corn-irrig_2                                                      ;Each tick, irrigation will be accessed from a "corn-irrig_2" list
   set wheat-use-in item (k mod 10) wheat-irrig_2                                                    ;Each tick, irrigation will be accessed from a "wheat-irrig_2" list
@@ -1360,7 +1369,7 @@ to dryland-farming_3
   set milo-tot-income (item (item n yrs-seq) milo-yield_2 * one-of milo-price * SG-area)
 
   calculate-expenses_yield_2                                                                        ;Get farm expenses -- Link to "calculate-expenses_yield_2"
-  calculate-net-income                                                                              ;Calculate farm net income
+
 
   if corn-area > 0 [
   ifelse corn-tot-yield > corn-mean-yield                                                           ;Apply crop insurance?
@@ -1413,6 +1422,8 @@ to dryland-farming_3
       ]
   ]
   ]
+
+  calculate-net-income                                                                              ;Calculate farm net income
 
   let k ticks
   set corn-use-in item (k mod 10) corn-irrig_2                                                      ;Each tick, irrigation will be accessed from a "corn-irrig_2" list
@@ -1455,7 +1466,6 @@ to dryland-farming_4
   set milo-tot-income (milo-tot-yield * (one-of milo-price) * SG-area)
 
   calculate-expenses_yield_4                                                                        ;Get farm expenses -- Link to "calculate-expenses_yield_4"
-  calculate-net-income                                                                              ;Calculate farm net income
 
   if corn-area > 0 [
   ifelse corn-tot-yield > corn-mean-yield                                                           ;Apply crop insurance?
@@ -1509,6 +1519,9 @@ to dryland-farming_4
   ]
   ]
 
+  calculate-net-income                                                                              ;Calculate farm net income
+
+
   let k ticks
   set corn-use-in item (k mod 10) corn-irrig_4                                                      ;Each tick, irrigation will be accessed from a "corn-irrig_4" list
   set wheat-use-in item (k mod 10) wheat-irrig_4                                                    ;Each tick, irrigation will be accessed from a "wheat-irrig_4" list
@@ -1523,7 +1536,7 @@ to energy-calculation
 
   if count-solar-lifespan <= 25 [
   ifelse count-solar-lifespan = 0 [
-    set solar-production_temp (#Solar_Panels * Panel_power * 5.6 * 365 / 1000000)                   ;MWh = power(Watt) * 5hrs/day * 365days/year / 1000000
+    set solar-production_temp (#Solar_Panels * Panel_power * 5.6 * 365 / 1000000)                   ;MWh = power(Watt) * 5.6hrs/day * 365days/year / 1000000
     set solar-production solar-production_temp
     print (word ticks " New solar: solar production = " solar-production)
     set count-solar-lifespan (count-solar-lifespan + 1)]
@@ -2155,6 +2168,7 @@ PENS
 "Wheat" 1.0 0 -3844592 true "" "plot wheat-tot-yield"
 "Soybeans" 1.0 0 -13210332 true "" "plot soybeans-tot-yield"
 "SG" 1.0 0 -12440034 true "" "plot milo-tot-yield"
+"C. APH" 1.0 2 -8053223 true "" "plot corn-mean-yield"
 
 BUTTON
 160
@@ -2479,7 +2493,7 @@ PLOT
 173
 1396
 293
-Energy Income
+Energy Net Income
 Years
 $
 0.0
@@ -2667,7 +2681,7 @@ PLOT
 460
 1396
 580
-Income from Crop Insurance
+Income From Crop Insurance
 NIL
 $
 0.0
@@ -2753,9 +2767,9 @@ TEXTBOX
 
 TEXTBOX
 1039
-113
+125
 1110
-135
+147
 SG = Grain \nsorghum
 9
 0.0
