@@ -5,28 +5,24 @@ extensions [csv bitmap]
 globals [
   cropland-patches aquifer-patches river-patches wind-bar solar-bar wind-patches solar-patches corn-patches
   crop-area crop-color radius-of-%area total-area area-multiplier crop-background
-  precip_raw current-elev patch-change yrs-seq zero-line turbine_size precip_GCM gw-level
-  corn-data corn-GCMs corn-sum_1 corn-sum_2 corn-price corn-yield_1 corn-irrig_1 corn-yield_2 corn-irrig_2 corn-yield_3 corn-irrig_3 corn-yield_4 corn-irrig_4
-  wheat-data wheat-GCMs wheat-sum_1 wheat-sum_2 wheat-price wheat-yield_1 wheat-irrig_1 wheat-yield_2 wheat-irrig_2 wheat-yield_3 wheat-irrig_3 wheat-yield_4 wheat-irrig_4
-  soybeans-data soybeans-GCMs soybeans-sum_1 soybeans-sum_2 soybeans-price soybeans-yield_1 soybeans-irrig_1 soybeans-yield_2 soybeans-irrig_2 soybeans-yield_3 soybeans-irrig_3 soybeans-yield_4 soybeans-irrig_4
-  milo-data milo-GCMs milo-sum_1 milo-sum_2 milo-price milo-yield_1 milo-irrig_1 milo-yield_2 milo-irrig_2 milo-yield_3 milo-irrig_3 milo-yield_4 milo-irrig_4
+  precip_raw current-elev patch-change yrs-seq zero-line turbine_size precip_RCP8.5 precip_RCP4.5 gw-level
+  corn-data corn-GCMs corn-sum_1 corn-sum_2 corn-price corn-yield_1 corn-irrig_1 corn-yield_2 corn-irrig_2 corn-yield_3 corn-irrig_3 corn-yield_4 corn-irrig_4 corn-yield_5 corn-irrig_5 corn-yield_6 corn-irrig_6
+  wheat-data wheat-GCMs wheat-sum_1 wheat-sum_2 wheat-price wheat-yield_1 wheat-irrig_1 wheat-yield_2 wheat-irrig_2 wheat-yield_3 wheat-irrig_3 wheat-yield_4 wheat-irrig_4 wheat-yield_5 wheat-irrig_5 wheat-yield_6 wheat-irrig_6
+  soybeans-data soybeans-GCMs soybeans-sum_1 soybeans-sum_2 soybeans-price soybeans-yield_1 soybeans-irrig_1 soybeans-yield_2 soybeans-irrig_2 soybeans-yield_3 soybeans-irrig_3 soybeans-yield_4 soybeans-irrig_4 soybeans-yield_5 soybeans-irrig_5 soybeans-yield_6 soybeans-irrig_6
+  milo-data milo-GCMs milo-sum_1 milo-sum_2 milo-price milo-yield_1 milo-irrig_1 milo-yield_2 milo-irrig_2 milo-yield_3 milo-irrig_3 milo-yield_4 milo-irrig_4 milo-yield_5 milo-irrig_5 milo-yield_6 milo-irrig_6
   corn-expenses wheat-expenses soybeans-expenses milo-expenses
   corn-tot-income wheat-tot-income soybeans-tot-income milo-tot-income
   corn-net-income wheat-net-income soybeans-net-income milo-net-income
   corn-history wheat-history soybeans-history milo-history
   corn-coverage wheat-coverage soybeans-coverage milo-coverage
   corn-base-price wheat-base-price soybeans-base-price milo-base-price
-  corn-guarantee wheat-guarantee soybeans-guarantee milo-guarantee
+  corn-guarantee wheat-guarantee soybeans-guarantee milo-guarantee corn-claimed wheat-claimed soybeans-claimed milo-claimed
+  corn-ins-claimed wheat-ins-claimed soybeans-ins-claimed milo-ins-claimed corn-yield-deficiency wheat-yield-deficiency soybeans-yield-deficiency milo-yield-deficiency
   corn-mean-yield wheat-mean-yield soybeans-mean-yield milo-mean-yield
   corn-tot-yield wheat-tot-yield soybeans-tot-yield milo-tot-yield
   corn-irrig-increment wheat-irrig-increment soybeans-irrig-increment milo-irrig-increment
-  corn-use-in wheat-use-in soybeans-use-in milo-use-in water-use-feet gw-change calibrated-water-use dryland-check? GCM-random-year
+  corn-use-in wheat-use-in soybeans-use-in milo-use-in water-use-feet gw-change calibrated-water-use dryland-check? GCM-random-year level-30 level-30-patch level-60 level-60-patch gw-upper-limit gw-lower-limit
   corn-N-app wheat-N-app soybeans-N-app milo-N-app N-accu N-accu2 N-accu-temp
-  corn-N-use wheat-N-use soybeans-N-use milo-N-use
-  corn-N-use_1 wheat-N-use_1 soybeans-N-use_1 milo-N-use_1
-  corn-N-use_2 wheat-N-use_2 soybeans-N-use_2 milo-N-use_2
-  corn-N-use_3 wheat-N-use_3 soybeans-N-use_3 milo-N-use_3
-  corn-N-use_4 wheat-N-use_4 soybeans-N-use_4 milo-N-use_4
   #Solar_panels solar-production solar-production_temp count-solar-lifespan solar-cost solar-sell solar-net-income %Solar-production
   wind-production wind-production_temp wind-cost wind-sell wind-net-income energy-net-income %Wind-production count-wind-lifespan count-wind-lifespan-cost
 ]
@@ -113,6 +109,13 @@ to setup
   set aquifer-patches patches with [pxcor > 66 and pxcor < 83 and pycor < 70]
   ask aquifer-patches [set pcolor blue]
   ask patch 79 -97 [set plabel "GW"]
+
+  set gw-lower-limit 30
+  set gw-upper-limit 60
+  set level-30-patch (gw-lower-limit * 170 / aquifer-thickness)                                     ;Calculate #patches below 30 feet in gw-patches (lower limit)
+  set level-60-patch (gw-upper-limit * 170 / aquifer-thickness)                                     ;Calculate #patches below 60 feet in gw-patches (upper limit)
+  set level-30 (-100 + level-30-patch)                                                              ;Locate a level where lower level is.
+  set level-60 (-100 + level-60-patch)                                                              ;Locate a level where upper level is.
 
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;;;;;;;;;;;;;;;;;;;; River patches ;;;;;;;;;;;;;;;;;;;                                            ;Set "river-patches" and patch's color
@@ -249,7 +252,8 @@ end
 
 to import-data                                                                                      ;Create a number of lists to store values from csv files
   set precip_raw []                                                                                 ;A list for precipitation data
-  set precip_GCM []                                                                                 ;A list for GCM precipitation data
+  set precip_RCP8.5 []                                                                              ;A list for GCM RCP8.5 precipitation data
+  set precip_RCP4.5 []                                                                              ;A list for GCM RCP4.5 precipitation data
   set corn-data []                                                                                  ;All crop data including headings of the table
   set corn-GCMs []                                                                                  ;All crop data including headings of the table
   set corn-sum_1 []                                                                                 ;All crop data excluding headings of the table
@@ -259,10 +263,14 @@ to import-data                                                                  
   set corn-irrig_1 []                                                                               ;Irrig_1 means simulated irrigation from historical data
   set corn-yield_2 []                                                                               ;Yield_2 means simulated yield from dryland simulation
   set corn-irrig_2 []                                                                               ;Irrig_2 means simulated irrigation from dryland simualtion (= zero)
-  set corn-yield_3 []                                                                               ;Yield_3 means simulated yield from Global Climate Models (GCMs) data (projection)
-  set corn-irrig_3 []                                                                               ;Irrig_3 means simulated irrigation from GCMs data (projection)
-  set corn-yield_4 []                                                                               ;Yield_4 means simulated yield from GCMs data + dryland simulation (dryland projection)
-  set corn-irrig_4 []                                                                               ;Irrig_4 means simulated irrigation from GCMs data + dryland simulation (dryland projection)
+  set corn-yield_3 []                                                                               ;Yield_3 means simulated yield from Global Climate Models (GCMs) data (RCP8.5)
+  set corn-irrig_3 []                                                                               ;Irrig_3 means simulated irrigation from GCMs data (RCP8.5)
+  set corn-yield_4 []                                                                               ;Yield_4 means simulated yield from GCMs data + dryland simulation (dryland RCP8.5)
+  set corn-irrig_4 []                                                                               ;Irrig_4 means simulated irrigation from GCMs data + dryland simulation (dryland RCP8.5)
+  set corn-yield_5 []                                                                               ;Yield_5 means simulated yield from Global Climate Models (GCMs) data (RCP4.5)
+  set corn-irrig_5 []                                                                               ;Irrig_5 means simulated irrigation from GCMs data (RCP4.5)
+  set corn-yield_6 []                                                                               ;Yield_6 means simulated yield from GCMs data + dryland simulation (dryland RCP4.5)
+  set corn-irrig_6 []                                                                               ;Irrig_6 means simulated irrigation from GCMs data + dryland simulation (dryland RCP4.5)
   set corn-N-app []                                                                                 ;N application
 
   set wheat-data []                                                                                 ;See above from corn
@@ -278,6 +286,10 @@ to import-data                                                                  
   set wheat-irrig_3 []
   set wheat-yield_4 []
   set wheat-irrig_4 []
+  set wheat-yield_5 []
+  set wheat-irrig_5 []
+  set wheat-yield_6 []
+  set wheat-irrig_6 []
   set wheat-N-app []
 
   set soybeans-data []                                                                              ;See above from corn
@@ -293,6 +305,10 @@ to import-data                                                                  
   set soybeans-irrig_3 []
   set soybeans-yield_4 []
   set soybeans-irrig_4 []
+  set soybeans-yield_5 []
+  set soybeans-irrig_5 []
+  set soybeans-yield_6 []
+  set soybeans-irrig_6 []
   set soybeans-N-app []
 
   set milo-data []                                                                                  ;See above from corn
@@ -308,6 +324,10 @@ to import-data                                                                  
   set milo-irrig_3 []
   set milo-yield_4 []
   set milo-irrig_4 []
+  set milo-yield_5 []
+  set milo-irrig_5 []
+  set milo-yield_6 []
+  set milo-irrig_6 []
   set milo-N-app []
 
   set corn-data lput csv:from-file "1_Corn_inputs.csv" corn-data                                    ;Import all corn values to a corn-data list
@@ -390,50 +410,84 @@ to import-data                                                                  
 let n 1                                                                                             ;Set a temporary variable
   while [n < 82] [                                                                                  ;10 loops for 10-year data
     foreach corn-GCMs [x -> set corn-sum_2 lput item n x corn-sum_2]                                ;Get rid of headings of the table (starting from item 1 instead of item 0)
-      foreach corn-sum_2 [y -> set precip_GCM lput item 1 y precip_GCM]                             ;Item 1 of a csv file is precipitation
+      foreach corn-sum_2 [y -> set precip_RCP8.5 lput item 1 y precip_RCP8.5]                       ;Item 1 of a csv file is precipitation (RCP8.5)
       foreach corn-sum_2 [y -> set corn-yield_3 lput item 2 y corn-yield_3]                         ;Item 2 of a csv file is yield_3
       foreach corn-sum_2 [y -> set corn-irrig_3 lput item 3 y corn-irrig_3]                         ;Item 3 of a csv file is irrig_3
       foreach corn-sum_2 [y -> set corn-yield_4 lput item 4 y corn-yield_4]                         ;Item 4 of a csv file is yield_4
       foreach corn-sum_2 [y -> set corn-irrig_4 lput item 5 y corn-irrig_4]                         ;Item 5 of a csv file is irrig_4
+      foreach corn-sum_2 [y -> set precip_RCP4.5 lput item 6 y precip_RCP4.5]                       ;Item 1 of a csv file is precipitation (RCP4.5)
+      foreach corn-sum_2 [y -> set corn-yield_5 lput item 7 y corn-yield_5]                         ;Item 2 of a csv file is yield_5
+      foreach corn-sum_2 [y -> set corn-irrig_5 lput item 8 y corn-irrig_5]                         ;Item 3 of a csv file is irrig_5
+      foreach corn-sum_2 [y -> set corn-yield_6 lput item 9 y corn-yield_6]                         ;Item 4 of a csv file is yield_6
+      foreach corn-sum_2 [y -> set corn-irrig_6 lput item 10 y corn-irrig_6]                        ;Item 5 of a csv file is irrig_6
 
     foreach wheat-GCMs [x -> set wheat-sum_2 lput item n x wheat-sum_2]                             ;See above
       foreach wheat-sum_2 [y -> set wheat-yield_3 lput item 1 y wheat-yield_3]
       foreach wheat-sum_2 [y -> set wheat-irrig_3 lput item 2 y wheat-irrig_3]
       foreach wheat-sum_2 [y -> set wheat-yield_4 lput item 3 y wheat-yield_4]
       foreach wheat-sum_2 [y -> set wheat-irrig_4 lput item 4 y wheat-irrig_4]
+      foreach wheat-sum_2 [y -> set wheat-yield_5 lput item 5 y wheat-yield_5]
+      foreach wheat-sum_2 [y -> set wheat-irrig_5 lput item 6 y wheat-irrig_5]
+      foreach wheat-sum_2 [y -> set wheat-yield_6 lput item 7 y wheat-yield_6]
+      foreach wheat-sum_2 [y -> set wheat-irrig_6 lput item 8 y wheat-irrig_6]
 
     foreach soybeans-GCMs [x -> set soybeans-sum_2 lput item n x soybeans-sum_2]                    ;See above
       foreach soybeans-sum_2 [y -> set soybeans-yield_3 lput item 1 y soybeans-yield_3]
       foreach soybeans-sum_2 [y -> set soybeans-irrig_3 lput item 2 y soybeans-irrig_3]
       foreach soybeans-sum_2 [y -> set soybeans-yield_4 lput item 3 y soybeans-yield_4]
       foreach soybeans-sum_2 [y -> set soybeans-irrig_4 lput item 4 y soybeans-irrig_4]
+      foreach soybeans-sum_2 [y -> set soybeans-yield_5 lput item 5 y soybeans-yield_5]
+      foreach soybeans-sum_2 [y -> set soybeans-irrig_5 lput item 6 y soybeans-irrig_5]
+      foreach soybeans-sum_2 [y -> set soybeans-yield_6 lput item 7 y soybeans-yield_6]
+      foreach soybeans-sum_2 [y -> set soybeans-irrig_6 lput item 8 y soybeans-irrig_6]
 
     foreach milo-GCMs [x -> set milo-sum_2 lput item n x milo-sum_2]                                ;See above
       foreach milo-sum_2 [y -> set milo-yield_3 lput item 1 y milo-yield_3]
       foreach milo-sum_2 [y -> set milo-irrig_3 lput item 2 y milo-irrig_3]
       foreach milo-sum_2 [y -> set milo-yield_4 lput item 3 y milo-yield_4]
       foreach milo-sum_2 [y -> set milo-irrig_4 lput item 4 y milo-irrig_4]
+      foreach milo-sum_2 [y -> set milo-yield_5 lput item 5 y milo-yield_5]
+      foreach milo-sum_2 [y -> set milo-irrig_5 lput item 6 y milo-irrig_5]
+      foreach milo-sum_2 [y -> set milo-yield_6 lput item 7 y milo-yield_6]
+      foreach milo-sum_2 [y -> set milo-irrig_6 lput item 8 y milo-irrig_6]
 
-        if length precip_GCM != 81 [set precip_GCM []]
+        if length precip_RCP8.5 != 81 [set precip_RCP8.5 []]
         if length corn-yield_3 != 81 [set corn-yield_3 []]
         if length corn-irrig_3 != 81 [set corn-irrig_3 []]
         if length corn-yield_4 != 81 [set corn-yield_4 []]
         if length corn-irrig_4 != 81 [set corn-irrig_4 []]
+        if length precip_RCP4.5 != 81 [set precip_RCP4.5 []]
+        if length corn-yield_5 != 81 [set corn-yield_5 []]
+        if length corn-irrig_5 != 81 [set corn-irrig_5 []]
+        if length corn-yield_6 != 81 [set corn-yield_6 []]
+        if length corn-irrig_6 != 81 [set corn-irrig_6 []]
 
         if length wheat-yield_3 != 81 [set wheat-yield_3 []]
         if length wheat-irrig_3 != 81 [set wheat-irrig_3 []]
         if length wheat-yield_4 != 81 [set wheat-yield_4 []]
         if length wheat-irrig_4 != 81 [set wheat-irrig_4 []]
+        if length wheat-yield_5 != 81 [set wheat-yield_5 []]
+        if length wheat-irrig_5 != 81 [set wheat-irrig_5 []]
+        if length wheat-yield_6 != 81 [set wheat-yield_6 []]
+        if length wheat-irrig_6 != 81 [set wheat-irrig_6 []]
 
         if length soybeans-yield_3 != 81 [set soybeans-yield_3 []]
         if length soybeans-irrig_3 != 81 [set soybeans-irrig_3 []]
         if length soybeans-yield_4 != 81 [set soybeans-yield_4 []]
         if length soybeans-irrig_4 != 81 [set soybeans-irrig_4 []]
+        if length soybeans-yield_5 != 81 [set soybeans-yield_5 []]
+        if length soybeans-irrig_5 != 81 [set soybeans-irrig_5 []]
+        if length soybeans-yield_6 != 81 [set soybeans-yield_6 []]
+        if length soybeans-irrig_6 != 81 [set soybeans-irrig_6 []]
 
         if length milo-yield_3 != 81 [set milo-yield_3 []]
         if length milo-irrig_3 != 81 [set milo-irrig_3 []]
         if length milo-yield_4 != 81 [set milo-yield_4 []]
         if length milo-irrig_4 != 81 [set milo-irrig_4 []]
+        if length milo-yield_5 != 81 [set milo-yield_5 []]
+        if length milo-irrig_5 != 81 [set milo-irrig_5 []]
+        if length milo-yield_6 != 81 [set milo-yield_6 []]
+        if length milo-irrig_6 != 81 [set milo-irrig_6 []]
 
     set n (n + 1)
   ]
@@ -520,6 +574,128 @@ to calculate-expenses_yield_4                                                   
   if (item (item k yrs-seq) milo-yield_4) > 93 [set milo-expenses (361.86 * SG-area)]
 end
 
+to calculate-expenses_yield_5                                                                       ;Expenses for irrigated farming (using GCMs data) [ref: AgManager.info]
+  let k (ticks mod 10)
+  if (item (item k yrs-seq) corn-yield_5) < 210 [set corn-expenses (786.23 * corn-area)]
+  if (item (item k yrs-seq) corn-yield_5) >= 210 and (item (item k yrs-seq) corn-yield_5) <= 237.5 [set corn-expenses (861.41 * corn-area)]
+  if (item (item k yrs-seq) corn-yield_5) > 237.5 [set corn-expenses (920.04 * corn-area)]
+
+  if (item (item k yrs-seq) wheat-yield_5) < 62.5 [set wheat-expenses (498.13 * wheat-area)]
+  if (item (item k yrs-seq) wheat-yield_5) >= 62.5 and (item (item k yrs-seq) wheat-yield_5) <= 67.5 [set wheat-expenses (523.43 * wheat-area)]
+  if (item (item k yrs-seq) wheat-yield_5) > 67.5 [set wheat-expenses (548.74 * wheat-area)]
+
+  if (item (item k yrs-seq) soybeans-yield_5) < 58 [set soybeans-expenses (542.07 * soybeans-area)]
+  if (item (item k yrs-seq) soybeans-yield_5) >= 58 and (item (item k yrs-seq) soybeans-yield_5) <= 64 [set soybeans-expenses (572.48 * soybeans-area)]
+  if (item (item k yrs-seq) soybeans-yield_5) > 64 [set soybeans-expenses (620.95 * soybeans-area)]
+
+  if (item (item k yrs-seq) milo-yield_5) < 150 [set milo-expenses (618.55 * SG-area)]
+  if (item (item k yrs-seq) milo-yield_5) >= 150 and (item (item k yrs-seq) milo-yield_5) <= 170 [set milo-expenses (666.17 * SG-area)]
+  if (item (item k yrs-seq) milo-yield_5) > 170 [set milo-expenses (713.79 * SG-area)]
+end
+
+to calculate-expenses_yield_6                                                                       ;Expenses for dryland farming (using GCMs data) [ref: AgManager.info]
+  let k (ticks mod 10)
+  if (item (item k yrs-seq) corn-yield_6) < 66 [set corn-expenses (273.10 * corn-area)]
+  if (item (item k yrs-seq) corn-yield_6) >= 66 and (item (item k yrs-seq) corn-yield_6) <= 91 [set corn-expenses (337.57 * corn-area)]
+  if (item (item k yrs-seq) corn-yield_6) > 91 [set corn-expenses (377.54 * corn-area)]
+
+  if (item (item k yrs-seq) wheat-yield_6) < 37.5 [set wheat-expenses (245.47 * wheat-area)]
+  if (item (item k yrs-seq) wheat-yield_6) >= 37.5 and (item (item k yrs-seq) wheat-yield_6) <= 46.5 [set wheat-expenses (277.41 * wheat-area)]
+  if (item (item k yrs-seq) wheat-yield_6) > 46.5 [set wheat-expenses (309.35 * wheat-area)]
+
+  if (item (item k yrs-seq) soybeans-yield_6) < 22.5 [set soybeans-expenses (224.51 * soybeans-area)]
+  if (item (item k yrs-seq) soybeans-yield_6) >= 22.5 and (item (item k yrs-seq) soybeans-yield_6) <= 27.5 [set soybeans-expenses (248.50 * soybeans-area)]
+  if (item (item k yrs-seq) soybeans-yield_6) > 27.5 [set soybeans-expenses (272.48 * soybeans-area)]
+
+  if (item (item k yrs-seq) milo-yield_6) < 68 [set milo-expenses (263.01 * SG-area)]
+  if (item (item k yrs-seq) milo-yield_6) >= 68 and (item (item k yrs-seq) milo-yield_6) <= 93 [set milo-expenses (314.41 * SG-area)]
+  if (item (item k yrs-seq) milo-yield_6) > 93 [set milo-expenses (361.86 * SG-area)]
+end
+
+to calculate-insurance
+  if corn-area > 0 [
+  set corn-claimed "NO"
+  ifelse corn-tot-yield > corn-mean-yield                                                           ;Apply crop insurance?
+    [set corn-tot-income corn-tot-income
+     ask patch 13 -35 [
+      set plabel " "]]
+    [set corn-yield-deficiency (corn-mean-yield - corn-tot-yield)
+     ifelse corn-tot-income > corn-guarantee
+      [set corn-tot-income corn-tot-income
+       print "corn A"]
+      [set corn-claimed "YES"
+       set corn-ins-claimed (corn-guarantee - corn-tot-income)
+       set corn-tot-income corn-tot-income + (corn-yield-deficiency * corn-base-price * corn-area)
+       print "corn B"
+
+      ask patch 13 -35 [
+      set plabel "Ins. Claim"
+      set plabel-color red
+      ]]
+  ]
+  ]
+
+  if wheat-area > 0 [
+  set wheat-claimed "NO"
+  ifelse wheat-tot-yield > wheat-mean-yield                                                           ;Apply crop insurance?
+    [set wheat-tot-income wheat-tot-income
+     ask patch -5 56 [
+      set plabel " "]]
+    [set wheat-yield-deficiency (wheat-mean-yield - wheat-tot-yield)
+     ifelse wheat-tot-income > wheat-guarantee
+      [set wheat-tot-income wheat-tot-income
+       print "wheat A"]
+      [set wheat-claimed "YES"
+       set wheat-ins-claimed (wheat-guarantee - wheat-tot-income)
+       set wheat-tot-income wheat-tot-income + (wheat-yield-deficiency * wheat-base-price * wheat-area)
+       print "wheat B"
+
+     ask patch -5 56 [
+      set plabel "Ins. Claim"
+      set plabel-color red
+      ]]
+  ]
+  ]
+
+  if soybeans-area > 0 [
+  set soybeans-claimed "NO"
+  ifelse soybeans-tot-yield > soybeans-mean-yield                                                           ;Apply crop insurance?
+    [set soybeans-tot-income soybeans-tot-income
+     ask patch -37 -79 [
+      set plabel " "]]
+    [set soybeans-yield-deficiency (soybeans-mean-yield - soybeans-tot-yield)
+     ifelse soybeans-tot-income > soybeans-guarantee
+      [set soybeans-tot-income soybeans-tot-income]
+      [set soybeans-claimed "YES"
+       set soybeans-ins-claimed (soybeans-guarantee - soybeans-tot-income)
+       set soybeans-tot-income soybeans-tot-income + (soybeans-yield-deficiency * soybeans-base-price * soybeans-area)
+     ask patch -37 -79 [
+      set plabel "Ins. Claim"
+      set plabel-color red
+      ]]
+  ]
+  ]
+
+  if SG-area > 0 [
+  set milo-claimed "NO"
+  ifelse milo-tot-yield > milo-mean-yield                                                           ;Apply crop insurance?
+    [set milo-tot-income milo-tot-income
+     ask patch -37 -21 [
+      set plabel " "]]
+    [set milo-yield-deficiency (milo-mean-yield - milo-tot-yield)
+     ifelse milo-tot-income > milo-guarantee
+      [set milo-tot-income milo-tot-income]
+      [set milo-claimed "YES"
+       set milo-ins-claimed (milo-guarantee - milo-tot-income)
+       set milo-tot-income milo-tot-income + (milo-yield-deficiency * milo-base-price * SG-area)
+     ask patch -37 -21 [
+      set plabel "Ins. Claim"
+      set plabel-color red
+      ]]
+  ]
+  ]
+end
+
 to calculate-net-income                                                                             ;Calculate farm net income
   set corn-net-income (corn-tot-income - corn-expenses)
   set wheat-net-income (wheat-tot-income - wheat-expenses)
@@ -530,167 +706,129 @@ end
 to future_processes
 if Future_Process = "Repeat Historical"                                                             ;Repeat historical scenario
    [ifelse ticks <= 9                                                                               ;First 10 year data based on history
-     [set corn-N-use corn-N-use_1                                                                   ;Classify nitrogen uses into different scenario
-      set wheat-N-use wheat-N-use_1                                                                 ;Classify nitrogen uses into different scenario
-      set soybeans-N-use soybeans-N-use_1                                                           ;Classify nitrogen uses into different scenario
-      set milo-N-use milo-N-use_1                                                                   ;Classify nitrogen uses into different scenario
-      food-calculation_1-1
+     [food-calculation_1-1
       energy-calculation
       gw-depletion_1]
 
-     [ifelse current-elev > -49                                                                     ;Irrigated farming
-       [set corn-N-use corn-N-use_1
-        set wheat-N-use wheat-N-use_1
-        set soybeans-N-use soybeans-N-use_1
-        set milo-N-use milo-N-use_1
-        food-calculation_1-2
+     [ifelse current-elev > level-60                                                                     ;Irrigated farming
+       [food-calculation_1-2
         energy-calculation
         gw-depletion_1]
 
-       [ifelse current-elev > -66 and dryland-check? = 1                                            ;Irrigated farming
-         [set corn-N-use corn-N-use_1
-          set wheat-N-use wheat-N-use_1
-          set soybeans-N-use soybeans-N-use_1
-          set milo-N-use milo-N-use_1
-          food-calculation_1-2
+       [ifelse current-elev > level-30 and dryland-check? = 1                                            ;Irrigated farming
+         [food-calculation_1-2
           energy-calculation
           gw-depletion_1]
 
-            [set corn-N-use corn-N-use_2                                                            ;Dryland farming
-             set wheat-N-use wheat-N-use_2
-             set soybeans-N-use soybeans-N-use_2
-             set milo-N-use milo-N-use_2
-             dryland-farming_1
+            [dryland-farming_1                                                                      ;Dryland farming
              gw-depletion_dryland
              energy-calculation
              set dryland-check? 0
-             if current-elev > -49 [set dryland-check? 1]]
+             if current-elev > level-60 [set dryland-check? 1]]
        ]
      ]
   ]
 
   if Future_Process = "Wetter Future"                                                               ;Wetter years scenario
    [ifelse ticks <= 9                                                                               ;First 10 year data based on history
-     [set corn-N-use corn-N-use_1                                                                   ;Classify nitrogen uses into different scenario
-      set wheat-N-use wheat-N-use_1                                                                 ;Classify nitrogen uses into different scenario
-      set soybeans-N-use soybeans-N-use_1                                                           ;Classify nitrogen uses into different scenario
-      set milo-N-use milo-N-use_1                                                                   ;Classify nitrogen uses into different scenario
-      food-calculation_1-1
+     [food-calculation_1-1
       energy-calculation
       gw-depletion_1]
 
-     [ifelse current-elev > -49                                                                     ;Irrigated farming
-       [set corn-N-use corn-N-use_1
-        set wheat-N-use wheat-N-use_1
-        set soybeans-N-use soybeans-N-use_1
-        set milo-N-use milo-N-use_1
-        food-calculation_2
+     [ifelse current-elev > level-60                                                                     ;Irrigated farming
+       [food-calculation_2
         energy-calculation
         gw-depletion_2]
 
-       [ifelse current-elev > -66 and dryland-check? = 1                                            ;Irrigated farming
-         [set corn-N-use corn-N-use_1
-          set wheat-N-use wheat-N-use_1
-          set soybeans-N-use soybeans-N-use_1
-          set milo-N-use milo-N-use_1
-          food-calculation_2
+       [ifelse current-elev > level-30 and dryland-check? = 1                                            ;Irrigated farming
+         [food-calculation_2
           energy-calculation
           gw-depletion_2]
 
-            [set corn-N-use corn-N-use_2                                                            ;Dryland farming
-             set wheat-N-use wheat-N-use_2
-             set soybeans-N-use soybeans-N-use_2
-             set milo-N-use milo-N-use_2
-             dryland-farming_2
+            [dryland-farming_2                                                                      ;Dryland farming
              gw-depletion_dryland
              energy-calculation
              set dryland-check? 0
-             if current-elev > -49 [set dryland-check? 1]]
+             if current-elev > level-60 [set dryland-check? 1]]
        ]
      ]
   ]
 
   if Future_Process = "Dryer Future"                                                                ;Dryer years scenario
    [ifelse ticks <= 9                                                                               ;First 10 year data based on history
-     [set corn-N-use corn-N-use_1                                                                   ;Classify nitrogen uses into different scenario
-      set wheat-N-use wheat-N-use_1                                                                 ;Classify nitrogen uses into different scenario
-      set soybeans-N-use soybeans-N-use_1                                                           ;Classify nitrogen uses into different scenario
-      set milo-N-use milo-N-use_1                                                                   ;Classify nitrogen uses into different scenario
-      food-calculation_1-1
+     [food-calculation_1-1
       energy-calculation
       gw-depletion_1]
 
-     [ifelse current-elev > -49                                                                     ;Irrigated farming
-       [set corn-N-use corn-N-use_1
-        set wheat-N-use wheat-N-use_1
-        set soybeans-N-use soybeans-N-use_1
-        set milo-N-use milo-N-use_1
-        food-calculation_3
+     [ifelse current-elev > level-60                                                                     ;Irrigated farming
+       [food-calculation_3
         energy-calculation
         gw-depletion_3]
 
-       [ifelse current-elev > -66 and dryland-check? = 1                                            ;Irrigated farming
-         [set corn-N-use corn-N-use_1
-          set wheat-N-use wheat-N-use_1
-          set soybeans-N-use soybeans-N-use_1
-          set milo-N-use milo-N-use_1
-          food-calculation_3
+       [ifelse current-elev > level-30 and dryland-check? = 1                                            ;Irrigated farming
+         [food-calculation_3
           energy-calculation
           gw-depletion_3]
 
-            [set corn-N-use corn-N-use_2                                                            ;Dryland farming
-             set wheat-N-use wheat-N-use_2
-             set soybeans-N-use soybeans-N-use_2
-             set milo-N-use milo-N-use_2
-             dryland-farming_3
+            [dryland-farming_3                                                                      ;Dryland farming
              gw-depletion_dryland
              energy-calculation
              set dryland-check? 0
-             if current-elev > -49 [set dryland-check? 1]]
+             if current-elev > level-60 [set dryland-check? 1]]
        ]
      ]
   ]
 
-  if Future_Process = "Impose T, P, & S Changes"                                                    ;Climate projection scenario
+  if Future_Process = "Impose T, P, & S Changes" and Climate_Model = "RCP8.5"                       ;Climate projection scenario
    [ifelse ticks <= 9                                                                               ;First 10 year data based on history
-     [set corn-N-use corn-N-use_1                                                                   ;Classify nitrogen uses into different scenario
-      set wheat-N-use wheat-N-use_1                                                                 ;Classify nitrogen uses into different scenario
-      set soybeans-N-use soybeans-N-use_1                                                           ;Classify nitrogen uses into different scenario
-      set milo-N-use milo-N-use_1                                                                   ;Classify nitrogen uses into different scenario
-      food-calculation_1-1
+     [food-calculation_1-1
       energy-calculation
       gw-depletion_1]
 
-     [ifelse current-elev > -49                                                                     ;Irrigated farming
-       [set corn-N-use corn-N-use_3
-        set wheat-N-use wheat-N-use_3
-        set soybeans-N-use soybeans-N-use_3
-        set milo-N-use milo-N-use_3
-        food-calculation_4
+     [ifelse current-elev > level-60                                                                     ;Irrigated farming
+       [food-calculation_4
         energy-calculation
         gw-depletion_4]
 
-       [ifelse current-elev > -66 and dryland-check? = 1                                            ;Irrigated farming
-         [set corn-N-use corn-N-use_3
-          set wheat-N-use wheat-N-use_3
-          set soybeans-N-use soybeans-N-use_3
-          set milo-N-use milo-N-use_3
-          food-calculation_4
+       [ifelse current-elev > level-30 and dryland-check? = 1                                            ;Irrigated farming
+         [food-calculation_4
           energy-calculation
           gw-depletion_4]
 
-            [set corn-N-use corn-N-use_4                                                            ;Dryland farming
-             set wheat-N-use wheat-N-use_4
-             set soybeans-N-use soybeans-N-use_4
-             set milo-N-use milo-N-use_4
-             dryland-farming_4
+            [dryland-farming_4                                                                      ;Dryland farming
              gw-depletion_dryland
              energy-calculation
              set dryland-check? 0
-             if current-elev > -49 [set dryland-check? 1]]
+             if current-elev > level-60 [set dryland-check? 1]]
        ]
      ]
   ]
+
+  if Future_Process = "Impose T, P, & S Changes" and Climate_Model = "RCP4.5"                       ;Climate projection scenario
+   [ifelse ticks <= 9                                                                               ;First 10 year data based on history
+     [food-calculation_1-1
+      energy-calculation
+      gw-depletion_1]
+
+     [ifelse current-elev > level-60                                                                     ;Irrigated farming
+       [food-calculation_5
+        energy-calculation
+        gw-depletion_5]
+
+       [ifelse current-elev > level-30 and dryland-check? = 1                                            ;Irrigated farming
+         [food-calculation_5
+          energy-calculation
+          gw-depletion_5]
+
+            [dryland-farming_5                                                                      ;Dryalnd farming
+             gw-depletion_dryland
+             energy-calculation
+             set dryland-check? 0
+             if current-elev > level-60 [set dryland-check? 1]]
+       ]
+     ]
+  ]
+
 end
 
 to check-area
@@ -704,6 +842,10 @@ to check-area
     set corn-irrig_3 (n-values 81 [0])
     set corn-yield_4 (n-values 81 [0])
     set corn-irrig_4 (n-values 81 [0])
+    set corn-yield_5 (n-values 81 [0])
+    set corn-irrig_5 (n-values 81 [0])
+    set corn-yield_6 (n-values 81 [0])
+    set corn-irrig_6 (n-values 81 [0])
     set corn-N-app (n-values 10 [0])
   ]
 
@@ -716,6 +858,10 @@ to check-area
     set wheat-irrig_3 (n-values 81 [0])
     set wheat-yield_4 (n-values 81 [0])
     set wheat-irrig_4 (n-values 81 [0])
+    set wheat-yield_5 (n-values 81 [0])
+    set wheat-irrig_5 (n-values 81 [0])
+    set wheat-yield_6 (n-values 81 [0])
+    set wheat-irrig_6 (n-values 81 [0])
     set wheat-N-app (n-values 10 [0])
   ]
 
@@ -728,6 +874,10 @@ to check-area
     set soybeans-irrig_3 (n-values 81 [0])
     set soybeans-yield_4 (n-values 81 [0])
     set soybeans-irrig_4 (n-values 81 [0])
+    set soybeans-yield_5 (n-values 81 [0])
+    set soybeans-irrig_5 (n-values 81 [0])
+    set soybeans-yield_6 (n-values 81 [0])
+    set soybeans-irrig_6 (n-values 81 [0])
     set soybeans-N-app (n-values 10 [0])
   ]
 
@@ -740,6 +890,10 @@ to check-area
     set milo-irrig_3 (n-values 81 [0])
     set milo-yield_4 (n-values 81 [0])
     set milo-irrig_4 (n-values 81 [0])
+    set milo-yield_5 (n-values 81 [0])
+    set milo-irrig_5 (n-values 81 [0])
+    set milo-yield_6 (n-values 81 [0])
+    set milo-irrig_6 (n-values 81 [0])
     set milo-N-app (n-values 10 [0])
   ]
 
@@ -789,7 +943,7 @@ to food-calculation_1-2                                                         
   set soybeans-mean-yield mean soybeans-history                                                     ;Average soybeans production for the last 10 years
   set milo-mean-yield mean milo-history                                                             ;Average milo production for the last 10 years
 
-  set corn-guarantee ((corn-mean-yield * corn-coverage * corn-base-price) * corn-area)              ;Calculate guarantee price
+  set corn-guarantee ((corn-mean-yield * corn-coverage * corn-base-price) * corn-area)              ;Calculate guarantee growth crop income
   set wheat-guarantee ((wheat-mean-yield * wheat-coverage * wheat-base-price) * wheat-area)
   set soybeans-guarantee ((soybeans-mean-yield * soybeans-coverage * soybeans-base-price) * soybeans-area)
   set milo-guarantee ((milo-mean-yield * milo-coverage * milo-base-price) * SG-area)
@@ -800,60 +954,7 @@ to food-calculation_1-2                                                         
   set milo-tot-income (item (n mod 10) milo-yield_1 * item (n mod 10) milo-price * SG-area)
 
   calculate-expenses_yield_1                                                                        ;Get farm expenses -- Link to "calculate-expenses_yield_1"
-
-
-  if corn-area > 0 [
-  ifelse corn-tot-yield > corn-mean-yield                                                           ;Apply crop insurance?
-    [set corn-tot-income corn-tot-income
-     ask patch 13 -35 [
-      set plabel " "]]
-    [set corn-tot-income corn-guarantee
-     ask patch 13 -35 [
-      set plabel "Ins. Claim"
-      set plabel-color red
-      ]
-  ]
-  ]
-
-  if wheat-area > 0 [
-  ifelse wheat-tot-yield > wheat-mean-yield                                                         ;Apply crop insurance?
-    [set wheat-tot-income wheat-tot-income
-     ask patch -5 56 [
-      set plabel " "]]
-    [set wheat-tot-income wheat-guarantee
-     ask patch -5 56 [
-      set plabel "Ins. Claim"
-      set plabel-color red
-      ]
-  ]
-  ]
-
-  if soybeans-area > 0 [
-  ifelse soybeans-tot-yield > soybeans-mean-yield                                                   ;Apply crop insurance?
-    [set soybeans-tot-income soybeans-tot-income
-     ask patch -37 -79 [
-      set plabel " "]]
-    [set soybeans-tot-income soybeans-guarantee
-     ask patch -37 -79 [
-      set plabel "Ins. Claim"
-      set plabel-color red
-      ]
-  ]
-  ]
-
-  if SG-area > 0 [
-  ifelse milo-tot-yield > milo-mean-yield                                                           ;Apply crop insurance?
-    [set milo-tot-income milo-tot-income
-     ask patch -37 -21 [
-      set plabel " "]]
-    [set milo-tot-income milo-guarantee
-     ask patch -37 -21 [
-      set plabel "Ins. Claim"
-      set plabel-color red
-      ]
-    ]
-  ]
-
+  calculate-insurance
   calculate-net-income                                                                              ;Calculate farm net income after insurance
 end
 
@@ -897,60 +998,7 @@ to food-calculation_2                                                           
   set milo-tot-income (item (item n yrs-seq) milo-yield_1 * one-of milo-price * SG-area)
 
   calculate-expenses_yield_1                                                                        ;Get farm expenses -- Link to "calculate-expenses_yield_1"
-
-
-  if corn-area > 0 [
-  ifelse corn-tot-yield > corn-mean-yield                                                           ;Apply crop insurance?
-    [set corn-tot-income corn-tot-income
-     ask patch 13 -35 [
-      set plabel " "]]
-    [set corn-tot-income corn-guarantee
-     ask patch 13 -35 [
-      set plabel "Ins. Claim"
-      set plabel-color red
-    ]
-  ]
-  ]
-
-  if wheat-area > 0 [
-  ifelse wheat-tot-yield > wheat-mean-yield                                                         ;Apply crop insurance?
-    [set wheat-tot-income wheat-tot-income
-     ask patch -5 56 [
-      set plabel " "]]
-    [set wheat-tot-income wheat-guarantee
-     ask patch -5 56 [
-      set plabel "Ins. Claim"
-      set plabel-color red
-    ]
-  ]
-  ]
-
-  if soybeans-area > 0 [
-  ifelse soybeans-tot-yield > soybeans-mean-yield                                                   ;Apply crop insurance?
-    [set soybeans-tot-income soybeans-tot-income
-     ask patch -37 -79 [
-      set plabel " "]]
-    [set soybeans-tot-income soybeans-guarantee
-     ask patch -37 -79 [
-      set plabel "Ins. Claim"
-      set plabel-color red
-    ]
-  ]
-  ]
-
-  if SG-area > 0 [
-  ifelse milo-tot-yield > milo-mean-yield                                                           ;Apply crop insurance?
-    [set milo-tot-income milo-tot-income
-     ask patch -37 -21 [
-      set plabel " "]]
-    [set milo-tot-income milo-guarantee
-     ask patch -37 -21 [
-      set plabel "Ins. Claim"
-      set plabel-color red
-    ]
-  ]
-  ]
-
+  calculate-insurance
   calculate-net-income                                                                              ;Calculate farm net income
 end
 
@@ -994,63 +1042,11 @@ to food-calculation_3                                                           
   set milo-tot-income (item (item n yrs-seq) milo-yield_1 * one-of milo-price * SG-area)
 
   calculate-expenses_yield_1                                                                        ;Get farm expenses -- Link to "calculate-expenses_yield_1"
-
-
-  if corn-area > 0 [
-  ifelse corn-tot-yield > corn-mean-yield                                                           ;Apply crop insurance?
-    [set corn-tot-income corn-tot-income
-     ask patch 13 -35 [
-      set plabel " "]]
-    [set corn-tot-income corn-guarantee
-     ask patch 13 -35 [
-      set plabel "Ins. Claim"
-      set plabel-color red
-      ]
-  ]
-  ]
-
-  if wheat-area > 0 [
-  ifelse wheat-tot-yield > wheat-mean-yield                                                         ;Apply crop insurance?
-    [set wheat-tot-income wheat-tot-income
-     ask patch -5 56 [
-      set plabel " "]]
-    [set wheat-tot-income wheat-guarantee
-     ask patch -5 56 [
-      set plabel "Ins. Claim"
-      set plabel-color red
-      ]
-  ]
-  ]
-
-  if soybeans-area > 0 [
-  ifelse soybeans-tot-yield > soybeans-mean-yield                                                   ;Apply crop insurance?
-    [set soybeans-tot-income soybeans-tot-income
-     ask patch -37 -79 [
-      set plabel " "]]
-    [set soybeans-tot-income soybeans-guarantee
-     ask patch -37 -79 [
-      set plabel "Ins. Claim"
-      set plabel-color red
-      ]
-  ]
-  ]
-
-  if SG-area > 0 [
-  ifelse milo-tot-yield > milo-mean-yield                                                           ;Apply crop insurance?
-    [set milo-tot-income milo-tot-income
-     ask patch -37 -21 [
-      set plabel " "]]
-    [set milo-tot-income milo-guarantee
-     ask patch -37 -21 [
-      set plabel "Ins. Claim"
-      set plabel-color red
-      ]
-  ]
-  ]
+  calculate-insurance
   calculate-net-income                                                                              ;Calculate farm net income
 end
 
-to food-calculation_4                                                                               ;Randomly choose data from GCMs
+to food-calculation_4                                                                               ;Randomly choose data from GCMs RCP8.5
   ifelse ticks < 91
   [let m (ticks - 10)
    set corn-tot-yield (item m corn-yield_3)
@@ -1083,60 +1079,44 @@ to food-calculation_4                                                           
   set milo-tot-income (milo-tot-yield * (one-of milo-price) * SG-area)
 
   calculate-expenses_yield_3                                                                        ;Get farm expenses -- Link to "calculate-expenses_yield_3"
+  calculate-insurance
+  calculate-net-income                                                                              ;Calculate farm net income
+end
 
+to food-calculation_5                                                                               ;Randomly choose data from GCMs RCP8.5
+  ifelse ticks < 91
+  [let m (ticks - 10)
+   set corn-tot-yield (item m corn-yield_5)
+   set wheat-tot-yield (item m wheat-yield_5)
+   set soybeans-tot-yield (item m soybeans-yield_5)
+   set milo-tot-yield (item m milo-yield_5)]
+  [set corn-tot-yield (item GCM-random-year corn-yield_5)
+   set wheat-tot-yield (item GCM-random-year wheat-yield_5)
+   set soybeans-tot-yield (item GCM-random-year soybeans-yield_5)
+   set milo-tot-yield (item GCM-random-year milo-yield_5)]
 
-  if corn-area > 0 [
-  ifelse corn-tot-yield > corn-mean-yield                                                           ;Apply crop insurance?
-    [set corn-tot-income corn-tot-income
-     ask patch 13 -35 [
-      set plabel " "]]
-    [set corn-tot-income corn-guarantee
-     ask patch 13 -35 [
-      set plabel "Ins. Claim"
-      set plabel-color red
-      ]
-  ]
-  ]
+  set corn-history lput corn-tot-yield but-first corn-history                                       ;Add the most recent yield in a "corn-history" list and remove the oldest one
+  set wheat-history lput wheat-tot-yield but-first wheat-history                                    ;Add the most recent yield in a "wheat-history" list and remove the oldest one
+  set soybeans-history lput soybeans-tot-yield but-first soybeans-history                           ;Add the most recent yield in a "soybeans-history" list and remove the oldest one
+  set milo-history lput milo-tot-yield but-first milo-history                                       ;Add the most recent yield in a "milo-history" list and remove the oldest one
 
-  if wheat-area > 0 [
-  ifelse wheat-tot-yield > wheat-mean-yield                                                         ;Apply crop insurance?
-    [set wheat-tot-income wheat-tot-income
-     ask patch -5 56 [
-      set plabel " "]]
-    [set wheat-tot-income wheat-guarantee
-     ask patch -5 56 [
-      set plabel "Ins. Claim"
-      set plabel-color red
-      ]
-  ]
-  ]
+  set corn-mean-yield mean corn-history                                                             ;Average corn production for the last 10 years
+  set wheat-mean-yield mean wheat-history                                                           ;Average wheat production for the last 10 years
+  set soybeans-mean-yield mean soybeans-history                                                     ;Average soybeans production for the last 10 years
+  set milo-mean-yield mean milo-history                                                             ;Average milo production for the last 10 years
 
-  if soybeans-area > 0 [
-  ifelse soybeans-tot-yield > soybeans-mean-yield                                                  ;Apply crop insurance?
-    [set soybeans-tot-income soybeans-tot-income
-     ask patch -37 -79 [
-      set plabel " "]]
-    [set soybeans-tot-income soybeans-guarantee
-     ask patch -37 -79 [
-      set plabel "Ins. Claim"
-      set plabel-color red
-      ]
-  ]
-  ]
+  set corn-guarantee ((corn-mean-yield * corn-coverage * corn-base-price) * corn-area)              ;Calculate guarantee price
+  set wheat-guarantee ((wheat-mean-yield * wheat-coverage * wheat-base-price) * wheat-area)
+  set soybeans-guarantee ((soybeans-mean-yield * soybeans-coverage * soybeans-base-price) * soybeans-area)
+  set milo-guarantee ((milo-mean-yield * milo-coverage * milo-base-price) * SG-area)
 
-  if SG-area > 0 [
-  ifelse milo-tot-yield > milo-mean-yield                                                           ;Apply crop insurance?
-    [set milo-tot-income milo-tot-income
-     ask patch -37 -21 [
-      set plabel " "]]
-    [set milo-tot-income milo-guarantee
-     ask patch -37 -21 [
-      set plabel "Ins. Claim"
-      set plabel-color red
-      ]
-  ]
-  ]
+  set corn-tot-income (corn-tot-yield * (one-of corn-price) * corn-area)                            ;Calculate farm gross income
+  set wheat-tot-income (wheat-tot-yield * (one-of wheat-price) * wheat-area)
+  set soybeans-tot-income (soybeans-tot-yield * (one-of soybeans-price) * soybeans-area)
+  set milo-tot-income (milo-tot-yield * (one-of milo-price) * SG-area)
 
+  calculate-expenses_yield_5                                                                        ;Get farm expenses -- Link to "calculate-expenses_yield_5"
+  calculate-insurance
   calculate-net-income                                                                              ;Calculate farm net income
 end
 
@@ -1169,59 +1149,8 @@ to dryland-farming_1
   set milo-tot-income (item (n mod 10) milo-yield_2 * item (n mod 10) milo-price * SG-area)
 
   calculate-expenses_yield_2                                                                        ;Get farm expenses -- Link to "calculate-expenses_yield_1"
-
-
-  if corn-area > 0 [
-  ifelse corn-tot-yield > corn-mean-yield                                                           ;Apply crop insurance?
-    [set corn-tot-income corn-tot-income
-     ask patch 13 -35 [
-      set plabel " "]]
-    [set corn-tot-income corn-guarantee
-     ask patch 13 -35 [
-      set plabel "Ins. Claim"
-      set plabel-color red
-      ]
-  ]
-  ]
-
-  if wheat-area > 0 [
-  ifelse wheat-tot-yield > wheat-mean-yield                                                         ;Apply crop insurance?
-    [set wheat-tot-income wheat-tot-income
-     ask patch -5 56 [
-      set plabel " "]]
-    [set wheat-tot-income wheat-guarantee
-     ask patch -5 56 [
-      set plabel "Ins. Claim"
-      set plabel-color red
-      ]
-  ]
-  ]
-
-  if soybeans-area > 0 [
-  ifelse soybeans-tot-yield > soybeans-mean-yield                                                   ;Apply crop insurance?
-    [set soybeans-tot-income soybeans-tot-income
-     ask patch -37 -79 [
-      set plabel " "]]
-    [set soybeans-tot-income soybeans-guarantee
-     ask patch -37 -79 [
-      set plabel "Ins. Claim"
-      set plabel-color red
-      ]
-  ]
-  ]
-
-  if SG-area > 0 [
-  ifelse milo-tot-yield > milo-mean-yield                                                          ;Apply crop insurance?
-    [set milo-tot-income milo-tot-income
-     ask patch -37 -21 [
-      set plabel " "]]
-    [set milo-tot-income milo-guarantee
-     ask patch -37 -21 [
-      set plabel "Ins. Claim"
-      set plabel-color red
-      ]
-  ]
-  ]
+  calculate-insurance
+  calculate-net-income                                                                              ;Calculate farm net income
 
   let k ticks
   set corn-use-in item (k mod 10) corn-irrig_2                                                      ;Each tick, irrigation will be accessed from a "corn-irrig_2" list
@@ -1268,60 +1197,7 @@ to dryland-farming_2
   set milo-tot-income (item (item n yrs-seq) milo-yield_2 * one-of milo-price * SG-area)
 
   calculate-expenses_yield_2                                                                        ;Get farm expenses -- Link to "calculate-expenses_yield_2"
-  calculate-net-income                                                                              ;Calculate farm net income
-
-  if corn-area > 0 [
-  ifelse corn-tot-yield > corn-mean-yield                                                           ;Apply crop insurance?
-    [set corn-tot-income corn-tot-income
-     ask patch 13 -35 [
-      set plabel " "]]
-    [set corn-tot-income corn-guarantee
-     ask patch 13 -35 [
-      set plabel "Ins. Claim"
-      set plabel-color red
-      ]
-  ]
-  ]
-
-  if wheat-area > 0 [
-  ifelse wheat-tot-yield > wheat-mean-yield                                                         ;Apply crop insurance?
-    [set wheat-tot-income wheat-tot-income
-     ask patch -5 56 [
-      set plabel " "]]
-    [set wheat-tot-income wheat-guarantee
-     ask patch -5 56 [
-      set plabel "Ins. Claim"
-      set plabel-color red
-      ]
-  ]
-  ]
-
-  if soybeans-area > 0 [
-  ifelse soybeans-tot-yield > soybeans-mean-yield                                                   ;Apply crop insurance?
-    [set soybeans-tot-income soybeans-tot-income
-     ask patch -37 -79 [
-      set plabel " "]]
-    [set soybeans-tot-income soybeans-guarantee
-     ask patch -37 -79 [
-      set plabel "Ins. Claim"
-      set plabel-color red
-      ]
-  ]
-  ]
-
-  if SG-area > 0 [
-  ifelse milo-tot-yield > milo-mean-yield                                                           ;Apply crop insurance?
-    [set milo-tot-income milo-tot-income
-     ask patch -37 -21 [
-      set plabel " "]]
-    [set milo-tot-income milo-guarantee
-     ask patch -37 -21 [
-      set plabel "Ins. Claim"
-      set plabel-color red
-      ]
-  ]
-  ]
-
+  calculate-insurance
   calculate-net-income                                                                              ;Calculate farm net income
 
   let k ticks
@@ -1369,60 +1245,7 @@ to dryland-farming_3
   set milo-tot-income (item (item n yrs-seq) milo-yield_2 * one-of milo-price * SG-area)
 
   calculate-expenses_yield_2                                                                        ;Get farm expenses -- Link to "calculate-expenses_yield_2"
-
-
-  if corn-area > 0 [
-  ifelse corn-tot-yield > corn-mean-yield                                                           ;Apply crop insurance?
-    [set corn-tot-income corn-tot-income
-     ask patch 13 -35 [
-      set plabel " "]]
-    [set corn-tot-income corn-guarantee
-     ask patch 13 -35 [
-      set plabel "Ins. Claim"
-      set plabel-color red
-      ]
-  ]
-  ]
-
-  if wheat-area > 0 [
-  ifelse wheat-tot-yield > wheat-mean-yield                                                         ;Apply crop insurance?
-    [set wheat-tot-income wheat-tot-income
-     ask patch -5 56 [
-      set plabel " "]]
-    [set wheat-tot-income wheat-guarantee
-     ask patch -5 56 [
-      set plabel "Ins. Claim"
-      set plabel-color red
-      ]
-  ]
-  ]
-
-  if soybeans-area > 0 [
-  ifelse soybeans-tot-yield > soybeans-mean-yield                                                   ;Apply crop insurance?
-    [set soybeans-tot-income soybeans-tot-income
-     ask patch -37 -79 [
-      set plabel " "]]
-    [set soybeans-tot-income soybeans-guarantee
-     ask patch -37 -79 [
-      set plabel "Ins. Claim"
-      set plabel-color red
-      ]
-  ]
-  ]
-
-  if SG-area > 0 [
-  ifelse milo-tot-yield > milo-mean-yield                                                           ;Apply crop insurance?
-    [set milo-tot-income milo-tot-income
-     ask patch -37 -21 [
-      set plabel " "]]
-    [set milo-tot-income milo-guarantee
-     ask patch -37 -21 [
-      set plabel "Ins. Claim"
-      set plabel-color red
-      ]
-  ]
-  ]
-
+  calculate-insurance
   calculate-net-income                                                                              ;Calculate farm net income
 
   let k ticks
@@ -1466,67 +1289,58 @@ to dryland-farming_4
   set milo-tot-income (milo-tot-yield * (one-of milo-price) * SG-area)
 
   calculate-expenses_yield_4                                                                        ;Get farm expenses -- Link to "calculate-expenses_yield_4"
-
-  if corn-area > 0 [
-  ifelse corn-tot-yield > corn-mean-yield                                                           ;Apply crop insurance?
-    [set corn-tot-income corn-tot-income
-     ask patch 13 -35 [
-      set plabel " "]]
-    [set corn-tot-income corn-guarantee
-     ask patch 13 -35 [
-      set plabel "Ins. Claim"
-      set plabel-color red
-      ]
-  ]
-  ]
-
-  if wheat-area > 0 [
-  ifelse wheat-tot-yield > wheat-mean-yield                                                         ;Apply crop insurance?
-    [set wheat-tot-income wheat-tot-income
-     ask patch -5 56 [
-      set plabel " "]]
-    [set wheat-tot-income wheat-guarantee
-     ask patch -5 56 [
-      set plabel "Ins. Claim"
-      set plabel-color red
-      ]
-  ]
-  ]
-
-  if soybeans-area > 0 [
-  ifelse soybeans-tot-yield > soybeans-mean-yield                                                   ;Apply crop insurance?
-    [set soybeans-tot-income soybeans-tot-income
-     ask patch -37 -79 [
-      set plabel " "]]
-    [set soybeans-tot-income soybeans-guarantee
-     ask patch -37 -79 [
-      set plabel "Ins. Claim"
-      set plabel-color red
-      ]
-  ]
-  ]
-
-  if SG-area > 0 [
-  ifelse milo-tot-yield > milo-mean-yield                                                           ;Apply crop insurance?
-    [set milo-tot-income milo-tot-income
-     ask patch -37 -21 [
-      set plabel " "]]
-    [set milo-tot-income milo-guarantee
-     ask patch -37 -21 [
-      set plabel "Ins. Claim"
-      set plabel-color red
-      ]
-  ]
-  ]
-
+  calculate-insurance
   calculate-net-income                                                                              ;Calculate farm net income
-
 
   let k ticks
   set corn-use-in item (k mod 10) corn-irrig_4                                                      ;Each tick, irrigation will be accessed from a "corn-irrig_4" list
   set wheat-use-in item (k mod 10) wheat-irrig_4                                                    ;Each tick, irrigation will be accessed from a "wheat-irrig_4" list
   set soybeans-use-in item (k mod 10) soybeans-irrig_4                                              ;Each tick, irrigation will be accessed from a "soybeans-irrig_4" list
   set milo-use-in item (k mod 10) milo-irrig_4                                                      ;Each tick, irrigation will be accessed from a "milo-irrig_4" list
+end
+
+to dryland-farming_5
+
+  ifelse ticks < 91
+  [let m (ticks - 10)
+   set corn-tot-yield (item m corn-yield_6)
+   set wheat-tot-yield (item m wheat-yield_6)
+   set soybeans-tot-yield (item m soybeans-yield_6)
+   set milo-tot-yield (item m milo-yield_6)]
+  [set corn-tot-yield (item GCM-random-year corn-yield_6)
+   set wheat-tot-yield (item GCM-random-year wheat-yield_6)
+   set soybeans-tot-yield (item GCM-random-year soybeans-yield_6)
+   set milo-tot-yield (item GCM-random-year milo-yield_6)]
+
+  set corn-history lput corn-tot-yield but-first corn-history                                       ;Add the most recent yield in a "corn-history" list and remove the oldest one
+  set wheat-history lput wheat-tot-yield but-first wheat-history                                    ;Add the most recent yield in a "wheat-history" list and remove the oldest one
+  set soybeans-history lput soybeans-tot-yield but-first soybeans-history                           ;Add the most recent yield in a "soybeans-history" list and remove the oldest one
+  set milo-history lput milo-tot-yield but-first milo-history                                       ;Add the most recent yield in a "milo-history" list and remove the oldest one
+
+  set corn-mean-yield mean corn-history                                                             ;Average corn production for the last 10 years
+  set wheat-mean-yield mean wheat-history                                                           ;Average wheat production for the last 10 years
+  set soybeans-mean-yield mean soybeans-history                                                     ;Average soybeans production for the last 10 years
+  set milo-mean-yield mean milo-history                                                             ;Average milo production for the last 10 years
+
+  set corn-guarantee ((corn-mean-yield * corn-coverage * corn-base-price) * corn-area)              ;Calculate guarantee price
+  set wheat-guarantee ((wheat-mean-yield * wheat-coverage * wheat-base-price) * wheat-area)
+  set soybeans-guarantee ((soybeans-mean-yield * soybeans-coverage * soybeans-base-price) * soybeans-area)
+  set milo-guarantee ((milo-mean-yield * milo-coverage * milo-base-price) * SG-area)
+
+  set corn-tot-income (corn-tot-yield * (one-of corn-price) * corn-area)                            ;Calculate farm gross income
+  set wheat-tot-income (wheat-tot-yield * (one-of wheat-price) * wheat-area)
+  set soybeans-tot-income (soybeans-tot-yield * (one-of soybeans-price) * soybeans-area)
+  set milo-tot-income (milo-tot-yield * (one-of milo-price) * SG-area)
+
+  calculate-expenses_yield_6                                                                        ;Get farm expenses -- Link to "calculate-expenses_yield_4"
+  calculate-insurance
+  calculate-net-income                                                                              ;Calculate farm net income
+
+  let k ticks
+  set corn-use-in item (k mod 10) corn-irrig_6                                                      ;Each tick, irrigation will be accessed from a "corn-irrig_6" list
+  set wheat-use-in item (k mod 10) wheat-irrig_6                                                    ;Each tick, irrigation will be accessed from a "wheat-irrig_6" list
+  set soybeans-use-in item (k mod 10) soybeans-irrig_6                                              ;Each tick, irrigation will be accessed from a "soybeans-irrig_6" list
+  set milo-use-in item (k mod 10) milo-irrig_6                                                      ;Each tick, irrigation will be accessed from a "milo-irrig_6" list
 end
 
 to energy-calculation
@@ -1538,12 +1352,12 @@ to energy-calculation
   ifelse count-solar-lifespan = 0 [
     set solar-production_temp (#Solar_Panels * Panel_power * 5.6 * 365 / 1000000)                   ;MWh = power(Watt) * 5.6hrs/day * 365days/year / 1000000
     set solar-production solar-production_temp
-    print (word ticks " New solar: solar production = " solar-production)
+    ;print (word ticks " New solar: solar production = " solar-production)
     set count-solar-lifespan (count-solar-lifespan + 1)]
 
    [set solar-production (0.995 * solar-production_temp)                                            ;0.5% degradation annually
     set solar-production_temp (solar-production)
-    print (word "tick " ticks ": solar production = " solar-production)
+    ;print (word "tick " ticks ": solar production = " solar-production)
     set count-solar-lifespan (count-solar-lifespan + 1)
     if count-solar-lifespan = 25 [set count-solar-lifespan 0]
     ]
@@ -1553,19 +1367,19 @@ to energy-calculation
   ifelse count-wind-lifespan <= 9 [                                                                 ;Count 10 years (0 to 9)
     set wind-production_temp (#wind_turbines * turbine_size * 0.421 * 24 * 365)                     ;MWh = power(MW) * Kansas_wind_capacity * 24hrs/day * 365days/year, capacity 42.1% (Berkeley Lab)
     set wind-production wind-production_temp
-    print (word ticks "100% solar production = " wind-production)
+    ;print (word ticks "100% solar production = " wind-production)
     set count-wind-lifespan (count-wind-lifespan + 1)]
 
    [set wind-production (0.98 * wind-production_temp)                                               ;2% degradation annually (project age beyound 10 years)
     set wind-production_temp (wind-production)
-    print (word "tick " ticks ": solar production = " solar-production)
+    ;print (word "tick " ticks ": solar production = " solar-production)
     set count-wind-lifespan (count-wind-lifespan + 1)
     if count-wind-lifespan = 20 [set count-wind-lifespan 0]
     ]
   ]
 
   set solar-cost (#Solar_Panels * (Panel_power / 1000) * 3050 / 25)                                 ;Solar cost = #Solar_Panels * Panel_power * $3050/kW
-  print (word "solar prod for cost cal: " solar-production)
+  ;print (word "solar prod for cost cal: " solar-production)
   set solar-sell (solar-production * 38)                                                            ;Sell = MWh * $38/MWh (Bob and Mary)
                                                                                                     ;Wholesale < Coop $65 < Retail, , (Wholesale was $22-24/MWh, Retail price is $105/MWh)
 
@@ -1577,10 +1391,11 @@ to energy-calculation
   ifelse count-wind-lifespan-cost <= 9 [
     set wind-cost ((1470000 * turbine_size / 20) + (45000 * turbine_size)) * #wind_turbines
     set count-wind-lifespan-cost (count-wind-lifespan-cost + 1)
-    print (word "first 10 year: " wind-cost)]
+    ;print (word "first 10 year: " wind-cost)
+    ]
 
     [set wind-cost ((1470000 * turbine_size / 20) + (50000 * turbine_size)) * #wind_turbines
-     print (word "Beyond 10 years: " wind-cost)
+     ;print (word "Beyond 10 years: " wind-cost)
      set count-wind-lifespan-cost (count-wind-lifespan-cost + 1)
      if count-wind-lifespan-cost = 20 [set count-wind-lifespan-cost 0]
     ]
@@ -1622,7 +1437,7 @@ to gw-depletion_1
   set current-elev (current-elev + patch-change)                                                    ;Set new current elevation (new top of aquifer)
   if current-elev > 69 [set current-elev 69]                                                        ;Exceed capacity
 
-  if current-elev < -66 [                                                                           ;Is the top of aquifer below 80% of initial thickness?
+  if current-elev < level-30 [                                                                      ;Is the top of aquifer below 30 feet?
     ask aquifer-patches with [pycor < current-elev] [                                               ;Yes
       set pcolor 14]                                                                                ;Set "aquifer-patches" to be red
   ]
@@ -1655,7 +1470,7 @@ to gw-depletion_2
   set current-elev (current-elev + patch-change)                                                    ;Set new current elevation (new top of aquifer)
   if current-elev > 69 [set current-elev 69]                                                        ;Exceed capacity
 
-  if current-elev < -66 [                                                                           ;Is the top of aquifer below 80% of initial thickness?
+  if current-elev < level-30 [                                                                      ;Is the top of aquifer below 30 feet?
     ask aquifer-patches with [pycor < current-elev] [                                               ;Yes
       set pcolor 14]                                                                                ;Set "aquifer-patches" to be red
   ]
@@ -1688,7 +1503,7 @@ to gw-depletion_3
   set current-elev (current-elev + patch-change)                                                    ;Set new current elevation (new top of aquifer)
   if current-elev > 69 [set current-elev 69]                                                        ;Exceed capacity
 
-  if current-elev < -66 [                                                                           ;Is the top of aquifer below 80% of initial thickness?
+  if current-elev < level-30 [                                                                      ;Is the top of aquifer below 30 feet?
     ask aquifer-patches with [pycor < current-elev] [                                               ;Yes
       set pcolor 14]                                                                                ;Set "aquifer-patches" to be red
   ]
@@ -1725,7 +1540,44 @@ to gw-depletion_4
   set current-elev (current-elev + patch-change)                                                    ;Set new current elevation (new top of aquifer)
   if current-elev > 69 [set current-elev 69]                                                        ;Exceed capacity
 
-  if current-elev < -66 [                                                                           ;Is the top of aquifer below 80% of initial thickness?
+  if current-elev < level-30 [                                                                      ;Is the top of aquifer below 30 feet?
+    ask aquifer-patches with [pycor < current-elev] [                                               ;Yes
+      set pcolor 14]                                                                                ;Set "aquifer-patches" to be red
+  ]
+end
+
+to gw-depletion_5
+
+  ifelse ticks < 91
+  [let m (ticks - 10)
+   set corn-use-in (item m corn-irrig_5)
+   set wheat-use-in (item m wheat-irrig_5)
+   set soybeans-use-in (item m soybeans-irrig_5)
+   set milo-use-in (item m milo-irrig_5)]
+  [set corn-use-in (item GCM-random-year corn-irrig_5)
+   set wheat-use-in (item GCM-random-year wheat-irrig_5)
+   set soybeans-use-in (item GCM-random-year soybeans-irrig_5)
+   set milo-use-in (item GCM-random-year milo-irrig_5)]
+
+  ;Normalize water use
+  set water-use-feet (((corn-use-in * corn-area) + (wheat-use-in * wheat-area) + (soybeans-use-in * soybeans-area) + (milo-use-in * SG-area)) / (12 * total-area))
+  set calibrated-water-use ((0.114 * water-use-feet) + 0.211)                                       ;Calibrate DSSAT simulated results with historical data
+  set gw-change ((-32.386 * calibrated-water-use) + 8.001)                                          ;Calculate water-level change using a regression equation (Whittemore et al., 2016)
+
+  set patch-change (gw-change * 170 / aquifer-thickness)                                            ;Convert water-level change to patch change
+
+  groundwater_level_change
+
+  ifelse patch-change < 0                                                                           ;Is water level decreasing?
+    [ask aquifer-patches with [pycor > (current-elev + patch-change)] [                             ;Yes
+     set pcolor 7]]                                                                                 ;Set patches above "new" level of aquifer (new current elevation) to be gray
+    [ask aquifer-patches with [pycor < (current-elev + patch-change)] [                             ;No
+     set pcolor 105]]                                                                               ;Set patches below "new" level of aquifer (new current elevation) to be blue
+
+  set current-elev (current-elev + patch-change)                                                    ;Set new current elevation (new top of aquifer)
+  if current-elev > 69 [set current-elev 69]                                                        ;Exceed capacity
+
+  if current-elev < level-30 [                                                                      ;Is the top of aquifer below 30 feet?
     ask aquifer-patches with [pycor < current-elev] [                                               ;Yes
       set pcolor 14]                                                                                ;Set "aquifer-patches" to be red
   ]
@@ -1756,7 +1608,7 @@ to gw-depletion_dryland
   set current-elev (current-elev + patch-change)                                                    ;Set new current elevation (new top of aquifer)
   if current-elev > 69 [set current-elev 69]                                                        ;Exceed capacity
 
-  if current-elev < -66 [                                                                           ;Is the top of aquifer below 80% of initial thickness?
+  if current-elev < level-30 [                                                                      ;Is the top of aquifer below 30 feet?
     ask aquifer-patches with [pycor < current-elev] [                                               ;Yes
       set pcolor 14]                                                                                ;Set "aquifer-patches" to be red
   ]
@@ -1800,7 +1652,7 @@ to contaminant                                                                  
     ask patch -52 16 [ask patches in-radius (item 3 radius-of-%area) [set pcolor 34]]
   ]]
 
-  [if (item (ticks) precip_GCM) >= 20 [                                                             ;Years that precip >= 20 inches are wet years
+  [if (item (ticks) precip_RCP8.5) >= 20 [                                                             ;Years that precip >= 20 inches are wet years
     ask up-to-n-of (0.0001 * N-accu) river-patches with [pcolor = 87] [set pcolor brown]            ;0.0001 is a scaling factor, graphically used to reduce number of dots in stream
 
     set N-accu2 (N-accu2 + N-accu)                                                                  ;N-accu2 is amount of nitrate in the stream
@@ -1846,7 +1698,7 @@ end
 to initialize-energy
   set #Solar_panels (#solar_panel_sets * 1000)
   set solar-production (#Solar_Panels * Panel_power * 5.6 * 365 / 1000000)
-  print (word "initialize " solar-production)
+  ;print (word "initialize " solar-production)
   set wind-production (#wind_turbines * turbine_size * 0.421 * 24 * 365)
   set %Solar-production (Solar-production * 100 / (Solar-production + Wind-production))
   set %Wind-production (Wind-production * 100 / (Solar-production + Wind-production))
@@ -1935,7 +1787,7 @@ to reset-symbols                                                                
     set wind-production (#wind_turbines * turbine_size * 0.421 * 24 * 365)]
 
   set solar-production solar-production
-  print (word "reset-symbol " solar-production)
+  ;print (word "reset-symbol " solar-production)
   set wind-production wind-production
   set %Solar-production (Solar-production * 100 / (Solar-production + Wind-production))
   set %Wind-production (Wind-production * 100 / (Solar-production + Wind-production))
@@ -2109,9 +1961,9 @@ NIL
 
 TEXTBOX
 7
-365
+358
 345
-384
+377
 Water ------------------------------------
 13
 95.0
@@ -2168,7 +2020,6 @@ PENS
 "Wheat" 1.0 0 -3844592 true "" "plot wheat-tot-yield"
 "Soybeans" 1.0 0 -13210332 true "" "plot soybeans-tot-yield"
 "SG" 1.0 0 -12440034 true "" "plot milo-tot-yield"
-"C. APH" 1.0 2 -8053223 true "" "plot corn-mean-yield"
 
 BUTTON
 160
@@ -2188,10 +2039,10 @@ NIL
 1
 
 SLIDER
-18
-321
-159
-354
+17
+315
+158
+348
 #Wind_turbines
 #Wind_turbines
 0
@@ -2203,7 +2054,7 @@ NIL
 HORIZONTAL
 
 SLIDER
-137
+156
 48
 323
 81
@@ -2219,9 +2070,9 @@ HORIZONTAL
 
 SLIDER
 162
-249
+245
 304
-282
+278
 Panel_power
 Panel_power
 0
@@ -2234,9 +2085,9 @@ HORIZONTAL
 
 TEXTBOX
 17
-233
+229
 159
-261
+257
 1 set = 1000 solar panels
 11
 0.0
@@ -2244,9 +2095,9 @@ TEXTBOX
 
 SLIDER
 17
-249
+245
 159
-282
+278
 #Solar_panel_sets
 #Solar_panel_sets
 0
@@ -2419,29 +2270,29 @@ Wind outputs
 
 TEXTBOX
 7
-428
+417
 353
-446
+435
 Climate Scenario ---------------------------------
 12
 0.0
 1
 
 CHOOSER
-9
-478
-180
-523
+8
+499
+162
+544
 Future_Process
 Future_Process
 "Repeat Historical" "Wetter Future" "Dryer Future" "Impose T, P, & S Changes"
 0
 
 TEXTBOX
-18
-305
-131
-323
+17
+299
+130
+317
 Wind Turbine
 11
 0.0
@@ -2469,10 +2320,10 @@ PENS
 "$0" 1.0 2 -8053223 true "" "plot zero-line"
 
 TEXTBOX
-9
-290
-46
-318
+8
+284
+45
+312
 • Wind
 11
 25.0
@@ -2480,9 +2331,9 @@ TEXTBOX
 
 TEXTBOX
 9
-218
+214
 49
-236
+232
 • Solar
 11
 25.0
@@ -2541,18 +2392,18 @@ Water ----------------------------------------------------------
 TEXTBOX
 347
 491
-802
+813
 526
-*First 10 years use historical data from 2008 to 2017, subsequent years apply Future Process.
+• First 10 years use historical data from 2008 to 2017, subsequent years apply Future Process.
 10
 5.0
 1
 
 TEXTBOX
 8
-388
+379
 343
-430
+409
 • Water is assumed to come from groundwater (GW) pumping. • Effects on surface water (SW) quality are represented.
 11
 95.0
@@ -2607,7 +2458,7 @@ TEXTBOX
 504
 802
 522
-**Year in the plots represents a sequential year. Year 1 is 2008 and year 60 is 2067.
+• Year in the plots represents a sequential year. Year 1 is 2008 and year 60 is 2067.
 10
 5.0
 1
@@ -2654,7 +2505,7 @@ Farm Economy -------------------
 SLIDER
 8
 48
-134
+153
 81
 Input-years
 Input-years
@@ -2663,7 +2514,7 @@ Input-years
 60.0
 5
 1
-NIL
+Years
 HORIZONTAL
 
 TEXTBOX
@@ -2692,10 +2543,10 @@ true
 true
 "" ""
 PENS
-"Corn" 1.0 2 -4079321 true "" "ifelse corn-tot-yield < corn-mean-yield [\nplot corn-guarantee]\n[plot zero-line]"
-"Wheat" 1.0 2 -3844592 true "" "ifelse wheat-tot-yield < wheat-mean-yield [\nplot wheat-guarantee]\n[plot zero-line]"
-"Soybeans" 1.0 2 -13210332 true "" "ifelse soybeans-tot-yield < soybeans-mean-yield [\nplot soybeans-guarantee]\n[plot zero-line]"
-"SG" 1.0 2 -12440034 true "" "ifelse milo-tot-yield < milo-mean-yield [\nplot milo-guarantee]\n[plot zero-line]"
+"Corn" 1.0 2 -4079321 true "" "ifelse corn-claimed = \"YES\" [plot corn-ins-claimed]\n[plot zero-line]"
+"Wheat" 1.0 2 -3844592 true "" "ifelse wheat-claimed = \"YES\" [plot wheat-ins-claimed]\n[plot zero-line]"
+"Soybeans" 1.0 2 -13210332 true "" "ifelse soybeans-claimed = \"YES\" [plot soybeans-ins-claimed]\n[plot zero-line]"
+"SG" 1.0 2 -12440034 true "" "ifelse milo-claimed = \"YES\" [plot milo-ins-claimed]\n[plot zero-line]"
 
 TEXTBOX
 1112
@@ -2741,35 +2592,25 @@ true
 true
 "set-plot-background-color 88" ""
 PENS
-"GW level" 1.0 0 -14454117 true "" "plot gw-level"
-"ST = 20% " 1.0 2 -5298144 true "" "plot (Aquifer-thickness * 0.2)"
-"ST = 30%" 1.0 2 -7500403 true "" "plot (Aquifer-thickness * 0.3)"
-
-TEXTBOX
-1326
-383
-1399
-405
-ST = Saturated \n        thickness
-9
-0.0
-1
+"GW level   " 1.0 0 -14454117 true "" "plot gw-level"
+"30 ft" 1.0 2 -5298144 true "" "plot (gw-lower-limit)"
+"60 ft" 1.0 2 -7500403 true "" "plot (gw-upper-limit)"
 
 TEXTBOX
 347
 518
 773
 536
-***FEWCalc requires NetLogo version 6.1.0 or higher.
+• FEWCalc requires NetLogo version 6.1.0 or higher.
 10
 5.0
 1
 
 TEXTBOX
 1039
-125
+113
 1110
-147
+135
 SG = Grain \nsorghum
 9
 0.0
@@ -2807,21 +2648,71 @@ SG = Grain \nsorghum
 
 CHOOSER
 162
-309
+303
 304
-354
+348
 Capacity_Megawatts
 Capacity_Megawatts
 1 2
 1
 
 TEXTBOX
-15
-446
-328
-478
-Climate scenario control temperature (T), precipitation (P), and solar radiation (S) for the simulated year.
+8
+436
+336
+468
+• Climate scenario controls temperature (T), precipitation (P), and solar radiation (S) for the simulated year.
 11
+4.0
+1
+
+CHOOSER
+165
+499
+325
+544
+Climate_Model
+Climate_Model
+"RCP4.5" "RCP8.5"
+1
+
+TEXTBOX
+347
+532
+816
+579
+• The Representative Concentration Pathways (RCPs) are used for making climate projections largely based on greenhouse gas (GHG) emissions. RCP4.5 is representative of an intermediate scenario, whearas RCP8.5 is a scenario with very high GHG emissions.
+10
+5.0
+1
+
+TEXTBOX
+165
+484
+327
+502
+For \"Impose T, P, and S Changes\"
+10
+0.0
+1
+
+TEXTBOX
+9
+469
+68
+499
+STEP 1
+12
+0.0
+1
+
+TEXTBOX
+165
+469
+213
+493
+STEP 2:
+12
 0.0
 1
 
