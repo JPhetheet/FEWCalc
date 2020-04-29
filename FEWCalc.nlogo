@@ -621,12 +621,10 @@ to calculate-insurance
       set plabel " "]]
     [set corn-yield-deficiency (corn-mean-yield - corn-tot-yield)
      ifelse corn-tot-income > corn-guarantee
-      [set corn-tot-income corn-tot-income
-       print "corn A"]
+      [set corn-tot-income corn-tot-income]
       [set corn-claimed "YES"
        set corn-ins-claimed (corn-guarantee - corn-tot-income)
        set corn-tot-income corn-tot-income + (corn-yield-deficiency * corn-base-price * corn-area)
-       print "corn B"
 
       ask patch 13 -35 [
       set plabel "Ins. Claim"
@@ -643,12 +641,10 @@ to calculate-insurance
       set plabel " "]]
     [set wheat-yield-deficiency (wheat-mean-yield - wheat-tot-yield)
      ifelse wheat-tot-income > wheat-guarantee
-      [set wheat-tot-income wheat-tot-income
-       print "wheat A"]
+      [set wheat-tot-income wheat-tot-income]
       [set wheat-claimed "YES"
        set wheat-ins-claimed (wheat-guarantee - wheat-tot-income)
        set wheat-tot-income wheat-tot-income + (wheat-yield-deficiency * wheat-base-price * wheat-area)
-       print "wheat B"
 
      ask patch -5 56 [
       set plabel "Ins. Claim"
