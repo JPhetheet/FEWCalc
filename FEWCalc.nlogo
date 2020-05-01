@@ -2400,7 +2400,7 @@ TEXTBOX
 379
 343
 409
-• Water is assumed to come from groundwater (GW) pumping. • Effects on surface water (SW) quality are represented.
+• Water is assumed to come from groundwater (GW) pumping. • Effects on surface water (SW) quality are accumulated.
 11
 95.0
 1
