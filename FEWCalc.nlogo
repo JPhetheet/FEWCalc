@@ -1625,10 +1625,10 @@ to contaminant                                                                  
   set N-accu (N-accu + N-accu-temp)                                                                 ;N accumulation before transporting to the stream
   ;print N-accu
 
-  ask patch -1 0 [ask n-of (0.1 * (item (item k yrs-seq) corn-N-app) / 1.12) patches in-radius (item 0 radius-of-%area) [set pcolor brown]]            ;dots shown in a circle are in a unit area (lbs/ac); kg/ha to lb/ac, dividing by 1.12
-  ask patch -18 84 [ask n-of (0.1 * (item (item k yrs-seq) wheat-N-app) / 1.12) patches in-radius (item 1 radius-of-%area) [set pcolor brown]]         ;dots shown in a circle are in a unit area (lbs/ac); kg/ha to lb/ac, dividing by 1.12
-  ask patch -51.5 -51 [ask n-of (0.1 * (item (item k yrs-seq) soybeans-N-app) / 1.12) patches in-radius (item 2 radius-of-%area) [set pcolor brown]]   ;dots shown in a circle are in a unit area (lbs/ac); kg/ha to lb/ac, dividing by 1.12
-  ask patch -52 16 [ask n-of (0.1 * (item (item k yrs-seq) milo-N-app) / 1.12) patches in-radius (item 3 radius-of-%area) [set pcolor brown]]          ;dots shown in a circle are in a unit area (lbs/ac); kg/ha to lb/ac, dividing by 1.12
+  ask patch -1 0 [ask n-of (0.0001 * (item (item k yrs-seq) corn-N-app) / 1.12 * corn-area) patches in-radius (item 0 radius-of-%area) [set pcolor brown]]            ;dots shown in a circle are in a unit area (lbs/ac); kg/ha to lb/ac, dividing by 1.12
+  ask patch -18 84 [ask n-of (0.0001 * (item (item k yrs-seq) wheat-N-app) / 1.12 * wheat-area) patches in-radius (item 1 radius-of-%area) [set pcolor brown]]         ;dots shown in a circle are in a unit area (lbs/ac); kg/ha to lb/ac, dividing by 1.12
+  ask patch -51.5 -51 [ask n-of (0.0001 * (item (item k yrs-seq) soybeans-N-app) / 1.12 * soybeans-area) patches in-radius (item 2 radius-of-%area) [set pcolor brown]]   ;dots shown in a circle are in a unit area (lbs/ac); kg/ha to lb/ac, dividing by 1.12
+  ask patch -52 16 [ask n-of (0.0001 * (item (item k yrs-seq) milo-N-app) / 1.12 * SG-area) patches in-radius (item 3 radius-of-%area) [set pcolor brown]]          ;dots shown in a circle are in a unit area (lbs/ac); kg/ha to lb/ac, dividing by 1.12
 
   ifelse Future_Process = "Repeat Historical" or Future_Process = "Wetter Future" or Future_Process = "Dryer Future"
   [if (item k yrs-seq) = 7 or (item k yrs-seq) = 8 or (item k yrs-seq) = 9 [                         ;yrs-seq = 7, 8, and 9 are wet years
@@ -2282,7 +2282,7 @@ CHOOSER
 Future_Process
 Future_Process
 "Repeat Historical" "Wetter Future" "Dryer Future" "Impose T, P, & S Changes"
-0
+2
 
 TEXTBOX
 17
@@ -2398,9 +2398,9 @@ TEXTBOX
 TEXTBOX
 8
 379
-343
-409
-• Water is assumed to come from groundwater (GW) pumping. • Effects on surface water (SW) quality are accumulated.
+344
+397
+• Water is assumed to come from groundwater (GW) pumping.
 11
 95.0
 1
@@ -2710,6 +2710,16 @@ TEXTBOX
 STEP 2:
 12
 0.0
+1
+
+TEXTBOX
+8
+395
+328
+413
+• Effects on surface water (SW) quality are accumulated.
+11
+95.0
 1
 
 @#$#@#$#@
