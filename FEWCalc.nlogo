@@ -1648,7 +1648,7 @@ to contaminant                                                                  
     ask patch -52 16 [ask patches in-radius (item 3 radius-of-%area) [set pcolor 34]]
   ]]
 
-  [if (item (ticks) precip_RCP8.5) >= 20 [                                                             ;Years that precip >= 20 inches are wet years
+  [if Future_Process = "Impose T, P, and S Changes" and (item (ticks) precip_RCP8.5) >= 20 or Future_Process = "Impose T, P, and S Changes" and (item (ticks) precip_RCP4.5) >= 20 [           ;Years that precip >= 20 inches are wet years
     ask up-to-n-of (0.0001 * N-accu) river-patches with [pcolor = 87] [set pcolor brown]            ;0.0001 is a scaling factor, graphically used to reduce number of dots in stream
 
     set N-accu2 (N-accu2 + N-accu)                                                                  ;N-accu2 is amount of nitrate in the stream
@@ -2282,7 +2282,7 @@ CHOOSER
 Future_Process
 Future_Process
 "Repeat Historical" "Wetter Future" "Dryer Future" "Impose T, P, & S Changes"
-2
+0
 
 TEXTBOX
 17
