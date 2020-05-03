@@ -83,30 +83,34 @@ to setup
     set radius-of-%area lput sqrt ((x / (sum crop-area) * area-multiplier) / pi) radius-of-%area    ;Calculate radius of crop circle
   ]
 
+
   if corn-area > 0 [
     ask patch -1 0 [ask patches in-radius (item 0 radius-of-%area) [set pcolor 37]]
-    import-drawing "corn-symbol.png"
+    import-drawing "Symbol-corn.png"                                                                ;There is a problem with image import. It disappears.
+    import-drawing "Symbol-corn.png"                                                                ;To solve the problem, we import this image twice.
     ask patch 6 -27 [set plabel "Corn"]]
 
   if wheat-area > 0 [
     ask patch -18 84 [ask patches in-radius (item 1 radius-of-%area) [set pcolor 22]]
-    import-drawing "wheat-symbol.png"
+    import-drawing "Symbol-wheat.png"
     ask patch -9 63 [
         set plabel "Wheat"
         set plabel-color black]]
 
   if soybeans-area > 0 [
     ask patch -51.5 -51 [ask patches in-radius (item 2 radius-of-%area) [set pcolor 36]]
-    import-drawing "soybeans-symbol.png"
+    import-drawing "Symbol-soybeans.png"
     ask patch -38 -72 [
         set plabel "soybeans"
         set plabel-color black]]
 
   if SG-area > 0 [
     ask patch -52 16 [ask patches in-radius (item 3 radius-of-%area) [set pcolor 34]]
-    import-drawing "milo-symbol.png"
+    import-drawing "Symbol-milo.png"
     ask patch -43 -6 [set plabel "Grain"]
     ask patch -38 -13 [set plabel "sorghum"]]
+
+
 
   ;import-drawing "crop-symbol.png"                                                                  ;Overlay each crop circle by its symbol
 
@@ -2306,7 +2310,7 @@ CHOOSER
 Future_Process
 Future_Process
 "Repeat Historical" "Wetter Future" "Dryer Future" "Impose T, P, & S Changes"
-0
+1
 
 TEXTBOX
 17
