@@ -83,25 +83,32 @@ to setup
     set radius-of-%area lput sqrt ((x / (sum crop-area) * area-multiplier) / pi) radius-of-%area    ;Calculate radius of crop circle
   ]
 
-  ask patch -1 0 [ask patches in-radius (item 0 radius-of-%area) [set pcolor 37]]
-  ask patch -18 84 [ask patches in-radius (item 1 radius-of-%area) [set pcolor 22]]
-  ask patch -51.5 -51 [ask patches in-radius (item 2 radius-of-%area) [set pcolor 36]]
-  ask patch -52 16 [ask patches in-radius (item 3 radius-of-%area) [set pcolor 34]]
+  if corn-area > 0 [
+    ask patch -1 0 [ask patches in-radius (item 0 radius-of-%area) [set pcolor 37]]
+    import-drawing "corn-symbol.png"
+    ask patch 6 -27 [set plabel "Corn"]]
 
-  ask patch 6 -27 [
-    set plabel "Corn"]
-  ask patch -9 63 [
-    set plabel "Wheat"
-    set plabel-color black]
-  ask patch -38 -72 [
-    set plabel "soybeans"
-    set plabel-color black]
-  ask patch -43 -6 [
-    set plabel "Grain"]
-  ask patch -38 -13 [
-    set plabel "sorghum"]
+  if wheat-area > 0 [
+    ask patch -18 84 [ask patches in-radius (item 1 radius-of-%area) [set pcolor 22]]
+    import-drawing "wheat-symbol.png"
+    ask patch -9 63 [
+        set plabel "Wheat"
+        set plabel-color black]]
 
-  import-drawing "crop-symbol.png"                                                                  ;Overlay each crop circle by its symbol
+  if soybeans-area > 0 [
+    ask patch -51.5 -51 [ask patches in-radius (item 2 radius-of-%area) [set pcolor 36]]
+    import-drawing "soybeans-symbol.png"
+    ask patch -38 -72 [
+        set plabel "soybeans"
+        set plabel-color black]]
+
+  if SG-area > 0 [
+    ask patch -52 16 [ask patches in-radius (item 3 radius-of-%area) [set pcolor 34]]
+    import-drawing "milo-symbol.png"
+    ask patch -43 -6 [set plabel "Grain"]
+    ask patch -38 -13 [set plabel "sorghum"]]
+
+  ;import-drawing "crop-symbol.png"                                                                  ;Overlay each crop circle by its symbol
 
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;;;;;;;;;;;;;;;;;;; Aquifer patches ;;;;;;;;;;;;;;;;;;                                            ;Set "aquifer-patches" and patch's color
@@ -1648,7 +1655,7 @@ to contaminant                                                                  
     ask patch -52 16 [ask patches in-radius (item 3 radius-of-%area) [set pcolor 34]]
   ]]
 
-  [if Future_Process = "Impose T, P, and S Changes" and (item (ticks) precip_RCP8.5) >= 20 or Future_Process = "Impose T, P, and S Changes" and (item (ticks) precip_RCP4.5) >= 20 [           ;Years that precip >= 20 inches are wet years
+  [ifelse (Future_Process = "Impose T, P, & S Changes" and Climate_Model = "RCP8.5" and (item (ticks) precip_RCP8.5) >= 20) [           ;Years that precip >= 20 inches are wet years
     ask up-to-n-of (0.0001 * N-accu) river-patches with [pcolor = 87] [set pcolor brown]            ;0.0001 is a scaling factor, graphically used to reduce number of dots in stream
 
     set N-accu2 (N-accu2 + N-accu)                                                                  ;N-accu2 is amount of nitrate in the stream
@@ -1663,7 +1670,24 @@ to contaminant                                                                  
     ask patch -18 84 [ask patches in-radius (item 1 radius-of-%area) [set pcolor 22]]
     ask patch -51.5 -51 [ask patches in-radius (item 2 radius-of-%area) [set pcolor 36]]
     ask patch -52 16 [ask patches in-radius (item 3 radius-of-%area) [set pcolor 34]]
-  ]]
+  ]
+
+    [if Future_Process = "Impose T, P, & S Changes" and Climate_Model = "RCP4.5" and (item (ticks) precip_RCP4.5) >= 20 [           ;Years that precip >= 20 inches are wet years
+    ask up-to-n-of (0.0001 * N-accu) river-patches with [pcolor = 87] [set pcolor brown]            ;0.0001 is a scaling factor, graphically used to reduce number of dots in stream
+
+    set N-accu2 (N-accu2 + N-accu)                                                                  ;N-accu2 is amount of nitrate in the stream
+    ;print (word "N-accu: " N-accu2)
+
+    ask patch 64 81 [                                                                               ;Show a number in the World
+    set plabel round (N-accu2)
+    set plabel-color white]
+
+    set N-accu 0                                                                                    ;N-accu (in crop circles) is reset because nitrate is transported into the river
+    ask patch -1 0 [ask patches in-radius (item 0 radius-of-%area) [set pcolor 37]]
+    ask patch -18 84 [ask patches in-radius (item 1 radius-of-%area) [set pcolor 22]]
+    ask patch -51.5 -51 [ask patches in-radius (item 2 radius-of-%area) [set pcolor 36]]
+    ask patch -52 16 [ask patches in-radius (item 3 radius-of-%area) [set pcolor 34]]
+  ]]]
 
   ;print (word "Temp. var. k: " k)  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;print (word "corn-N-use" corn-N-use)  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
