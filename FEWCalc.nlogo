@@ -2084,7 +2084,7 @@ SLIDER
 81
 Aquifer-thickness
 Aquifer-thickness
-0
+70
 300
 200.0
 10
@@ -2310,7 +2310,7 @@ CHOOSER
 Future_Process
 Future_Process
 "Repeat Historical" "Wetter Future" "Dryer Future" "Impose T, P, & S Changes"
-1
+0
 
 TEXTBOX
 17
