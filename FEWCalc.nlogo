@@ -33,7 +33,7 @@ globals [
 to setup
   ca                                                                                                ;Clear all
   import-data                                                                                       ;Import data from csv file in the FEWCalc folder
-  set turbine_size Capacity_Megawatts                                                               ;Set wind turbine size (change this value will affect installation and O&M costs
+  set turbine_size Capacity_MW                                                               ;Set wind turbine size (change this value will affect installation and O&M costs
   set zero-line 0                                                                                   ;Use to draw a zero line in plots
   set total-area (Corn_area + Wheat_area + Soybeans_area + SG_area)                                 ;Calculate total crop area
   set current-elev 69                                                                               ;Set top of aquifer = max pycor of "aquifer patches"
@@ -225,7 +225,7 @@ to setup
   set solar-patches patches with [pxcor > 0 and pxcor < 65 and pycor > 33 and pycor < 100]          ;Set a location to place solar symbols
 
   let t 0                                                                                           ;Set a temporary variable
-    repeat #solar_panel_sets [                                                                      ;Place solar panels as a grid within "solar-patches"
+    repeat #Panel_sets [                                                                      ;Place solar panels as a grid within "solar-patches"
       ifelse t < 5 [
         crt 1 [
         setxy 56 (65 - (t * 12))
@@ -253,7 +253,7 @@ to setup
 end
 
 to go
-  if ticks = Sim._years [stop]
+  if ticks = Simulation_period [stop]
   check-area
   reset-symbols
   set GCM-random-year (random 81)
@@ -1405,16 +1405,16 @@ end
 to energy-calculation
   ;Bob Johnson (bobjohnson@centurylink.net), Earnie Lehman (earnielehman@gmail.com), and Hongyu Wu (hongyuwu@ksu.edu)
   ;assuming the cost spreads over 20 (wind) and 25 (solar) years with no interest
-  ;set #Solar_panels (#solar_panel_sets * 1000)
+  ;set #Solar_panels (#Panel_sets * 1000)
 
   if count-solar-lifespan <= 25 [
   ifelse count-solar-lifespan = 0 [
-    set solar-production_temp (#Solar_Panels * Panel_power * 5.6 * 365 / 1000000)                   ;MWh = power(Watt) * 5.6hrs/day * 365days/year / 1000000
+    set solar-production_temp (#Solar_Panels * Panel_capacity * 5.6 * 365 / 1000000)                   ;MWh = power(Watt) * 5.6hrs/day * 365days/year / 1000000
     set solar-production solar-production_temp
     ;print (word ticks " New solar: solar production = " solar-production)
     set count-solar-lifespan (count-solar-lifespan + 1)]
 
-   [set solar-production (0.995 * solar-production_temp)                                            ;0.5% degradation annually
+   [set solar-production ((1 - (0.5 / 100)) * solar-production_temp)                                            ;0.5% degradation annually
     set solar-production_temp (solar-production)
     ;print (word "tick " ticks ": solar production = " solar-production)
     set count-solar-lifespan (count-solar-lifespan + 1)
@@ -1422,22 +1422,22 @@ to energy-calculation
     ]
   ]
 
-  if count-wind-lifespan <= 20 [
+  if count-wind-lifespan <= 30 [
   ifelse count-wind-lifespan <= 9 [                                                                 ;Count 10 years (0 to 9)
     set wind-production_temp (#wind_turbines * turbine_size * 0.421 * 24 * 365)                     ;MWh = power(MW) * Kansas_wind_capacity * 24hrs/day * 365days/year, capacity 42.1% (Berkeley Lab)
     set wind-production wind-production_temp
     ;print (word ticks "100% solar production = " wind-production)
     set count-wind-lifespan (count-wind-lifespan + 1)]
 
-   [set wind-production (0.98 * wind-production_temp)                                               ;2% degradation annually (project age beyound 10 years)
+   [set wind-production ((1 - (degradation / 100)) * wind-production_temp)                                               ;2% degradation annually (project age beyound 10 years)
     set wind-production_temp (wind-production)
     ;print (word "tick " ticks ": solar production = " solar-production)
     set count-wind-lifespan (count-wind-lifespan + 1)
-    if count-wind-lifespan = 20 [set count-wind-lifespan 0]
+    if count-wind-lifespan = 30 [set count-wind-lifespan 0]
     ]
   ]
 
-  set solar-cost (#Solar_Panels * (Panel_power / 1000) * 3050 / 25)                                 ;Solar cost = #Solar_Panels * Panel_power * $3050/kW
+  set solar-cost (#Solar_Panels * (Panel_capacity / 1000) * 3050 / 25)                                 ;Solar cost = #Solar_Panels * Panel_capacity * $3050/kW
   ;print (word "solar prod for cost cal: " solar-production)
   set solar-sell (solar-production * 38)                                                            ;Sell = MWh * $38/MWh (Bob and Mary)
                                                                                                     ;Wholesale < Coop $65 < Retail, , (Wholesale was $22-24/MWh, Retail price is $105/MWh)
@@ -1446,17 +1446,17 @@ to energy-calculation
   ;For 2MW, Wind cost = $1470/kW + (O&M costs) * #wind_turbines, (ref. Berkeley Lab, Hongyu Wu)
   ;Operations and maintenance costs: $45,000/MW for turbine aged between 0 and 10 years, and $50,000/MW beyond 10 years
 
-  if count-wind-lifespan-cost <= 20 [
+  if count-wind-lifespan-cost <= 30 [
   ifelse count-wind-lifespan-cost <= 9 [
-    set wind-cost ((1470000 * turbine_size / 20) + (45000 * turbine_size)) * #wind_turbines
+    set wind-cost ((1470000 * turbine_size / 30) + (45000 * turbine_size)) * #wind_turbines
     set count-wind-lifespan-cost (count-wind-lifespan-cost + 1)
     ;print (word "first 10 year: " wind-cost)
     ]
 
-    [set wind-cost ((1470000 * turbine_size / 20) + (50000 * turbine_size)) * #wind_turbines
+    [set wind-cost ((1470000 * turbine_size / 30) + (50000 * turbine_size)) * #wind_turbines
      ;print (word "Beyond 10 years: " wind-cost)
      set count-wind-lifespan-cost (count-wind-lifespan-cost + 1)
-     if count-wind-lifespan-cost = 20 [set count-wind-lifespan-cost 0]
+     if count-wind-lifespan-cost = 30 [set count-wind-lifespan-cost 0]
     ]
   ]
 
@@ -1772,8 +1772,8 @@ to treatment                                                                    
 end
 
 to initialize-energy
-  set #Solar_panels (#solar_panel_sets * 1000)
-  set solar-production (#Solar_Panels * Panel_power * 5.6 * 365 / 1000000)
+  set #Solar_panels (#Panel_sets * 1000)
+  set solar-production (#Solar_Panels * Panel_capacity * 5.6 * 365 / 1000000)
   ;print (word "initialize " solar-production)
   set wind-production (#wind_turbines * turbine_size * 0.421 * 24 * 365)
   set %Solar-production (Solar-production * 100 / (Solar-production + Wind-production))
@@ -1833,7 +1833,7 @@ to reset-symbols                                                                
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   set solar-patches patches with [pxcor > 0 and pxcor < 65 and pycor > 33 and pycor < 100]
   let t 0
-    repeat #solar_panel_sets [
+    repeat #Panel_sets [
 
       ifelse t < 5 [
         crt 1 [
@@ -1859,7 +1859,7 @@ to reset-symbols                                                                
   ]
 
   if ticks = 0 [
-    set solar-production (#Solar_Panels * Panel_power * 5.6 * 365 / 1000000)
+    set solar-production (#Solar_Panels * Panel_capacity * 5.6 * 365 / 1000000)
     set wind-production (#wind_turbines * turbine_size * 0.421 * 24 * 365)]
 
   set solar-production solar-production
@@ -1925,10 +1925,10 @@ Years
 30.0
 
 BUTTON
-8
-10
-74
-43
+5
+14
+71
+47
 NIL
 Setup
 NIL
@@ -1942,10 +1942,10 @@ NIL
 1
 
 INPUTBOX
-8
-109
-82
-169
+5
+113
+85
+173
 Corn_area
 200.0
 1
@@ -1953,32 +1953,32 @@ Corn_area
 Number
 
 INPUTBOX
-85
-109
-159
-169
+87
+113
+166
+173
 Wheat_area
-0.0
-1
-0
-Number
-
-INPUTBOX
-162
-109
-246
-169
-Soybeans_area
 125.0
 1
 0
 Number
 
 INPUTBOX
-249
-109
-323
-169
+168
+113
+252
+173
+Soybeans_area
+0.0
+1
+0
+Number
+
+INPUTBOX
+254
+113
+334
+173
 SG_area
 125.0
 1
@@ -1986,10 +1986,10 @@ SG_area
 Number
 
 TEXTBOX
-9
-89
-346
-113
+6
+93
+343
+117
 Agriculture -------------------------------\n
 13
 63.0
@@ -2018,10 +2018,10 @@ PENS
 "US$0" 1.0 2 -8053223 true "" "plot zero-line"
 
 BUTTON
-76
-10
-158
-43
+73
+14
+155
+47
 Go once
 Go
 NIL
@@ -2035,20 +2035,20 @@ NIL
 1
 
 TEXTBOX
-7
-358
-345
-377
+4
+362
+342
+381
 Water ------------------------------------
 13
 95.0
 1
 
 TEXTBOX
-8
-195
-347
-215
+5
+194
+344
+214
 Energy -----------------------------------
 13
 25.0
@@ -2097,10 +2097,10 @@ PENS
 "SG" 1.0 0 -12440034 true "" "plot milo-tot-yield"
 
 BUTTON
-160
-10
-223
-43
+157
+14
+220
+47
 NIL
 Go
 T
@@ -2114,10 +2114,10 @@ NIL
 1
 
 SLIDER
-17
-315
+47
+271
 158
-348
+304
 #Wind_turbines
 #Wind_turbines
 0
@@ -2129,10 +2129,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-156
-48
-323
-81
+168
+52
+334
+85
 Aquifer_thickness
 Aquifer_thickness
 70
@@ -2140,41 +2140,41 @@ Aquifer_thickness
 200.0
 10
 1
-Feet
+Ft
 HORIZONTAL
 
 SLIDER
 162
-245
-304
-278
-Panel_power
-Panel_power
+217
+335
+250
+Panel_capacity
+Panel_capacity
 0
 300
 250.0
 10
 1
-Watts
+W
 HORIZONTAL
 
 TEXTBOX
-17
-229
-159
-257
+46
+251
+188
+269
 1 set = 1000 solar panels
-11
+10
 0.0
 1
 
 SLIDER
-17
-245
-159
-278
-#Solar_panel_sets
-#Solar_panel_sets
+47
+217
+158
+250
+#Panel_sets
+#Panel_sets
 0
 8
 3.0
@@ -2294,11 +2294,11 @@ round solar-net-income
 11
 
 TEXTBOX
-9
-172
-235
-190
-Circles show proportional crop areas (acres)
+6
+174
+328
+192
+Circles show proportional crop areas (acres), SG =Grain sorghum.
 10
 0.0
 1
@@ -2344,34 +2344,24 @@ Wind outputs
 1
 
 TEXTBOX
-7
-417
-353
-435
+4
+421
+350
+439
 Climate Scenario ---------------------------------
 12
 0.0
 1
 
 CHOOSER
-8
-472
-175
-517
+5
+476
+172
+521
 Future_Process
 Future_Process
 "Repeat Historical" "Wetter Future" "Dryer Future" "Impose T, P, & S Changes"
 0
-
-TEXTBOX
-17
-299
-130
-317
-Wind Turbine
-11
-0.0
-1
 
 PLOT
 824
@@ -2395,20 +2385,20 @@ PENS
 "US$0" 1.0 2 -8053223 true "" "plot zero-line"
 
 TEXTBOX
-8
-284
-45
-312
+5
+270
+42
+288
 • Wind
 11
 25.0
 1
 
 TEXTBOX
-9
-214
-49
-232
+6
+213
+46
+231
 • Solar
 11
 25.0
@@ -2475,10 +2465,10 @@ TEXTBOX
 1
 
 TEXTBOX
-8
-379
-344
-397
+5
+383
+341
+401
 • Water is assumed to come from groundwater (GW) pumping.
 11
 95.0
@@ -2578,18 +2568,18 @@ Farm Economy -------------------
 1
 
 SLIDER
-8
-48
-153
-81
-Sim._years
-Sim._years
+5
+52
+166
+85
+Simulation_period
+Simulation_period
 0
 150
 60.0
 5
 1
-Years
+Yrs
 HORIZONTAL
 
 TEXTBOX
@@ -2722,30 +2712,30 @@ SG = Grain \nsorghum
 1
 
 CHOOSER
-162
-303
-304
-348
-Capacity_Megawatts
-Capacity_Megawatts
+47
+312
+158
+357
+Capacity_MW
+Capacity_MW
 1 2
 1
 
 TEXTBOX
-8
-436
-336
-468
+5
+440
+333
+472
 • Climate scenario controls temperature (T), precipitation (P), and solar radiation (S) for the simulated year.
 11
 4.0
 1
 
 CHOOSER
-7
-538
-175
-583
+4
+542
+172
+587
 Climate_Model
 Climate_Model
 "RCP4.5" "RCP8.5"
@@ -2762,23 +2752,65 @@ TEXTBOX
 1
 
 TEXTBOX
-8
-523
-170
-541
+5
+527
+167
+545
 For \"Impose T, P, and S Changes\"
 10
 0.0
 1
 
 TEXTBOX
-8
-395
-328
-413
+5
+399
+325
+417
 • Effects on surface water (SW) quality are accumulated.
 11
 95.0
+1
+
+OUTPUT
+162
+272
+335
+357
+13
+
+TEXTBOX
+169
+280
+329
+351
+NIL
+11
+9.9
+0
+
+SLIDER
+171
+316
+327
+349
+Degradation
+Degradation
+1.5
+2
+1.5
+0.05
+1
+%/yr
+HORIZONTAL
+
+TEXTBOX
+170
+279
+334
+312
+Annual degradation rate is applied when turbines age beyond 10 yrs. A default value is XX %.
+9
+25.0
 1
 
 @#$#@#$#@
