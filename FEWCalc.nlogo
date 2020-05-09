@@ -2193,10 +2193,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-70
-923
-211
-968
+7
+924
+148
+969
 solar-production (MWh)
 round solar-production
 17
@@ -2204,10 +2204,10 @@ round solar-production
 11
 
 MONITOR
-70
-992
-211
-1037
+7
+993
+148
+1038
 Wind-production (MWh)
 round Wind-production
 17
@@ -2215,10 +2215,10 @@ round Wind-production
 11
 
 MONITOR
-217
-923
-302
-968
+154
+924
+239
+969
 solar-cost ($)
 solar-cost
 17
@@ -2226,10 +2226,10 @@ solar-cost
 11
 
 MONITOR
-472
-923
-599
-968
+409
+924
+536
+969
 solar-sell ($ per year)
 solar-sell
 17
@@ -2237,10 +2237,10 @@ solar-sell
 11
 
 MONITOR
-217
-992
-302
-1037
+154
+993
+239
+1038
 wind-cost ($)
 wind-cost
 17
@@ -2248,10 +2248,10 @@ wind-cost
 11
 
 MONITOR
-472
-992
-598
-1037
+409
+993
+535
+1038
 wind-sell ($ per year)
 round wind-sell
 17
@@ -2259,10 +2259,10 @@ round wind-sell
 11
 
 MONITOR
-308
-923
-466
-968
+245
+924
+403
+969
 Solar-cost / 30 ($ per year)
 round (Solar-cost / 30)
 17
@@ -2270,10 +2270,10 @@ round (Solar-cost / 30)
 11
 
 MONITOR
-308
-992
-467
-1037
+245
+993
+404
+1038
 wind-cost / 30 ($ per year)
 wind-cost / 30
 17
@@ -2281,10 +2281,10 @@ wind-cost / 30
 11
 
 MONITOR
-604
-993
-713
-1038
+541
+994
+650
+1039
 wind-net-income
 round wind-net-income
 17
@@ -2292,10 +2292,10 @@ round wind-net-income
 11
 
 MONITOR
-604
-923
-713
-968
+541
+924
+650
+969
 solar-net-income
 round solar-net-income
 17
@@ -2323,7 +2323,7 @@ MWh
 0.0
 60.0
 0.0
-0.0
+2000.0
 true
 true
 "set-plot-background-color 28" ""
@@ -2333,20 +2333,20 @@ PENS
 "0 MWh" 1.0 2 -8053223 true "" "plot zero-line"
 
 TEXTBOX
-71
-903
-221
-921
+8
+904
+158
+922
 Solar outputs
 11
 0.0
 1
 
 TEXTBOX
-72
-975
-222
-993
+9
+976
+159
+994
 Wind outputs
 11
 0.0
@@ -2370,7 +2370,7 @@ CHOOSER
 Future_Process
 Future_Process
 "Repeat Historical" "Wetter Future" "Dryer Future" "Impose T, P, & S Changes"
-0
+1
 
 PLOT
 824
@@ -2424,7 +2424,7 @@ $
 0.0
 60.0
 0.0
-0.0
+15000.0
 true
 true
 "set-plot-background-color 28" ""
@@ -2484,10 +2484,10 @@ Water is assumed to come from groundwater (GW) pumping.
 1
 
 MONITOR
-916
-924
-995
-969
+853
+925
+932
+970
 NIL
 current-elev
 3
@@ -2495,10 +2495,10 @@ current-elev
 11
 
 MONITOR
-1074
-924
-1164
-969
+1011
+925
+1101
+970
 NIL
 patch-change
 3
@@ -2506,10 +2506,10 @@ patch-change
 11
 
 MONITOR
-998
-924
-1071
-969
+935
+925
+1008
+970
 NIL
 gw-change
 3
@@ -2517,10 +2517,10 @@ gw-change
 11
 
 MONITOR
-820
-924
-913
-969
+757
+925
+850
+970
 NIL
 water-use-feet
 3
@@ -2536,25 +2536,6 @@ TEXTBOX
 10
 5.0
 1
-
-PLOT
-300
-778
-584
-898
-Groundwater-Level Change
-Years
-Feet
-0.0
-60.0
-0.0
-5.0
-true
-true
-"set-plot-background-color 88" ""
-PENS
-"Level        " 1.0 0 -14454117 true "" "plot gw-change"
-"0 ft" 1.0 2 -8053223 true "" "plot zero-line"
 
 TEXTBOX
 349
@@ -2621,24 +2602,6 @@ Crop Insurance -------------------
 15
 0.0
 1
-
-PLOT
-7
-779
-291
-899
-N Accumulation
-NIL
-lbs
-0.0
-60.0
-0.0
-10.0
-true
-true
-"" ""
-PENS
-"N in SW " 1.0 0 -15973838 true "" "plot N-accu2"
 
 PLOT
 1112
@@ -2809,7 +2772,7 @@ NYear_S
 NYear_S
 20
 30
-25.0
+30.0
 1
 1
 Yrs
@@ -2824,7 +2787,7 @@ NYear_W
 NYear_W
 20
 30
-25.0
+30.0
 1
 1
 Yrs
@@ -2909,8 +2872,8 @@ TEXTBOX
 172
 190
 355
-242
-ITC: Investment Tax Credit (%)\nPTC: Production Tax Credit ($/kWh)\nNYear: Lifespan (years)\n1 set = 1000 solar panels
+245
+ITC: Investment Tax Credit (%)\nPTC: Production Tax Credit ($/kWh)\nNYear: Lifespan (years)\n1 set of panels = 1000 solar panels
 9
 25.0
 1
