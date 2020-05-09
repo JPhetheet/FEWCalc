@@ -7,7 +7,7 @@ extensions [csv bitmap]
 globals [
   cropland-patches aquifer-patches river-patches wind-bar solar-bar wind-patches solar-patches corn-patches
   crop-area crop-color radius-of-%area total-area area-multiplier crop-background
-  precip_raw current-elev patch-change yrs-seq zero-line turbine_size precip_RCP8.5 precip_RCP4.5 gw-level
+  precip_raw current-elev patch-change yrs-seq zero-line precip_RCP8.5 precip_RCP4.5 gw-level
   corn-data corn-GCMs corn-sum_1 corn-sum_2 corn-price corn-yield_1 corn-irrig_1 corn-yield_2 corn-irrig_2 corn-yield_3 corn-irrig_3 corn-yield_4 corn-irrig_4 corn-yield_5 corn-irrig_5 corn-yield_6 corn-irrig_6
   wheat-data wheat-GCMs wheat-sum_1 wheat-sum_2 wheat-price wheat-yield_1 wheat-irrig_1 wheat-yield_2 wheat-irrig_2 wheat-yield_3 wheat-irrig_3 wheat-yield_4 wheat-irrig_4 wheat-yield_5 wheat-irrig_5 wheat-yield_6 wheat-irrig_6
   soybeans-data soybeans-GCMs soybeans-sum_1 soybeans-sum_2 soybeans-price soybeans-yield_1 soybeans-irrig_1 soybeans-yield_2 soybeans-irrig_2 soybeans-yield_3 soybeans-irrig_3 soybeans-yield_4 soybeans-irrig_4 soybeans-yield_5 soybeans-irrig_5 soybeans-yield_6 soybeans-irrig_6
@@ -26,14 +26,13 @@ globals [
   corn-irrig-increment wheat-irrig-increment soybeans-irrig-increment milo-irrig-increment
   corn-use-in wheat-use-in soybeans-use-in milo-use-in water-use-feet gw-change calibrated-water-use dryland-check? GCM-random-year level-30 level-30-patch level-60 level-60-patch gw-upper-limit gw-lower-limit
   corn-N-app wheat-N-app soybeans-N-app milo-N-app N-accu N-accu2 N-accu-temp
-  #Solar_panels solar-production solar-production_temp count-solar-lifespan solar-cost solar-sell solar-net-income %Solar-production
-  wind-production wind-production_temp wind-cost wind-sell wind-net-income energy-net-income %Wind-production count-wind-lifespan count-wind-lifespan-cost
+  #Solar_panels solar-production solar-production_temp count-solar-lifespan solar-cost solar-sell solar-sell_temp solar-net-income %Solar-production count-solar-lifespan-sell
+  wind-production wind-production_temp wind-cost wind-sell wind-sell_temp wind-net-income energy-net-income %Wind-production count-wind-lifespan count-wind-lifespan-cost count-wind-lifespan-sell
 ]
 
 to setup
   ca                                                                                                ;Clear all
   import-data                                                                                       ;Import data from csv file in the FEWCalc folder
-  set turbine_size Capacity_MW                                                               ;Set wind turbine size (change this value will affect installation and O&M costs
   set zero-line 0                                                                                   ;Use to draw a zero line in plots
   set total-area (Corn_area + Wheat_area + Soybeans_area + SG_area)                                 ;Calculate total crop area
   set current-elev 69                                                                               ;Set top of aquifer = max pycor of "aquifer patches"
@@ -200,20 +199,20 @@ to setup
         crt 1 [
         setxy (35 + (w * 22)) -97
         set shape "wind"
-        set size (turbine_size * 30)
+        set size (Capacity_W * 30)
         set w (w + 1)]
       ]
         [ifelse w < 4 [
           crt 1 [
           setxy (25 + ((w - 2) * 22)) -65
           set shape "wind"
-          set size (turbine_size * 30)
+          set size (Capacity_W * 30)
           set w (w + 1)]
          ]
          [crt 1 [
            setxy (35 + ((w - 4) * 22)) -31
            set shape "wind"
-           set size (turbine_size * 30)
+           set size (Capacity_W * 30)
            set w (w + 1)]
          ]
        ]
@@ -1404,63 +1403,83 @@ end
 
 to energy-calculation
   ;Bob Johnson (bobjohnson@centurylink.net), Earnie Lehman (earnielehman@gmail.com), and Hongyu Wu (hongyuwu@ksu.edu)
-  ;assuming the cost spreads over 20 (wind) and 25 (solar) years with no interest
-  ;set #Solar_panels (#Panel_sets * 1000)
 
-  if count-solar-lifespan <= 25 [
+  if count-solar-lifespan <= Nyear_S [
   ifelse count-solar-lifespan = 0 [
-    set solar-production_temp (#Solar_Panels * Panel_capacity * 5.6 * 365 / 1000000)                   ;MWh = power(Watt) * 5.6hrs/day * 365days/year / 1000000
+    set solar-production_temp (#Solar_Panels * Capacity_S * 5.6 * 365 / 1000000)                   ;MWh = power(Watt) * 5.6hrs/day * 365days/year / 1000000
     set solar-production solar-production_temp
     ;print (word ticks " New solar: solar production = " solar-production)
     set count-solar-lifespan (count-solar-lifespan + 1)]
 
-   [set solar-production ((1 - (0.5 / 100)) * solar-production_temp)                                            ;0.5% degradation annually
+   [set solar-production ((1 - (Degrade_S / 100)) * solar-production_temp)
     set solar-production_temp (solar-production)
     ;print (word "tick " ticks ": solar production = " solar-production)
     set count-solar-lifespan (count-solar-lifespan + 1)
-    if count-solar-lifespan = 25 [set count-solar-lifespan 0]
+    if count-solar-lifespan = Nyear_S [set count-solar-lifespan 0]
     ]
   ]
 
-  if count-wind-lifespan <= 30 [
+  if count-wind-lifespan <= Nyear_W [
   ifelse count-wind-lifespan <= 9 [                                                                 ;Count 10 years (0 to 9)
-    set wind-production_temp (#wind_turbines * turbine_size * 0.421 * 24 * 365)                     ;MWh = power(MW) * Kansas_wind_capacity * 24hrs/day * 365days/year, capacity 42.1% (Berkeley Lab)
+    set wind-production_temp (#wind_turbines * Capacity_W * 0.421 * 24 * 365)                     ;MWh = power(MW) * Kansas_wind_Capacity_S * 24hrs/day * 365days/year, Capacity_S 42.1% (Berkeley Lab)
     set wind-production wind-production_temp
     ;print (word ticks "100% solar production = " wind-production)
     set count-wind-lifespan (count-wind-lifespan + 1)]
 
-   [set wind-production ((1 - (degradation / 100)) * wind-production_temp)                                               ;2% degradation annually (project age beyound 10 years)
+   [set wind-production ((1 - (Degrade_W / 100)) * wind-production_temp)
     set wind-production_temp (wind-production)
     ;print (word "tick " ticks ": solar production = " solar-production)
     set count-wind-lifespan (count-wind-lifespan + 1)
-    if count-wind-lifespan = 30 [set count-wind-lifespan 0]
+    if count-wind-lifespan = Nyear_W [set count-wind-lifespan 0]
     ]
   ]
 
-  set solar-cost (#Solar_Panels * (Panel_capacity / 1000) * 3050 / 25)                                 ;Solar cost = #Solar_Panels * Panel_capacity * $3050/kW
+  set solar-cost (#Solar_Panels * (Capacity_S / 1000) * 3050 / Nyear_S * (1 - (ITC_S / 100)))
   ;print (word "solar prod for cost cal: " solar-production)
-  set solar-sell (solar-production * 38)                                                            ;Sell = MWh * $38/MWh (Bob and Mary)
-                                                                                                    ;Wholesale < Coop $65 < Retail, , (Wholesale was $22-24/MWh, Retail price is $105/MWh)
 
-  ;Wind installation cost = $1000/kW or $1000000/MW, Annual O&M = 3% of installation cost
+  if count-solar-lifespan-sell <= Nyear_S [
+  ifelse count-solar-lifespan-sell <= 9 [
+     set solar-sell_temp (solar-production * (Energy_value + (100 * PTC_S)))
+     set solar-sell solar-sell_temp
+     set count-solar-lifespan-sell (count-solar-lifespan-sell + 1)]
+
+    [set solar-sell_temp (solar-production * Energy_value)
+     set solar-sell solar-sell_temp
+     set count-solar-lifespan-sell (count-solar-lifespan-sell + 1)
+     if count-solar-lifespan-sell = Nyear_S [set count-solar-lifespan-sell 0]
+     ]
+   ]
+
   ;For 2MW, Wind cost = $1470/kW + (O&M costs) * #wind_turbines, (ref. Berkeley Lab, Hongyu Wu)
   ;Operations and maintenance costs: $45,000/MW for turbine aged between 0 and 10 years, and $50,000/MW beyond 10 years
 
-  if count-wind-lifespan-cost <= 30 [
+  if count-wind-lifespan-cost <= Nyear_W [
   ifelse count-wind-lifespan-cost <= 9 [
-    set wind-cost ((1470000 * turbine_size / 30) + (45000 * turbine_size)) * #wind_turbines
+    set wind-cost ((1470000 * Capacity_W / Nyear_W) + (45000 * Capacity_W)) * #wind_turbines * (1 - (ITC_W / 100))
     set count-wind-lifespan-cost (count-wind-lifespan-cost + 1)
     ;print (word "first 10 year: " wind-cost)
     ]
 
-    [set wind-cost ((1470000 * turbine_size / 30) + (50000 * turbine_size)) * #wind_turbines
+    [set wind-cost ((1470000 * Capacity_W / Nyear_W) + (50000 * Capacity_W)) * #wind_turbines * (1 - (ITC_W / 100))
      ;print (word "Beyond 10 years: " wind-cost)
      set count-wind-lifespan-cost (count-wind-lifespan-cost + 1)
-     if count-wind-lifespan-cost = 30 [set count-wind-lifespan-cost 0]
+     if count-wind-lifespan-cost = Nyear_W [set count-wind-lifespan-cost 0]
     ]
   ]
 
-  set wind-sell (wind-production * 38)                                                              ;Sell = MWh * $38/MWh
+  if count-wind-lifespan-sell <= Nyear_W [
+  ifelse count-wind-lifespan-sell <= 9 [
+     set wind-sell_temp (wind-production * (Energy_value + (100 * PTC_W)))
+     set wind-sell wind-sell_temp
+     set count-wind-lifespan-sell (count-wind-lifespan-sell + 1)]
+
+    [set wind-sell_temp (wind-production * Energy_value)
+     set wind-sell wind-sell_temp
+     set count-wind-lifespan-sell (count-wind-lifespan-sell + 1)
+     if count-wind-lifespan-sell = Nyear_W [set count-wind-lifespan-sell 0]
+     ]
+   ]
+
   set solar-net-income (solar-sell - solar-cost)
   set wind-net-income  (wind-sell - wind-cost)
   set energy-net-income (solar-net-income + wind-net-income)
@@ -1494,7 +1513,7 @@ to gw-depletion_1
      set pcolor 105]]                                                                               ;Set patches below "new" level of aquifer (new current elevation) to be blue
 
   set current-elev (current-elev + patch-change)                                                    ;Set new current elevation (new top of aquifer)
-  if current-elev > 69 [set current-elev 69]                                                        ;Exceed capacity
+  if current-elev > 69 [set current-elev 69]                                                        ;Exceed Capacity_S
 
   if current-elev < level-30 [                                                                      ;Is the top of aquifer below 30 feet?
     ask aquifer-patches with [pycor < current-elev] [                                               ;Yes
@@ -1527,7 +1546,7 @@ to gw-depletion_2
      set pcolor 105]]                                                                               ;Set patches below "new" level of aquifer (new current elevation) to be blue
 
   set current-elev (current-elev + patch-change)                                                    ;Set new current elevation (new top of aquifer)
-  if current-elev > 69 [set current-elev 69]                                                        ;Exceed capacity
+  if current-elev > 69 [set current-elev 69]                                                        ;Exceed Capacity_S
 
   if current-elev < level-30 [                                                                      ;Is the top of aquifer below 30 feet?
     ask aquifer-patches with [pycor < current-elev] [                                               ;Yes
@@ -1560,7 +1579,7 @@ to gw-depletion_3
      set pcolor 105]]                                                                               ;Set patches below "new" level of aquifer (new current elevation) to be blue
 
   set current-elev (current-elev + patch-change)                                                    ;Set new current elevation (new top of aquifer)
-  if current-elev > 69 [set current-elev 69]                                                        ;Exceed capacity
+  if current-elev > 69 [set current-elev 69]                                                        ;Exceed Capacity_S
 
   if current-elev < level-30 [                                                                      ;Is the top of aquifer below 30 feet?
     ask aquifer-patches with [pycor < current-elev] [                                               ;Yes
@@ -1597,7 +1616,7 @@ to gw-depletion_4
      set pcolor 105]]                                                                               ;Set patches below "new" level of aquifer (new current elevation) to be blue
 
   set current-elev (current-elev + patch-change)                                                    ;Set new current elevation (new top of aquifer)
-  if current-elev > 69 [set current-elev 69]                                                        ;Exceed capacity
+  if current-elev > 69 [set current-elev 69]                                                        ;Exceed Capacity_S
 
   if current-elev < level-30 [                                                                      ;Is the top of aquifer below 30 feet?
     ask aquifer-patches with [pycor < current-elev] [                                               ;Yes
@@ -1634,7 +1653,7 @@ to gw-depletion_5
      set pcolor 105]]                                                                               ;Set patches below "new" level of aquifer (new current elevation) to be blue
 
   set current-elev (current-elev + patch-change)                                                    ;Set new current elevation (new top of aquifer)
-  if current-elev > 69 [set current-elev 69]                                                        ;Exceed capacity
+  if current-elev > 69 [set current-elev 69]                                                        ;Exceed Capacity_S
 
   if current-elev < level-30 [                                                                      ;Is the top of aquifer below 30 feet?
     ask aquifer-patches with [pycor < current-elev] [                                               ;Yes
@@ -1665,7 +1684,7 @@ to gw-depletion_dryland
      set pcolor 105]]                                                                               ;Set patches below "new" level of aquifer (new current elevation) to be blue
 
   set current-elev (current-elev + patch-change)                                                    ;Set new current elevation (new top of aquifer)
-  if current-elev > 69 [set current-elev 69]                                                        ;Exceed capacity
+  if current-elev > 69 [set current-elev 69]                                                        ;Exceed Capacity_S
 
   if current-elev < level-30 [                                                                      ;Is the top of aquifer below 30 feet?
     ask aquifer-patches with [pycor < current-elev] [                                               ;Yes
@@ -1773,9 +1792,9 @@ end
 
 to initialize-energy
   set #Solar_panels (#Panel_sets * 1000)
-  set solar-production (#Solar_Panels * Panel_capacity * 5.6 * 365 / 1000000)
+  set solar-production (#Solar_Panels * Capacity_S * 5.6 * 365 / 1000000)
   ;print (word "initialize " solar-production)
-  set wind-production (#wind_turbines * turbine_size * 0.421 * 24 * 365)
+  set wind-production (#wind_turbines * Capacity_W * 0.421 * 24 * 365)
   set %Solar-production (Solar-production * 100 / (Solar-production + Wind-production))
   set %Wind-production (Wind-production * 100 / (Solar-production + Wind-production))
 
@@ -1809,20 +1828,20 @@ to reset-symbols                                                                
         crt 1 [
         setxy (35 + (w * 22)) -97
         set shape "wind"
-        set size (turbine_size * 30)
+        set size (Capacity_W * 30)
         set w (w + 1)]
       ]
         [ifelse w < 4 [
           crt 1 [
           setxy (25 + ((w - 2) * 22)) -65
           set shape "wind"
-          set size (turbine_size * 30)
+          set size (Capacity_W * 30)
           set w (w + 1)]
          ]
           [crt 1 [
           setxy (35 + ((w - 4) * 22)) -31
           set shape "wind"
-          set size (turbine_size * 30)
+          set size (Capacity_W * 30)
           set w (w + 1)]
           ]
        ]
@@ -1859,8 +1878,8 @@ to reset-symbols                                                                
   ]
 
   if ticks = 0 [
-    set solar-production (#Solar_Panels * Panel_capacity * 5.6 * 365 / 1000000)
-    set wind-production (#wind_turbines * turbine_size * 0.421 * 24 * 365)]
+    set solar-production (#Solar_Panels * Capacity_S * 5.6 * 365 / 1000000)
+    set wind-production (#wind_turbines * Capacity_W * 0.421 * 24 * 365)]
 
   set solar-production solar-production
   ;print (word "reset-symbol " solar-production)
@@ -1926,9 +1945,9 @@ Years
 
 BUTTON
 5
-14
+10
 71
-47
+43
 NIL
 Setup
 NIL
@@ -1943,9 +1962,9 @@ NIL
 
 INPUTBOX
 5
-113
+97
 85
-173
+157
 Corn_area
 200.0
 1
@@ -1954,9 +1973,9 @@ Number
 
 INPUTBOX
 87
-113
+97
 166
-173
+157
 Wheat_area
 125.0
 1
@@ -1965,9 +1984,9 @@ Number
 
 INPUTBOX
 168
-113
+97
 252
-173
+157
 Soybeans_area
 0.0
 1
@@ -1976,9 +1995,9 @@ Number
 
 INPUTBOX
 254
-113
+97
 334
-173
+157
 SG_area
 125.0
 1
@@ -1987,9 +2006,9 @@ Number
 
 TEXTBOX
 6
-93
+79
 343
-117
+103
 Agriculture -------------------------------\n
 13
 63.0
@@ -2019,9 +2038,9 @@ PENS
 
 BUTTON
 73
-14
+10
 155
-47
+43
 Go once
 Go
 NIL
@@ -2036,20 +2055,20 @@ NIL
 
 TEXTBOX
 4
-362
-342
-381
-Water ------------------------------------
+414
+173
+446
+Water -------------
 13
 95.0
 1
 
 TEXTBOX
 5
-194
+173
 344
-214
-Energy -----------------------------------
+193
+Energy ------------------------------------
 13
 25.0
 1
@@ -2098,9 +2117,9 @@ PENS
 
 BUTTON
 157
-14
+10
 220
-47
+43
 NIL
 Go
 T
@@ -2114,10 +2133,10 @@ NIL
 1
 
 SLIDER
-47
-271
-158
-304
+8
+325
+119
+358
 #Wind_turbines
 #Wind_turbines
 0
@@ -2130,9 +2149,9 @@ HORIZONTAL
 
 SLIDER
 168
-52
+46
 334
-85
+79
 Aquifer_thickness
 Aquifer_thickness
 70
@@ -2144,12 +2163,12 @@ Ft
 HORIZONTAL
 
 SLIDER
-162
-217
-335
-250
-Panel_capacity
-Panel_capacity
+8
+276
+119
+309
+Capacity_S
+Capacity_S
 0
 300
 250.0
@@ -2158,21 +2177,11 @@ Panel_capacity
 W
 HORIZONTAL
 
-TEXTBOX
-46
-251
-188
-269
-1 set = 1000 solar panels
-10
-0.0
-1
-
 SLIDER
-47
-217
-158
-250
+8
+241
+119
+274
 #Panel_sets
 #Panel_sets
 0
@@ -2295,12 +2304,12 @@ round solar-net-income
 
 TEXTBOX
 6
-174
+158
 328
-192
+176
 Circles show proportional crop areas (acres), SG =Grain sorghum.
 10
-0.0
+63.0
 1
 
 PLOT
@@ -2314,7 +2323,7 @@ MWh
 0.0
 60.0
 0.0
-10.0
+0.0
 true
 true
 "set-plot-background-color 28" ""
@@ -2344,20 +2353,20 @@ Wind outputs
 1
 
 TEXTBOX
-4
-421
-350
-439
-Climate Scenario ---------------------------------
+162
+415
+347
+445
+Climate Scenario -----------
 12
 0.0
 1
 
 CHOOSER
-5
-476
-172
-521
+162
+478
+337
+523
 Future_Process
 Future_Process
 "Repeat Historical" "Wetter Future" "Dryer Future" "Impose T, P, & S Changes"
@@ -2385,10 +2394,10 @@ PENS
 "US$0" 1.0 2 -8053223 true "" "plot zero-line"
 
 TEXTBOX
-5
-270
-42
-288
+7
+310
+44
+328
 • Wind
 11
 25.0
@@ -2396,9 +2405,9 @@ TEXTBOX
 
 TEXTBOX
 6
-213
+226
 46
-231
+244
 • Solar
 11
 25.0
@@ -2415,7 +2424,7 @@ $
 0.0
 60.0
 0.0
-10.0
+0.0
 true
 true
 "set-plot-background-color 28" ""
@@ -2455,9 +2464,9 @@ Water ----------------------------------------------------------
 1
 
 TEXTBOX
-347
+351
 491
-813
+817
 526
 • First 10 years use historical data from 2008 to 2017, subsequent years apply Future Process.
 10
@@ -2466,10 +2475,10 @@ TEXTBOX
 
 TEXTBOX
 5
-383
-341
-401
-• Water is assumed to come from groundwater (GW) pumping.
+434
+167
+480
+Water is assumed to come from groundwater (GW) pumping.
 11
 95.0
 1
@@ -2519,9 +2528,9 @@ water-use-feet
 11
 
 TEXTBOX
-347
+351
 504
-802
+806
 522
 • Year in the plots represents a sequential year. Year 1 is 2008 and year 60 is 2067.
 10
@@ -2569,9 +2578,9 @@ Farm Economy -------------------
 
 SLIDER
 5
-52
+46
 166
-85
+79
 Simulation_period
 Simulation_period
 0
@@ -2581,16 +2590,6 @@ Simulation_period
 1
 Yrs
 HORIZONTAL
-
-TEXTBOX
-344
-753
-803
-771
-***Scenario 4, GCM data is available to year 91 (2098). It will be randomized after that year.
-10
-5.0
-1
 
 PLOT
 1112
@@ -2662,9 +2661,9 @@ PENS
 "60 ft" 1.0 2 -7500403 true "" "plot (gw-upper-limit)"
 
 TEXTBOX
-347
+351
 518
-773
+777
 536
 • FEWCalc requires NetLogo version 6.1.0 or higher.
 10
@@ -2711,40 +2710,30 @@ SG = Grain \nsorghum
 0.0
 1
 
-CHOOSER
-47
-312
-158
-357
-Capacity_MW
-Capacity_MW
-1 2
-1
-
 TEXTBOX
-5
-440
-333
-472
-• Climate scenario controls temperature (T), precipitation (P), and solar radiation (S) for the simulated year.
+162
+434
+348
+492
+Climate scenario controls annual temperature (T), precipitation (P), and solar radiation (S).
 11
-4.0
+0.0
 1
 
 CHOOSER
-4
-542
-172
-587
+162
+541
+337
+586
 Climate_Model
 Climate_Model
 "RCP4.5" "RCP8.5"
 0
 
 TEXTBOX
-347
+351
 532
-816
+820
 579
 • The Representative Concentration Pathways (RCPs) are used for making climate projections largely based on greenhouse gas (GHG) emissions. RCP4.5 is representative of an intermediate scenario, whearas RCP8.5 is a scenario with very high GHG emissions.
 10
@@ -2752,66 +2741,194 @@ TEXTBOX
 1
 
 TEXTBOX
-5
-527
-167
-545
+162
+526
+343
+554
 For \"Impose T, P, and S Changes\"
-10
+11
 0.0
 1
 
 TEXTBOX
 5
-399
-325
-417
-• Effects on surface water (SW) quality are accumulated.
+483
+161
+525
+Effects on surface water (SW) quality are accumulated.
 11
 95.0
 1
 
-OUTPUT
-162
-272
-335
-357
-13
-
-TEXTBOX
-169
-280
-329
-351
-NIL
-11
-9.9
-0
-
 SLIDER
-171
-316
-327
-349
-Degradation
-Degradation
-1.5
+121
+360
+246
+393
+Degrade_W
+Degrade_W
+1
 2
 1.5
-0.05
+0.1
 1
 %/yr
 HORIZONTAL
 
 TEXTBOX
-170
-279
-334
-312
-Annual degradation rate is applied when turbines age beyond 10 yrs. A default value is XX %.
+9
+396
+252
+421
+Wind annual degradation after 10 yrs. Default 1%.
 9
 25.0
 1
+
+SLIDER
+8
+192
+167
+225
+Energy_value
+Energy_value
+20
+40
+38.0
+0.1
+1
+$/MWh
+HORIZONTAL
+
+SLIDER
+121
+241
+246
+274
+NYear_S
+NYear_S
+20
+30
+25.0
+1
+1
+Yrs
+HORIZONTAL
+
+SLIDER
+121
+325
+246
+358
+NYear_W
+NYear_W
+20
+30
+25.0
+1
+1
+Yrs
+HORIZONTAL
+
+SLIDER
+248
+360
+340
+393
+PTC_W
+PTC_W
+0
+0.03
+0.023
+0.001
+1
+NIL
+HORIZONTAL
+
+SLIDER
+8
+360
+119
+393
+Capacity_W
+Capacity_W
+1
+2
+2.0
+1
+1
+MW
+HORIZONTAL
+
+SLIDER
+248
+325
+340
+358
+ITC_W
+ITC_W
+0
+40
+30.0
+1
+1
+%
+HORIZONTAL
+
+SLIDER
+248
+241
+340
+274
+ITC_S
+ITC_S
+0
+40
+30.0
+1
+1
+%
+HORIZONTAL
+
+SLIDER
+248
+276
+340
+309
+PTC_S
+PTC_S
+0
+0.03
+0.023
+0.001
+1
+NIL
+HORIZONTAL
+
+TEXTBOX
+172
+190
+355
+242
+ITC: Investment Tax Credit (%)\nPTC: Production Tax Credit ($/kWh)\nNYear: Lifespan (years)\n1 set = 1000 solar panels
+9
+25.0
+1
+
+SLIDER
+121
+276
+246
+309
+Degrade_S
+Degrade_S
+0
+1
+0.5
+0.1
+1
+%/yr
+HORIZONTAL
 
 @#$#@#$#@
 # FEWCalc
