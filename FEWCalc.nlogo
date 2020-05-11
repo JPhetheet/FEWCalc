@@ -1,5 +1,4 @@
-;Version XXX
-
+;Version 1.0.1
 ;Assembled by Mos Phetheet and Mary Hill, University of Kansas
 
 extensions [csv bitmap]
@@ -2370,7 +2369,7 @@ CHOOSER
 Future_Process
 Future_Process
 "Repeat Historical" "Wetter Future" "Dryer Future" "Impose T, P, & S Changes"
-1
+0
 
 PLOT
 824
@@ -2730,9 +2729,9 @@ SLIDER
 393
 Degrade_W
 Degrade_W
-1
+0
 2
-1.5
+1.0
 0.1
 1
 %/yr
@@ -2892,6 +2891,16 @@ Degrade_S
 1
 %/yr
 HORIZONTAL
+
+TEXTBOX
+226
+10
+328
+41
+FEWCalc 1.0.1
+12
+0.0
+1
 
 @#$#@#$#@
 # FEWCalc
