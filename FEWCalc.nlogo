@@ -16,7 +16,7 @@ globals [
   corn-net-income wheat-net-income soybeans-net-income milo-net-income
   corn-history wheat-history soybeans-history milo-history
   corn-coverage wheat-coverage soybeans-coverage milo-coverage
-  corn-base-price wheat-base-price soybeans-base-price milo-base-price
+  corn-price-FM wheat-price-FM soybeans-price-FM milo-price-FM
   corn-income-guarantee wheat-income-guarantee soybeans-income-guarantee milo-income-guarantee corn-claimed wheat-claimed soybeans-claimed milo-claimed
   corn-yield-guarantee wheat-yield-guarantee soybeans-yield-guarantee milo-yield-guarantee
   corn-ins-claimed wheat-ins-claimed soybeans-ins-claimed milo-ins-claimed corn-yield-deficiency wheat-yield-deficiency soybeans-yield-deficiency milo-yield-deficiency
@@ -26,36 +26,42 @@ globals [
   corn-use-in wheat-use-in soybeans-use-in milo-use-in water-use-feet gw-change calibrated-water-use dryland-check? GCM-random-year level-30 level-30-patch level-60 level-60-patch gw-upper-limit gw-lower-limit
   corn-N-app wheat-N-app soybeans-N-app milo-N-app N-accu N-accu2 N-accu-temp
   #Solar_panels solar-production solar-production_temp count-solar-lifespan solar-cost solar-sell solar-sell_temp solar-net-income %Solar-production count-solar-lifespan-sell
-  wind-production wind-production_temp wind-cost wind-sell wind-sell_temp wind-net-income energy-net-income %Wind-production count-wind-lifespan count-wind-lifespan-cost count-wind-lifespan-sell
+  wind-factor wind-production wind-production_temp wind-cost wind-sell wind-sell_temp wind-net-income energy-net-income %Wind-production count-wind-lifespan count-wind-lifespan-cost count-wind-lifespan-sell
 ]
 
 to setup
   ca                                                                                                ;Clear all
   import-data                                                                                       ;Import data from csv file in the FEWCalc folder
-  set zero-line 0                                                                                   ;Use to draw a zero line in plots
-  set total-area (Corn_area + Wheat_area + Soybeans_area + SG_area)                                 ;Calculate total crop area
-  set current-elev 69                                                                               ;Set top of aquifer = max pycor of "aquifer patches"
-  set area-multiplier 3000                                                                          ;Scale size of crop circles
+
+
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;;;;;;;;;;;;;;;; ADVANCED USER INPUTS ;;;;;;;;;;;;;;;;
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+  ;Wind production factor
+  set wind-factor 0.421                                                                             ;Wind production factor. Kansas = 42.1% (Wiser and Bolinger, 2019)
+
+  ;Level of coverage
   set corn-coverage 0.75                                                                            ;Level of coverage
   set wheat-coverage 0.7                                                                            ;Level of coverage
   set soybeans-coverage 0.7                                                                         ;Level of coverage
   set milo-coverage 0.65                                                                            ;Level of coverage
-  set corn-base-price 4.12                                                                          ;Base price for crop insurance calculation
-  set wheat-base-price 6.94                                                                         ;Base price for crop insurance calculation
-  set soybeans-base-price 9.39                                                                      ;Base price for crop insurance calculation
-  set milo-base-price 3.14                                                                          ;Base price for crop insurance calculation
-  set N-accu 0                                                                                      ;Assume there is no N accumulation in soil (fertilizer)
-  set N-accu2 0                                                                                     ;Assume there is no N accumulation in soil (fertilizer)
-  set dryland-check? 1                                                                              ;Dryland-check? = 1 means yes, it's the first dryland farming
-  set gw-level Aquifer_thickness                                                                    ;Initialize gw-level variable
-  set count-solar-lifespan 0
-  set count-wind-lifespan 0
-  set count-wind-lifespan-cost 0
 
+  ;Future market price
+  set corn-price-FM 4.12                                                                            ;Future market price for crop insurance calculation
+  set wheat-price-FM 6.94                                                                           ;Future market for crop insurance calculation
+  set soybeans-price-FM 9.39                                                                        ;Future market for crop insurance calculation
+  set milo-price-FM 3.14                                                                            ;Future market for crop insurance calculation
 
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;;;;;;;;;;;;;;;;;; cropland patches ;;;;;;;;;;;;;;;;;;
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  set total-area (Corn_area + Wheat_area + Soybeans_area + SG_area)                                 ;Calculate total crop area
+  set area-multiplier 3000                                                                          ;Scale size of crop circles
+  set N-accu 0                                                                                      ;Assume there is no N accumulation in soil (fertilizer)
+  set N-accu2 0                                                                                     ;Assume there is no N accumulation in soil (fertilizer)
+  set dryland-check? 1                                                                              ;Dryland-check? = 1 means yes, it's the first dryland farming
+
   set cropland-patches patches with [pxcor < 66]                                                    ;Divide the world where pxcor < 66 into cropland-patches
 
   set crop-background bitmap:import "center_pivot.jpg"                                              ;Import background
@@ -86,6 +92,8 @@ to setup
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;;;;;;;;;;;;;;;;;;; Aquifer patches ;;;;;;;;;;;;;;;;;;                                            ;Set "aquifer-patches" and patch's color
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  set current-elev 69                                                                               ;Set top of aquifer = max pycor of "aquifer patches"
+  set gw-level Aquifer_thickness                                                                    ;Initialize gw-level variable
   set aquifer-patches patches with [pxcor > 66 and pxcor < 83 and pycor < 70]
   ask aquifer-patches [set pcolor blue]
   ask patch 79 -97 [set plabel "GW"]
@@ -109,6 +117,11 @@ to setup
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;;;;;;;;;;;;;;;;;;; Solar patches ;;;;;;;;;;;;;;;;;;;;
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  set count-solar-lifespan 0
+  set count-wind-lifespan 0
+  set count-wind-lifespan-cost 0
+  set zero-line 0                                                                                   ;Use to draw a zero line in plots
+
   initialize-energy                                                                                 ;Initialize the amount of energy
 
   set %Solar-production (Solar-production * 100 / (Solar-production + Wind-production))             ;Calculate % of solar production
@@ -635,7 +648,7 @@ to calculate-insurance
       [set corn-tot-income corn-tot-income]
       [set corn-claimed "YES"
        set corn-ins-claimed (corn-income-guarantee - corn-tot-income)
-       set corn-tot-income corn-tot-income + (corn-yield-deficiency * corn-base-price * Corn_area)
+       set corn-tot-income corn-tot-income + (corn-yield-deficiency * corn-price-FM * Corn_area)
 
       ask patch 13 -35 [
       set plabel "Ins. Claim"
@@ -655,7 +668,7 @@ to calculate-insurance
       [set wheat-tot-income wheat-tot-income]
       [set wheat-claimed "YES"
        set wheat-ins-claimed (wheat-income-guarantee - wheat-tot-income)
-       set wheat-tot-income wheat-tot-income + (wheat-yield-deficiency * wheat-base-price * Wheat_area)
+       set wheat-tot-income wheat-tot-income + (wheat-yield-deficiency * wheat-price-FM * Wheat_area)
 
      ask patch -5 56 [
       set plabel "Ins. Claim"
@@ -675,7 +688,7 @@ to calculate-insurance
       [set soybeans-tot-income soybeans-tot-income]
       [set soybeans-claimed "YES"
        set soybeans-ins-claimed (soybeans-income-guarantee - soybeans-tot-income)
-       set soybeans-tot-income soybeans-tot-income + (soybeans-yield-deficiency * soybeans-base-price * Soybeans_area)
+       set soybeans-tot-income soybeans-tot-income + (soybeans-yield-deficiency * soybeans-price-FM * Soybeans_area)
      ask patch -37 -79 [
       set plabel "Ins. Claim"
       set plabel-color red
@@ -694,7 +707,7 @@ to calculate-insurance
       [set milo-tot-income milo-tot-income]
       [set milo-claimed "YES"
        set milo-ins-claimed (milo-income-guarantee - milo-tot-income)
-       set milo-tot-income milo-tot-income + (milo-yield-deficiency * milo-base-price * SG_area)
+       set milo-tot-income milo-tot-income + (milo-yield-deficiency * milo-price-FM * SG_area)
      ask patch -37 -21 [
       set plabel "Ins. Claim"
       set plabel-color red
@@ -955,10 +968,10 @@ to food-calculation_1-2                                                         
   set soybeans-yield-guarantee (soybeans-mean-yield * soybeans-coverage)
   set milo-yield-guarantee (milo-mean-yield * milo-coverage)
 
-  set corn-income-guarantee ((corn-yield-guarantee * corn-base-price) * Corn_area)                 ;Calculate guarantee growth crop income
-  set wheat-income-guarantee ((wheat-yield-guarantee * wheat-base-price) * Wheat_area)
-  set soybeans-income-guarantee ((soybeans-yield-guarantee * soybeans-base-price) * Soybeans_area)
-  set milo-income-guarantee ((milo-yield-guarantee * milo-base-price) * SG_area)
+  set corn-income-guarantee ((corn-yield-guarantee * corn-price-FM) * Corn_area)                 ;Calculate guarantee growth crop income
+  set wheat-income-guarantee ((wheat-yield-guarantee * wheat-price-FM) * Wheat_area)
+  set soybeans-income-guarantee ((soybeans-yield-guarantee * soybeans-price-FM) * Soybeans_area)
+  set milo-income-guarantee ((milo-yield-guarantee * milo-price-FM) * SG_area)
 
   set corn-tot-income (item (n mod 10) corn-yield_1 * item (n mod 10) corn-price * Corn_area)       ;Calculate farm gross income
   set wheat-tot-income (item (n mod 10) wheat-yield_1 * item (n mod 10) wheat-price * Wheat_area)
@@ -999,10 +1012,10 @@ to food-calculation_2                                                           
   set soybeans-yield-guarantee (soybeans-mean-yield * soybeans-coverage)
   set milo-yield-guarantee (milo-mean-yield * milo-coverage)
 
-  set corn-income-guarantee ((corn-yield-guarantee * corn-base-price) * Corn_area)                 ;Calculate guarantee growth crop income
-  set wheat-income-guarantee ((wheat-yield-guarantee * wheat-base-price) * Wheat_area)
-  set soybeans-income-guarantee ((soybeans-yield-guarantee * soybeans-base-price) * Soybeans_area)
-  set milo-income-guarantee ((milo-yield-guarantee * milo-base-price) * SG_area)
+  set corn-income-guarantee ((corn-yield-guarantee * corn-price-FM) * Corn_area)                 ;Calculate guarantee growth crop income
+  set wheat-income-guarantee ((wheat-yield-guarantee * wheat-price-FM) * Wheat_area)
+  set soybeans-income-guarantee ((soybeans-yield-guarantee * soybeans-price-FM) * Soybeans_area)
+  set milo-income-guarantee ((milo-yield-guarantee * milo-price-FM) * SG_area)
 
 ;  set corn-tot-income (item (item n yrs-seq) corn-yield_1 * item (item n yrs-seq) corn-price * Corn_area)               ;Calculate farm gross income
 ;  set wheat-tot-income (item (item n yrs-seq) wheat-yield_1 * item (item n yrs-seq) wheat-price * Wheat_area)
@@ -1048,10 +1061,10 @@ to food-calculation_3                                                           
   set soybeans-yield-guarantee (soybeans-mean-yield * soybeans-coverage)
   set milo-yield-guarantee (milo-mean-yield * milo-coverage)
 
-  set corn-income-guarantee ((corn-yield-guarantee * corn-base-price) * Corn_area)                 ;Calculate guarantee growth crop income
-  set wheat-income-guarantee ((wheat-yield-guarantee * wheat-base-price) * Wheat_area)
-  set soybeans-income-guarantee ((soybeans-yield-guarantee * soybeans-base-price) * Soybeans_area)
-  set milo-income-guarantee ((milo-yield-guarantee * milo-base-price) * SG_area)
+  set corn-income-guarantee ((corn-yield-guarantee * corn-price-FM) * Corn_area)                 ;Calculate guarantee growth crop income
+  set wheat-income-guarantee ((wheat-yield-guarantee * wheat-price-FM) * Wheat_area)
+  set soybeans-income-guarantee ((soybeans-yield-guarantee * soybeans-price-FM) * Soybeans_area)
+  set milo-income-guarantee ((milo-yield-guarantee * milo-price-FM) * SG_area)
 
 ;  set corn-tot-income (item (item n yrs-seq) corn-yield_1 * item (item n yrs-seq) corn-price * Corn_area)              ;Calculate farm gross income
 ;  set wheat-tot-income (item (item n yrs-seq) wheat-yield_1 * item (item n yrs-seq) wheat-price * Wheat_area)
@@ -1095,10 +1108,10 @@ to food-calculation_4                                                           
   set soybeans-yield-guarantee (soybeans-mean-yield * soybeans-coverage)
   set milo-yield-guarantee (milo-mean-yield * milo-coverage)
 
-  set corn-income-guarantee ((corn-yield-guarantee * corn-base-price) * Corn_area)                 ;Calculate guarantee growth crop income
-  set wheat-income-guarantee ((wheat-yield-guarantee * wheat-base-price) * Wheat_area)
-  set soybeans-income-guarantee ((soybeans-yield-guarantee * soybeans-base-price) * Soybeans_area)
-  set milo-income-guarantee ((milo-yield-guarantee * milo-base-price) * SG_area)
+  set corn-income-guarantee ((corn-yield-guarantee * corn-price-FM) * Corn_area)                 ;Calculate guarantee growth crop income
+  set wheat-income-guarantee ((wheat-yield-guarantee * wheat-price-FM) * Wheat_area)
+  set soybeans-income-guarantee ((soybeans-yield-guarantee * soybeans-price-FM) * Soybeans_area)
+  set milo-income-guarantee ((milo-yield-guarantee * milo-price-FM) * SG_area)
 
   set corn-tot-income (corn-tot-yield * (one-of corn-price) * Corn_area)                            ;Calculate farm gross income
   set wheat-tot-income (wheat-tot-yield * (one-of wheat-price) * Wheat_area)
@@ -1137,10 +1150,10 @@ to food-calculation_5                                                           
   set soybeans-yield-guarantee (soybeans-mean-yield * soybeans-coverage)
   set milo-yield-guarantee (milo-mean-yield * milo-coverage)
 
-  set corn-income-guarantee ((corn-yield-guarantee * corn-base-price) * Corn_area)                 ;Calculate guarantee growth crop income
-  set wheat-income-guarantee ((wheat-yield-guarantee * wheat-base-price) * Wheat_area)
-  set soybeans-income-guarantee ((soybeans-yield-guarantee * soybeans-base-price) * Soybeans_area)
-  set milo-income-guarantee ((milo-yield-guarantee * milo-base-price) * SG_area)
+  set corn-income-guarantee ((corn-yield-guarantee * corn-price-FM) * Corn_area)                 ;Calculate guarantee growth crop income
+  set wheat-income-guarantee ((wheat-yield-guarantee * wheat-price-FM) * Wheat_area)
+  set soybeans-income-guarantee ((soybeans-yield-guarantee * soybeans-price-FM) * Soybeans_area)
+  set milo-income-guarantee ((milo-yield-guarantee * milo-price-FM) * SG_area)
 
   set corn-tot-income (corn-tot-yield * (one-of corn-price) * Corn_area)                            ;Calculate farm gross income
   set wheat-tot-income (wheat-tot-yield * (one-of wheat-price) * Wheat_area)
@@ -1175,10 +1188,10 @@ to dryland-farming_1
   set soybeans-yield-guarantee (soybeans-mean-yield * soybeans-coverage)
   set milo-yield-guarantee (milo-mean-yield * milo-coverage)
 
-  set corn-income-guarantee ((corn-yield-guarantee * corn-base-price) * Corn_area)                 ;Calculate guarantee growth crop income
-  set wheat-income-guarantee ((wheat-yield-guarantee * wheat-base-price) * Wheat_area)
-  set soybeans-income-guarantee ((soybeans-yield-guarantee * soybeans-base-price) * Soybeans_area)
-  set milo-income-guarantee ((milo-yield-guarantee * milo-base-price) * SG_area)
+  set corn-income-guarantee ((corn-yield-guarantee * corn-price-FM) * Corn_area)                 ;Calculate guarantee growth crop income
+  set wheat-income-guarantee ((wheat-yield-guarantee * wheat-price-FM) * Wheat_area)
+  set soybeans-income-guarantee ((soybeans-yield-guarantee * soybeans-price-FM) * Soybeans_area)
+  set milo-income-guarantee ((milo-yield-guarantee * milo-price-FM) * SG_area)
 
   set corn-tot-income (item (n mod 10) corn-yield_2 * item (n mod 10) corn-price * Corn_area)       ;Calculate farm gross income
   set wheat-tot-income (item (n mod 10) wheat-yield_2 * item (n mod 10) wheat-price * Wheat_area)
@@ -1223,10 +1236,10 @@ to dryland-farming_2
   set soybeans-yield-guarantee (soybeans-mean-yield * soybeans-coverage)
   set milo-yield-guarantee (milo-mean-yield * milo-coverage)
 
-  set corn-income-guarantee ((corn-yield-guarantee * corn-base-price) * Corn_area)                 ;Calculate guarantee growth crop income
-  set wheat-income-guarantee ((wheat-yield-guarantee * wheat-base-price) * Wheat_area)
-  set soybeans-income-guarantee ((soybeans-yield-guarantee * soybeans-base-price) * Soybeans_area)
-  set milo-income-guarantee ((milo-yield-guarantee * milo-base-price) * SG_area)
+  set corn-income-guarantee ((corn-yield-guarantee * corn-price-FM) * Corn_area)                 ;Calculate guarantee growth crop income
+  set wheat-income-guarantee ((wheat-yield-guarantee * wheat-price-FM) * Wheat_area)
+  set soybeans-income-guarantee ((soybeans-yield-guarantee * soybeans-price-FM) * Soybeans_area)
+  set milo-income-guarantee ((milo-yield-guarantee * milo-price-FM) * SG_area)
 
 ;  set corn-tot-income (item (item n yrs-seq) corn-yield_2 * item (item n yrs-seq) corn-price * Corn_area)               ;Calculate farm gross income
 ;  set wheat-tot-income (item (item n yrs-seq) wheat-yield_2 * item (item n yrs-seq) wheat-price * Wheat_area)
@@ -1276,10 +1289,10 @@ to dryland-farming_3
   set soybeans-yield-guarantee (soybeans-mean-yield * soybeans-coverage)
   set milo-yield-guarantee (milo-mean-yield * milo-coverage)
 
-  set corn-income-guarantee ((corn-yield-guarantee * corn-base-price) * Corn_area)                 ;Calculate guarantee growth crop income
-  set wheat-income-guarantee ((wheat-yield-guarantee * wheat-base-price) * Wheat_area)
-  set soybeans-income-guarantee ((soybeans-yield-guarantee * soybeans-base-price) * Soybeans_area)
-  set milo-income-guarantee ((milo-yield-guarantee * milo-base-price) * SG_area)
+  set corn-income-guarantee ((corn-yield-guarantee * corn-price-FM) * Corn_area)                 ;Calculate guarantee growth crop income
+  set wheat-income-guarantee ((wheat-yield-guarantee * wheat-price-FM) * Wheat_area)
+  set soybeans-income-guarantee ((soybeans-yield-guarantee * soybeans-price-FM) * Soybeans_area)
+  set milo-income-guarantee ((milo-yield-guarantee * milo-price-FM) * SG_area)
 
 ;  set corn-tot-income (item (item n yrs-seq) corn-yield_2 * item (item n yrs-seq) corn-price * Corn_area)                 ;Calculate farm gross income
 ;  set wheat-tot-income (item (item n yrs-seq) wheat-yield_2 * item (item n yrs-seq) wheat-price * Wheat_area)
@@ -1330,10 +1343,10 @@ to dryland-farming_4
   set soybeans-yield-guarantee (soybeans-mean-yield * soybeans-coverage)
   set milo-yield-guarantee (milo-mean-yield * milo-coverage)
 
-  set corn-income-guarantee ((corn-yield-guarantee * corn-base-price) * Corn_area)                 ;Calculate guarantee growth crop income
-  set wheat-income-guarantee ((wheat-yield-guarantee * wheat-base-price) * Wheat_area)
-  set soybeans-income-guarantee ((soybeans-yield-guarantee * soybeans-base-price) * Soybeans_area)
-  set milo-income-guarantee ((milo-yield-guarantee * milo-base-price) * SG_area)
+  set corn-income-guarantee ((corn-yield-guarantee * corn-price-FM) * Corn_area)                 ;Calculate guarantee growth crop income
+  set wheat-income-guarantee ((wheat-yield-guarantee * wheat-price-FM) * Wheat_area)
+  set soybeans-income-guarantee ((soybeans-yield-guarantee * soybeans-price-FM) * Soybeans_area)
+  set milo-income-guarantee ((milo-yield-guarantee * milo-price-FM) * SG_area)
 
   set corn-tot-income (corn-tot-yield * (one-of corn-price) * Corn_area)                 ;Calculate farm gross income
   set wheat-tot-income (wheat-tot-yield * (one-of wheat-price) * Wheat_area)
@@ -1379,10 +1392,10 @@ to dryland-farming_5
   set soybeans-yield-guarantee (soybeans-mean-yield * soybeans-coverage)
   set milo-yield-guarantee (milo-mean-yield * milo-coverage)
 
-  set corn-income-guarantee ((corn-yield-guarantee * corn-base-price) * Corn_area)                 ;Calculate guarantee growth crop income
-  set wheat-income-guarantee ((wheat-yield-guarantee * wheat-base-price) * Wheat_area)
-  set soybeans-income-guarantee ((soybeans-yield-guarantee * soybeans-base-price) * Soybeans_area)
-  set milo-income-guarantee ((milo-yield-guarantee * milo-base-price) * SG_area)
+  set corn-income-guarantee ((corn-yield-guarantee * corn-price-FM) * Corn_area)                 ;Calculate guarantee growth crop income
+  set wheat-income-guarantee ((wheat-yield-guarantee * wheat-price-FM) * Wheat_area)
+  set soybeans-income-guarantee ((soybeans-yield-guarantee * soybeans-price-FM) * Soybeans_area)
+  set milo-income-guarantee ((milo-yield-guarantee * milo-price-FM) * SG_area)
 
   set corn-tot-income (corn-tot-yield * (one-of corn-price) * Corn_area)                            ;Calculate farm gross income
   set wheat-tot-income (wheat-tot-yield * (one-of wheat-price) * Wheat_area)
@@ -1420,7 +1433,7 @@ to energy-calculation
 
   if count-wind-lifespan <= Nyear_W [
   ifelse count-wind-lifespan <= 9 [                                                                 ;Count 10 years (0 to 9)
-    set wind-production_temp (#wind_turbines * Capacity_W * 0.421 * 24 * 365)                     ;MWh = power(MW) * Kansas_wind_Capacity_S * 24hrs/day * 365days/year, Capacity_S 42.1% (Berkeley Lab)
+    set wind-production_temp (#wind_turbines * Capacity_W * wind-factor * 24 * 365)                     ;MWh = power(MW) * Kansas_wind_Capacity_S * 24hrs/day * 365days/year, Capacity_S 42.1% (Berkeley Lab)
     set wind-production wind-production_temp
     ;print (word ticks "100% solar production = " wind-production)
     set count-wind-lifespan (count-wind-lifespan + 1)]
@@ -1793,7 +1806,7 @@ to initialize-energy
   set #Solar_panels (#Panel_sets * 1000)
   set solar-production (#Solar_Panels * Capacity_S * 5.6 * 365 / 1000000)
   ;print (word "initialize " solar-production)
-  set wind-production (#wind_turbines * Capacity_W * 0.421 * 24 * 365)
+  set wind-production (#wind_turbines * Capacity_W * wind-factor * 24 * 365)
   set %Solar-production (Solar-production * 100 / (Solar-production + Wind-production))
   set %Wind-production (Wind-production * 100 / (Solar-production + Wind-production))
 
@@ -1878,7 +1891,7 @@ to reset-symbols                                                                
 
   if ticks = 0 [
     set solar-production (#Solar_Panels * Capacity_S * 5.6 * 365 / 1000000)
-    set wind-production (#wind_turbines * Capacity_W * 0.421 * 24 * 365)]
+    set wind-production (#wind_turbines * Capacity_W * wind-factor * 24 * 365)]
 
   set solar-production solar-production
   ;print (word "reset-symbol " solar-production)
@@ -1943,9 +1956,9 @@ Years
 30.0
 
 BUTTON
-5
+158
 10
-71
+216
 43
 NIL
 Setup
@@ -1960,10 +1973,10 @@ NIL
 1
 
 INPUTBOX
-5
-97
-85
-157
+6
+66
+86
+126
 Corn_area
 200.0
 1
@@ -1971,10 +1984,10 @@ Corn_area
 Number
 
 INPUTBOX
-87
-97
-166
-157
+88
+66
+167
+126
 Wheat_area
 125.0
 1
@@ -1982,10 +1995,10 @@ Wheat_area
 Number
 
 INPUTBOX
-168
-97
-252
-157
+169
+66
+253
+126
 Soybeans_area
 0.0
 1
@@ -1993,10 +2006,10 @@ Soybeans_area
 Number
 
 INPUTBOX
-254
-97
-334
-157
+255
+66
+335
+126
 SG_area
 125.0
 1
@@ -2004,10 +2017,10 @@ SG_area
 Number
 
 TEXTBOX
-6
-79
-343
-103
+7
+48
+344
+72
 Agriculture -------------------------------\n
 13
 63.0
@@ -2036,9 +2049,9 @@ PENS
 "US$0" 1.0 2 -8053223 true "" "plot zero-line"
 
 BUTTON
-73
+218
 10
-155
+279
 43
 Go once
 Go
@@ -2053,20 +2066,20 @@ NIL
 1
 
 TEXTBOX
-4
-414
-173
-446
+5
+383
+174
+415
 Water -------------
 13
 95.0
 1
 
 TEXTBOX
-5
-173
-344
-193
+6
+142
+345
+162
 Energy ------------------------------------
 13
 25.0
@@ -2115,9 +2128,9 @@ PENS
 "SG" 1.0 0 -12440034 true "" "plot milo-tot-yield"
 
 BUTTON
-157
+281
 10
-220
+336
 43
 NIL
 Go
@@ -2132,10 +2145,10 @@ NIL
 1
 
 SLIDER
-8
-325
-119
-358
+9
+294
+120
+327
 #Wind_turbines
 #Wind_turbines
 0
@@ -2147,10 +2160,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-168
-46
-334
-79
+6
+510
+157
+543
 Aquifer_thickness
 Aquifer_thickness
 70
@@ -2162,10 +2175,10 @@ Ft
 HORIZONTAL
 
 SLIDER
-8
-276
-119
-309
+9
+245
+120
+278
 Capacity_S
 Capacity_S
 0
@@ -2177,10 +2190,10 @@ W
 HORIZONTAL
 
 SLIDER
-8
-241
-119
-274
+9
+210
+120
+243
 #Panel_sets
 #Panel_sets
 0
@@ -2302,10 +2315,10 @@ round solar-net-income
 11
 
 TEXTBOX
-6
-158
-328
-176
+7
+127
+329
+145
 Circles show proportional crop areas (acres), SG =Grain sorghum.
 10
 63.0
@@ -2352,20 +2365,20 @@ Wind outputs
 1
 
 TEXTBOX
-162
-415
-347
-445
+163
+384
+348
+414
 Climate Scenario -----------
 12
 0.0
 1
 
 CHOOSER
-162
-478
-337
-523
+163
+447
+338
+492
 Future_Process
 Future_Process
 "Repeat Historical" "Wetter Future" "Dryer Future" "Impose T, P, & S Changes"
@@ -2393,20 +2406,20 @@ PENS
 "US$0" 1.0 2 -8053223 true "" "plot zero-line"
 
 TEXTBOX
-7
-310
-44
-328
+8
+279
+45
+297
 • Wind
 11
 25.0
 1
 
 TEXTBOX
-6
-226
-46
-244
+7
+195
+47
+213
 • Solar
 11
 25.0
@@ -2473,10 +2486,10 @@ TEXTBOX
 1
 
 TEXTBOX
-5
-434
-167
-480
+6
+403
+168
+449
 Water is assumed to come from groundwater (GW) pumping.
 11
 95.0
@@ -2537,10 +2550,10 @@ TEXTBOX
 1
 
 TEXTBOX
-349
-10
-499
-29
+355
+37
+505
+56
 World
 15
 0.0
@@ -2557,14 +2570,14 @@ Farm Economy -------------------
 1
 
 SLIDER
-5
-46
-166
-79
+3
+10
+156
+43
 Simulation_period
 Simulation_period
 0
-150
+80
 60.0
 5
 1
@@ -2673,20 +2686,20 @@ SG = Grain \nsorghum
 1
 
 TEXTBOX
-162
-434
-348
-492
+163
+403
+349
+461
 Climate scenario controls annual temperature (T), precipitation (P), and solar radiation (S).
 11
 0.0
 1
 
 CHOOSER
-162
-541
-337
-586
+163
+510
+338
+555
 Climate_Model
 Climate_Model
 "RCP4.5" "RCP8.5"
@@ -2703,30 +2716,30 @@ TEXTBOX
 1
 
 TEXTBOX
-162
-526
-343
-554
+163
+495
+344
+523
 For \"Impose T, P, and S Changes\"
 11
 0.0
 1
 
 TEXTBOX
-5
-483
-161
-525
+6
+453
+155
+495
 Effects on surface water (SW) quality are accumulated.
 11
 95.0
 1
 
 SLIDER
-121
-360
-246
-393
+122
+329
+247
+362
 Degrade_W
 Degrade_W
 0
@@ -2738,24 +2751,24 @@ Degrade_W
 HORIZONTAL
 
 TEXTBOX
-9
-396
-252
-421
-Wind annual degradation after 10 yrs. Default 1%.
+10
+365
+281
+390
+Wind annual degradation applied after 10 yrs. Default 1%.
 9
 25.0
 1
 
 SLIDER
-8
-192
-167
-225
+9
+161
+168
+194
 Energy_value
 Energy_value
-20
-40
+0
+50
 38.0
 0.1
 1
@@ -2763,10 +2776,10 @@ $/MWh
 HORIZONTAL
 
 SLIDER
-121
-241
-246
-274
+122
+210
+247
+243
 NYear_S
 NYear_S
 20
@@ -2778,10 +2791,10 @@ Yrs
 HORIZONTAL
 
 SLIDER
-121
-325
-246
-358
+122
+294
+247
+327
 NYear_W
 NYear_W
 20
@@ -2793,25 +2806,25 @@ Yrs
 HORIZONTAL
 
 SLIDER
-248
-360
-340
-393
+249
+329
+341
+362
 PTC_W
 PTC_W
 0
 0.03
-0.023
+0.0
 0.001
 1
 NIL
 HORIZONTAL
 
 SLIDER
-8
-360
-119
-393
+9
+329
+120
+362
 Capacity_W
 Capacity_W
 1
@@ -2823,10 +2836,10 @@ MW
 HORIZONTAL
 
 SLIDER
-248
-325
-340
-358
+249
+294
+341
+327
 ITC_W
 ITC_W
 0
@@ -2838,10 +2851,10 @@ ITC_W
 HORIZONTAL
 
 SLIDER
-248
-241
-340
-274
+249
+210
+341
+243
 ITC_S
 ITC_S
 0
@@ -2853,15 +2866,15 @@ ITC_S
 HORIZONTAL
 
 SLIDER
-248
-276
-340
-309
+249
+245
+341
+278
 PTC_S
 PTC_S
 0
 0.03
-0.023
+0.0
 0.001
 1
 NIL
@@ -2869,19 +2882,19 @@ HORIZONTAL
 
 TEXTBOX
 172
-190
+159
 355
-245
-ITC: Investment Tax Credit (%)\nPTC: Production Tax Credit ($/kWh)\nNYear: Lifespan (years)\n1 set of panels = 1000 solar panels
+214
+• ITC: Investment Tax Credit (%) OR\n   PTC: Production Tax Credit ($/kWh)\n• NYear: Lifespan (years)\n• 1 set of panels = 1000 solar panels\n
 9
 25.0
 1
 
 SLIDER
-121
-276
-246
-309
+122
+245
+247
+278
 Degrade_S
 Degrade_S
 0
@@ -2893,12 +2906,12 @@ Degrade_S
 HORIZONTAL
 
 TEXTBOX
-226
+527
 10
-328
+629
 41
 FEWCalc 1.0.1
-12
+14
 0.0
 1
 
