@@ -23,7 +23,7 @@ globals [
   corn-mean-yield wheat-mean-yield soybeans-mean-yield milo-mean-yield
   corn-tot-yield wheat-tot-yield soybeans-tot-yield milo-tot-yield
   corn-irrig-increment wheat-irrig-increment soybeans-irrig-increment milo-irrig-increment
-  corn-use-in wheat-use-in soybeans-use-in milo-use-in water-use-feet gw-change calibrated-water-use dryland-check? GCM-random-year level-30 level-30-patch level-60 level-60-patch gw-upper-limit gw-lower-limit
+  corn-use-in wheat-use-in soybeans-use-in milo-use-in water-use-feet gw-change calibrated-water-use dryland-check? GCM-random-year level-30 level-30-patch level-60 level-60-patch gw-upper-limit
   corn-N-app wheat-N-app soybeans-N-app milo-N-app N-accu N-accu2 N-accu-temp
   #Solar_panels solar-production solar-production_temp count-solar-lifespan solar-cost solar-sell solar-sell_temp solar-net-income %Solar-production count-solar-lifespan-sell
   wind-factor wind-production wind-production_temp wind-cost wind-sell wind-sell_temp wind-net-income energy-net-income %Wind-production count-wind-lifespan count-wind-lifespan-cost count-wind-lifespan-sell
@@ -98,9 +98,8 @@ to setup
   ask aquifer-patches [set pcolor blue]
   ask patch 79 -97 [set plabel "GW"]
 
-  set gw-lower-limit 30
   set gw-upper-limit 60
-  set level-30-patch (gw-lower-limit * 170 / Aquifer_thickness)                                     ;Calculate #patches below 30 feet in gw-patches (lower limit)
+  set level-30-patch (Min_Aq_Thickness * 170 / Aquifer_thickness)                                     ;Calculate #patches below 30 feet in gw-patches (lower limit)
   set level-60-patch (gw-upper-limit * 170 / Aquifer_thickness)                                     ;Calculate #patches below 60 feet in gw-patches (upper limit)
   set level-30 (-100 + level-30-patch)                                                              ;Locate a level where lower level is.
   set level-60 (-100 + level-60-patch)                                                              ;Locate a level where upper level is.
@@ -1926,6 +1925,8 @@ to reset-symbols                                                                
   ask patch 54 87 [
     set plabel round (N-accu2)
     set plabel-color white]
+
+
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -2160,10 +2161,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-6
-510
-157
-543
+5
+486
+156
+519
 Aquifer_thickness
 Aquifer_thickness
 70
@@ -2632,7 +2633,7 @@ true
 "set-plot-background-color 88" ""
 PENS
 "GW level   " 1.0 0 -14454117 true "" "plot gw-level"
-"30 ft" 1.0 2 -5298144 true "" "plot (gw-lower-limit)"
+"Min Aq" 1.0 2 -5298144 true "" "plot (Min_Aq_Thickness)"
 "60 ft" 1.0 2 -7500403 true "" "plot (gw-upper-limit)"
 
 TEXTBOX
@@ -2727,9 +2728,9 @@ For \"Impose T, P, and S Changes\"
 
 TEXTBOX
 6
-453
-155
-495
+451
+161
+493
 Effects on surface water (SW) quality are accumulated.
 11
 95.0
@@ -2914,6 +2915,21 @@ FEWCalc 1.0.1
 14
 0.0
 1
+
+SLIDER
+5
+522
+156
+555
+Min_Aq_Thickness
+Min_Aq_Thickness
+0
+50
+30.0
+1
+1
+Ft
+HORIZONTAL
 
 @#$#@#$#@
 # FEWCalc
