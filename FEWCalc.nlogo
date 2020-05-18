@@ -1445,7 +1445,7 @@ to energy-calculation
     ]
   ]
 
-  set solar-cost (#Solar_Panels * (Capacity_S / 1000) * 3050 / Nyear_S * (1 - (ITC_S / 100)))
+  set solar-cost (#Solar_Panels * (Capacity_S / 1000) * Cost_S / Nyear_S * (1 - (ITC_S / 100)))
   ;print (word "solar prod for cost cal: " solar-production)
 
   if count-solar-lifespan-sell <= Nyear_S [
@@ -1466,12 +1466,12 @@ to energy-calculation
 
   if count-wind-lifespan-cost <= Nyear_W [
   ifelse count-wind-lifespan-cost <= 9 [
-    set wind-cost ((1470000 * Capacity_W / Nyear_W) + (45000 * Capacity_W)) * #wind_turbines * (1 - (ITC_W / 100))
+    set wind-cost (((Cost_W * 1000) * Capacity_W / Nyear_W) + (45000 * Capacity_W)) * #wind_turbines * (1 - (ITC_W / 100))
     set count-wind-lifespan-cost (count-wind-lifespan-cost + 1)
     ;print (word "first 10 year: " wind-cost)
     ]
 
-    [set wind-cost ((1470000 * Capacity_W / Nyear_W) + (50000 * Capacity_W)) * #wind_turbines * (1 - (ITC_W / 100))
+    [set wind-cost (((Cost_W * 1000) * Capacity_W / Nyear_W) + (50000 * Capacity_W)) * #wind_turbines * (1 - (ITC_W / 100))
      ;print (word "Beyond 10 years: " wind-cost)
      set count-wind-lifespan-cost (count-wind-lifespan-cost + 1)
      if count-wind-lifespan-cost = Nyear_W [set count-wind-lifespan-cost 0]
@@ -1930,13 +1930,13 @@ to reset-symbols                                                                
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-348
-30
-805
-488
+386
+29
+817
+461
 -1
 -1
-2.234
+2.1045
 1
 14
 1
@@ -1957,9 +1957,9 @@ Years
 30.0
 
 BUTTON
-158
+162
 10
-216
+231
 43
 NIL
 Setup
@@ -2020,9 +2020,9 @@ Number
 TEXTBOX
 7
 48
-344
+386
 72
-Agriculture -------------------------------\n
+Agriculture -------------------------------------\n
 13
 63.0
 1
@@ -2050,9 +2050,9 @@ PENS
 "US$0" 1.0 2 -8053223 true "" "plot zero-line"
 
 BUTTON
-218
+233
 10
-279
+302
 43
 Go once
 Go
@@ -2067,11 +2067,11 @@ NIL
 1
 
 TEXTBOX
-5
-383
-174
-415
-Water -------------
+8
+414
+185
+446
+Water -----------------
 13
 95.0
 1
@@ -2079,9 +2079,9 @@ Water -------------
 TEXTBOX
 6
 142
-345
-162
-Energy ------------------------------------
+382
+174
+Energy -----------------------------------------
 13
 25.0
 1
@@ -2129,9 +2129,9 @@ PENS
 "SG" 1.0 0 -12440034 true "" "plot milo-tot-yield"
 
 BUTTON
-281
+304
 10
-336
+373
 43
 NIL
 Go
@@ -2146,9 +2146,9 @@ NIL
 1
 
 SLIDER
-9
+7
 294
-120
+118
 327
 #Wind_turbines
 #Wind_turbines
@@ -2161,10 +2161,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-5
-486
-156
-519
+8
+512
+168
+545
 Aquifer_thickness
 Aquifer_thickness
 70
@@ -2176,9 +2176,9 @@ Ft
 HORIZONTAL
 
 SLIDER
-9
+7
 245
-120
+118
 278
 Capacity_S
 Capacity_S
@@ -2191,9 +2191,9 @@ W
 HORIZONTAL
 
 SLIDER
-9
+7
 210
-120
+118
 243
 #Panel_sets
 #Panel_sets
@@ -2366,24 +2366,24 @@ Wind outputs
 1
 
 TEXTBOX
-163
-384
-348
-414
-Climate Scenario -----------
+192
+415
+377
+445
+Climate Scenario ------------
 12
 0.0
 1
 
 CHOOSER
-163
-447
-338
-492
+192
+478
+367
+523
 Future_Process
 Future_Process
 "Repeat Historical" "Wetter Future" "Dryer Future" "Impose T, P, & S Changes"
-0
+3
 
 PLOT
 824
@@ -2408,9 +2408,9 @@ PENS
 
 TEXTBOX
 8
-279
+280
 45
-297
+298
 • Wind
 11
 25.0
@@ -2418,9 +2418,9 @@ TEXTBOX
 
 TEXTBOX
 7
-195
+196
 47
-213
+214
 • Solar
 11
 25.0
@@ -2477,21 +2477,21 @@ Water ----------------------------------------------------------
 1
 
 TEXTBOX
-351
-491
-817
-526
-• First 10 years use historical data from 2008 to 2017, subsequent years apply Future Process.
+386
+468
+814
+503
+• First 10 years use historical data (2008-2017), subsequent years apply Future Process.
 10
 5.0
 1
 
 TEXTBOX
-6
-403
-168
-449
-Water is assumed to come from groundwater (GW) pumping.
+7
+468
+189
+514
+• Water is assumed to come from groundwater (GW) pumping.
 11
 95.0
 1
@@ -2541,19 +2541,19 @@ water-use-feet
 11
 
 TEXTBOX
-351
+386
+486
+814
 504
-806
-522
 • Year in the plots represents a sequential year. Year 1 is 2008 and year 60 is 2067.
 10
 5.0
 1
 
 TEXTBOX
-355
+390
 37
-505
+540
 56
 World
 15
@@ -2571,9 +2571,9 @@ Farm Economy -------------------
 1
 
 SLIDER
-3
+7
 10
-156
+160
 43
 Simulation_period
 Simulation_period
@@ -2637,10 +2637,10 @@ PENS
 "60 ft" 1.0 2 -7500403 true "" "plot (gw-upper-limit)"
 
 TEXTBOX
-351
-518
-777
-536
+386
+505
+812
+523
 • FEWCalc requires NetLogo version 6.1.0 or higher.
 10
 5.0
@@ -2687,59 +2687,59 @@ SG = Grain \nsorghum
 1
 
 TEXTBOX
-163
-403
-349
-461
+192
+434
+378
+492
 Climate scenario controls annual temperature (T), precipitation (P), and solar radiation (S).
 11
 0.0
 1
 
 CHOOSER
-163
-510
-338
-555
+192
+541
+367
+586
 Climate_Model
 Climate_Model
 "RCP4.5" "RCP8.5"
 0
 
 TEXTBOX
-351
-532
+385
+525
 820
-579
+572
 • The Representative Concentration Pathways (RCPs) are used for making climate projections largely based on greenhouse gas (GHG) emissions. RCP4.5 is representative of an intermediate scenario, whearas RCP8.5 is a scenario with very high GHG emissions.
 10
 5.0
 1
 
 TEXTBOX
-163
-495
-344
-523
+192
+526
+373
+554
 For \"Impose T, P, and S Changes\"
 11
 0.0
 1
 
 TEXTBOX
-6
-451
-161
-493
-Effects on surface water (SW) quality are accumulated.
+8
+434
+180
+461
+• Effects on surface water (SW) quality are accumulated.
 11
 95.0
 1
 
 SLIDER
-122
+120
 329
-247
+245
 362
 Degrade_W
 Degrade_W
@@ -2752,20 +2752,20 @@ Degrade_W
 HORIZONTAL
 
 TEXTBOX
-10
-365
-281
-390
-Wind annual degradation applied after 10 yrs. Default 1%.
+248
+329
+376
+363
+Wind degradation applies after 10 yrs. Default 1%.
 9
 25.0
 1
 
 SLIDER
-9
-161
-168
-194
+7
+162
+166
+195
 Energy_value
 Energy_value
 0
@@ -2777,9 +2777,9 @@ $/MWh
 HORIZONTAL
 
 SLIDER
-122
+120
 210
-247
+245
 243
 NYear_S
 NYear_S
@@ -2792,9 +2792,9 @@ Yrs
 HORIZONTAL
 
 SLIDER
-122
+120
 294
-247
+245
 327
 NYear_W
 NYear_W
@@ -2807,10 +2807,10 @@ Yrs
 HORIZONTAL
 
 SLIDER
-249
-329
-341
-362
+288
+378
+380
+411
 PTC_W
 PTC_W
 0
@@ -2822,9 +2822,9 @@ NIL
 HORIZONTAL
 
 SLIDER
-9
+7
 329
-120
+118
 362
 Capacity_W
 Capacity_W
@@ -2837,10 +2837,10 @@ MW
 HORIZONTAL
 
 SLIDER
-249
-294
-341
-327
+195
+378
+287
+411
 ITC_W
 ITC_W
 0
@@ -2852,10 +2852,10 @@ ITC_W
 HORIZONTAL
 
 SLIDER
-249
-210
-341
-243
+7
+378
+99
+411
 ITC_S
 ITC_S
 0
@@ -2867,10 +2867,10 @@ ITC_S
 HORIZONTAL
 
 SLIDER
-249
-245
-341
-278
+101
+378
+193
+411
 PTC_S
 PTC_S
 0
@@ -2882,19 +2882,19 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-172
-159
-355
-214
-• ITC: Investment Tax Credit (%) OR\n   PTC: Production Tax Credit ($/kWh)\n• NYear: Lifespan (years)\n• 1 set of panels = 1000 solar panels\n
+226
+160
+383
+182
+Note that NYear is lifespan (years)
 9
 25.0
 1
 
 SLIDER
-122
+120
 245
-247
+245
 278
 Degrade_S
 Degrade_S
@@ -2907,9 +2907,9 @@ Degrade_S
 HORIZONTAL
 
 TEXTBOX
-527
+548
 10
-629
+650
 41
 FEWCalc 1.0.1
 14
@@ -2917,10 +2917,10 @@ FEWCalc 1.0.1
 1
 
 SLIDER
-5
-522
-156
-555
+8
+553
+168
+586
 Min_Aq_Thickness
 Min_Aq_Thickness
 0
@@ -2930,6 +2930,66 @@ Min_Aq_Thickness
 1
 Ft
 HORIZONTAL
+
+TEXTBOX
+7
+363
+92
+381
+• Tax Credits: 
+11
+25.0
+1
+
+SLIDER
+247
+210
+381
+243
+Cost_S
+Cost_S
+0
+4000
+3050.0
+1
+1
+$/kW
+HORIZONTAL
+
+SLIDER
+247
+294
+381
+327
+Cost_W
+Cost_W
+0
+2000
+1470.0
+1
+1
+$/kW
+HORIZONTAL
+
+TEXTBOX
+88
+365
+364
+387
+ITC: Investment TC (%) OR PTC: Production TC ($/kWh)
+9
+25.0
+1
+
+TEXTBOX
+249
+245
+384
+289
+A set of panels = 1,000 solar panels. Solar degradation starts at year 2.
+9
+25.0
+1
 
 @#$#@#$#@
 # FEWCalc
