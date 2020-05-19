@@ -1723,8 +1723,8 @@ to contaminant                                                                  
   ask patch -51.5 -51 [ask n-of (0.0001 * (item (item k yrs-seq) soybeans-N-app) / 1.12 * Soybeans_area) patches in-radius (item 2 radius-of-%area) [set pcolor brown]]   ;dots shown in a circle are in a unit area (lbs/ac); kg/ha to lb/ac, dividing by 1.12
   ask patch -52 16 [ask n-of (0.0001 * (item (item k yrs-seq) milo-N-app) / 1.12 * SG_area) patches in-radius (item 3 radius-of-%area) [set pcolor brown]]          ;dots shown in a circle are in a unit area (lbs/ac); kg/ha to lb/ac, dividing by 1.12
 
-  ifelse Future_Process = "Repeat Historical" or Future_Process = "Wetter Future" or Future_Process = "Dryer Future"
-  [if (item k yrs-seq) = 7 or (item k yrs-seq) = 8 or (item k yrs-seq) = 9 [                         ;yrs-seq = 7, 8, and 9 are wet years
+  ifelse ticks < 11 [                                                                               ;Historical
+    if (item k yrs-seq) = 7 or (item k yrs-seq) = 8 or (item k yrs-seq) = 9 [                       ;yrs-seq = 7, 8, and 9 are wet years
     ask up-to-n-of (0.0001 * N-accu) river-patches with [pcolor = 87] [set pcolor brown]            ;0.0001 is a scaling factor, graphically used to reduce number of dots in stream
 
     set N-accu2 (N-accu2 + N-accu)                                                                  ;N-accu2 is amount of nitrate in the stream
@@ -1741,7 +1741,26 @@ to contaminant                                                                  
     ask patch -52 16 [ask patches in-radius (item 3 radius-of-%area) [set pcolor 34]]
   ]]
 
-  [ifelse (Future_Process = "Impose T, P, & S Changes" and Climate_Model = "RCP8.5" and (item (ticks) precip_RCP8.5) >= 20) [           ;Years that precip >= 20 inches are wet years
+  [                                                                                                 ;Else: Future process
+  ifelse Future_Process = "Repeat Historical" or Future_Process = "Wetter Future" or Future_Process = "Dryer Future"
+  [if (item k yrs-seq) = 7 or (item k yrs-seq) = 8 or (item k yrs-seq) = 9 [                        ;yrs-seq = 7, 8, and 9 are wet years
+    ask up-to-n-of (0.0001 * N-accu) river-patches with [pcolor = 87] [set pcolor brown]            ;0.0001 is a scaling factor, graphically used to reduce number of dots in stream
+
+    set N-accu2 (N-accu2 + N-accu)                                                                  ;N-accu2 is amount of nitrate in the stream
+    ;print (word "N-accu: " N-accu2)
+
+    ask patch 54 87 [                                                                               ;Show a number in the World
+    set plabel round (N-accu2)
+    set plabel-color white]
+
+    set N-accu 0                                                                                    ;N-accu (in crop circles) is reset because nitrate is transported into the river
+    ask patch -1 0 [ask patches in-radius (item 0 radius-of-%area) [set pcolor 37]]
+    ask patch -18 84 [ask patches in-radius (item 1 radius-of-%area) [set pcolor 22]]
+    ask patch -51.5 -51 [ask patches in-radius (item 2 radius-of-%area) [set pcolor 36]]
+    ask patch -52 16 [ask patches in-radius (item 3 radius-of-%area) [set pcolor 34]]
+  ]]
+
+  [ifelse (Future_Process = "Impose T, P, & S Changes" and Climate_Model = "RCP8.5" and (item (ticks - 10) precip_RCP8.5) >= 20) [           ;Years that precip >= 20 inches are wet years
     ask up-to-n-of (0.0001 * N-accu) river-patches with [pcolor = 87] [set pcolor brown]            ;0.0001 is a scaling factor, graphically used to reduce number of dots in stream
 
     set N-accu2 (N-accu2 + N-accu)                                                                  ;N-accu2 is amount of nitrate in the stream
@@ -1758,7 +1777,7 @@ to contaminant                                                                  
     ask patch -52 16 [ask patches in-radius (item 3 radius-of-%area) [set pcolor 34]]
   ]
 
-    [if Future_Process = "Impose T, P, & S Changes" and Climate_Model = "RCP4.5" and (item (ticks) precip_RCP4.5) >= 20 [           ;Years that precip >= 20 inches are wet years
+    [if Future_Process = "Impose T, P, & S Changes" and Climate_Model = "RCP4.5" and (item (ticks - 10) precip_RCP4.5) >= 20 [           ;Years that precip >= 20 inches are wet years
     ask up-to-n-of (0.0001 * N-accu) river-patches with [pcolor = 87] [set pcolor brown]            ;0.0001 is a scaling factor, graphically used to reduce number of dots in stream
 
     set N-accu2 (N-accu2 + N-accu)                                                                  ;N-accu2 is amount of nitrate in the stream
@@ -1774,7 +1793,7 @@ to contaminant                                                                  
     ask patch -51.5 -51 [ask patches in-radius (item 2 radius-of-%area) [set pcolor 36]]
     ask patch -52 16 [ask patches in-radius (item 3 radius-of-%area) [set pcolor 34]]
   ]]]
-
+  ]
   ;print (word "Temp. var. k: " k)  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;print (word "corn-N-use" corn-N-use)  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;print (word "wheat-N-use" wheat-N-use)  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -2152,7 +2171,7 @@ SLIDER
 327
 #Wind_turbines
 #Wind_turbines
-0
+1
 6
 2.0
 1
@@ -2169,7 +2188,7 @@ Aquifer_thickness
 Aquifer_thickness
 70
 300
-200.0
+250.0
 10
 1
 Ft
@@ -2383,7 +2402,7 @@ CHOOSER
 Future_Process
 Future_Process
 "Repeat Historical" "Wetter Future" "Dryer Future" "Impose T, P, & S Changes"
-3
+0
 
 PLOT
 824
@@ -2577,10 +2596,10 @@ SLIDER
 43
 Simulation_period
 Simulation_period
-0
-80
+1
+90
 60.0
-5
+1
 1
 Yrs
 HORIZONTAL
