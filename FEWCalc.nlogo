@@ -2806,10 +2806,10 @@ HORIZONTAL
 
 TEXTBOX
 248
-329
+330
 376
-363
-Wind degradation applies after 10 yrs. Default 1%.
+364
+Wind degradation applies after 10 yrs.
 9
 25.0
 1
@@ -2935,11 +2935,11 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-226
-160
-383
-182
-Note that NYear is lifespan (years)
+265
+161
+381
+183
+*NYear is lifespan (years)
 9
 25.0
 1
@@ -3025,11 +3025,11 @@ $/kW
 HORIZONTAL
 
 TEXTBOX
-88
+86
 365
-364
+416
 387
-ITC: Investment TC (%) OR PTC: Production TC ($/kWh)
+Choose 1, ITC: Investment TC (%) OR PTC: Production TC ($/kWh)
 9
 25.0
 1
