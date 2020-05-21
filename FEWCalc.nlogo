@@ -25,7 +25,7 @@ globals [
   corn-irrig-increment wheat-irrig-increment soybeans-irrig-increment milo-irrig-increment
   corn-use-in wheat-use-in soybeans-use-in milo-use-in water-use-feet gw-change calibrated-water-use dryland-check? GCM-random-year level-30 level-30-patch level-60 level-60-patch gw-upper-limit
   corn-N-app wheat-N-app soybeans-N-app milo-N-app N-accu N-accu2 N-accu-temp
-  #Solar_panels solar-production solar-production_temp count-solar-lifespan solar-cost solar-sell solar-sell_temp solar-net-income %Solar-production count-solar-lifespan-sell
+  #Solar_panels solar-production solar-production_temp count-solar-lifespan solar-cost solar-sell solar-sell_temp solar-net-income %Solar-production count-solar-lifespan-sell term-loan_S interest-rate_S term-loan_W interest-rate_W
   wind-factor wind-production wind-production_temp wind-cost wind-sell wind-sell_temp wind-net-income energy-net-income %Wind-production count-wind-lifespan count-wind-lifespan-cost count-wind-lifespan-sell
 ]
 
@@ -53,13 +53,22 @@ to setup
   set soybeans-price-FM 9.39                                                                        ;Future market for crop insurance calculation
   set milo-price-FM 3.14                                                                            ;Future market for crop insurance calculation
 
+  ;Finance
+  set term-loan_S Nyear_S                                                                           ;set solar production term loan = solar panel lifespan
+  set interest-rate_S 0                                                                             ;set solar production interest rate = 0% per year (In progress)
+  set term-loan_W Nyear_W                                                                           ;set wind production loan = wind turbine lifespan
+  set interest-rate_W 0                                                                             ;set wind production interest rate = 0% per year (In progress)
+
+
+
+
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;;;;;;;;;;;;;;;;;; cropland patches ;;;;;;;;;;;;;;;;;;
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   set total-area (Corn_area + Wheat_area + Soybeans_area + SG_area)                                 ;Calculate total crop area
   set area-multiplier 3000                                                                          ;Scale size of crop circles
-  set N-accu 0                                                                                      ;Assume there is no N accumulation in soil (fertilizer)
-  set N-accu2 0                                                                                     ;Assume there is no N accumulation in soil (fertilizer)
+  set N-accu 0                                                                                      ;Assume there is no N accumulation in soil (fertilizer) N-accu -> in the field
+  set N-accu2 0                                                                                     ;Assume there is no N accumulation in soil (fertilizer) N-accu2 -> in surface-water bodies
   set dryland-check? 1                                                                              ;Dryland-check? = 1 means yes, it's the first dryland farming
 
   set cropland-patches patches with [pxcor < 66]                                                    ;Divide the world where pxcor < 66 into cropland-patches
@@ -99,7 +108,7 @@ to setup
   ask patch 79 -97 [set plabel "GW"]
 
   set gw-upper-limit 60
-  set level-30-patch (Min_Aq_Thickness * 170 / Aquifer_thickness)                                     ;Calculate #patches below 30 feet in gw-patches (lower limit)
+  set level-30-patch (Min_Aq_Thickness * 170 / Aquifer_thickness)                                   ;Calculate #patches below 30 feet in gw-patches (lower limit)
   set level-60-patch (gw-upper-limit * 170 / Aquifer_thickness)                                     ;Calculate #patches below 60 feet in gw-patches (upper limit)
   set level-30 (-100 + level-30-patch)                                                              ;Locate a level where lower level is.
   set level-60 (-100 + level-60-patch)                                                              ;Locate a level where upper level is.
@@ -1445,7 +1454,7 @@ to energy-calculation
     ]
   ]
 
-  set solar-cost (#Solar_Panels * (Capacity_S / 1000) * Cost_S / Nyear_S * (1 - (ITC_S / 100)))
+  set solar-cost (#Solar_Panels * (Capacity_S / 1000) * Cost_S / term-loan_S * (1 - (ITC_S / 100)))
   ;print (word "solar prod for cost cal: " solar-production)
 
   if count-solar-lifespan-sell <= Nyear_S [
@@ -1466,12 +1475,12 @@ to energy-calculation
 
   if count-wind-lifespan-cost <= Nyear_W [
   ifelse count-wind-lifespan-cost <= 9 [
-    set wind-cost (((Cost_W * 1000) * Capacity_W / Nyear_W) + (45000 * Capacity_W)) * #wind_turbines * (1 - (ITC_W / 100))
+    set wind-cost (((Cost_W * 1000) * Capacity_W / term-loan_W) + (45000 * Capacity_W)) * #wind_turbines * (1 - (ITC_W / 100))
     set count-wind-lifespan-cost (count-wind-lifespan-cost + 1)
     ;print (word "first 10 year: " wind-cost)
     ]
 
-    [set wind-cost (((Cost_W * 1000) * Capacity_W / Nyear_W) + (50000 * Capacity_W)) * #wind_turbines * (1 - (ITC_W / 100))
+    [set wind-cost (((Cost_W * 1000) * Capacity_W / term-loan_W) + (50000 * Capacity_W)) * #wind_turbines * (1 - (ITC_W / 100))
      ;print (word "Beyond 10 years: " wind-cost)
      set count-wind-lifespan-cost (count-wind-lifespan-cost + 1)
      if count-wind-lifespan-cost = Nyear_W [set count-wind-lifespan-cost 0]
@@ -1944,8 +1953,33 @@ to reset-symbols                                                                
   ask patch 54 87 [
     set plabel round (N-accu2)
     set plabel-color white]
+end
 
-
+to reset
+  set simulation_period 60
+  set corn_area 200
+  set wheat_area 125
+  set soybeans_area 0
+  set SG_area 125
+  set Energy_value 38
+  set #Panel_sets 3
+  set Nyear_S 30
+  set ITC_S 30
+  set Capacity_S 250
+  set Degrade_S 0.5
+  set PTC_S 0
+  set #Wind_turbines 2
+  set Nyear_W 30
+  set ITC_W 30
+  set Capacity_W 2
+  set Degrade_W 1
+  set PTC_W 0
+  set Aquifer_thickness 200
+  set Min_Aq_Thickness 30
+  set Future_Process "Repeat Historical"
+  set Climate_Model "RCP4.5"
+  set cost_S 3050
+  set cost_W 1470
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -1976,9 +2010,9 @@ Years
 30.0
 
 BUTTON
-162
+215
 10
-231
+270
 43
 NIL
 Setup
@@ -2069,9 +2103,9 @@ PENS
 "US$0" 1.0 2 -8053223 true "" "plot zero-line"
 
 BUTTON
-233
+271
 10
-302
+326
 43
 Go once
 Go
@@ -2148,9 +2182,9 @@ PENS
 "SG" 1.0 0 -12440034 true "" "plot milo-tot-yield"
 
 BUTTON
-304
+327
 10
-373
+382
 43
 NIL
 Go
@@ -2188,7 +2222,7 @@ Aquifer_thickness
 Aquifer_thickness
 70
 300
-250.0
+200.0
 10
 1
 Ft
@@ -2590,9 +2624,9 @@ Farm Economy -------------------
 1
 
 SLIDER
-7
+6
 10
-160
+158
 43
 Simulation_period
 Simulation_period
@@ -2800,8 +2834,8 @@ SLIDER
 210
 245
 243
-NYear_S
-NYear_S
+Nyear_S
+Nyear_S
 20
 30
 30.0
@@ -2815,8 +2849,8 @@ SLIDER
 294
 245
 327
-NYear_W
-NYear_W
+Nyear_W
+Nyear_W
 20
 30
 30.0
@@ -3010,6 +3044,23 @@ A set of panels = 1,000 solar panels. Solar degradation starts at year 2.
 25.0
 1
 
+BUTTON
+159
+10
+214
+43
+Default
+Reset
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
 @#$#@#$#@
 # FEWCalc
 **FEWCalc** is the **Food-Energy-Water Calculator** assembled by Jirapat Phetheet and Professor Mary C. Hill from Department of Geology, the University of Kansas. 
@@ -3026,12 +3077,16 @@ FEWCalc is an interactive tool integrating agriculture, energy, and water compon
 
 ## Load input data and initialize parameters
 ### Load input data
-There are four input files in comma-separated values (.csv) format under "FEWCalc" folder. Input values (e.g., precipitation and crop price) were from historical data between 2008 and 2017. Besides, they were calculated from DSSAT (e.g., yield and irrigation) using the same dataset. The input files listed below are separated into four major crop types in Kansas which are corn, wheat, soybean, and milo (sorghum).
+There are eight input files in comma-separated values (.csv) format under "FEWCalc" folder. Input values (e.g., precipitation and crop price) were from historical data between 2008 and 2017. Besides, they were calculated from DSSAT (e.g., yield and irrigation) using the same dataset (1-4) and global climate models (GCMs) (5-8). The input files listed below are separated into four major crop types in Kansas which are corn, wheat, soybean, and milo (grain sorghum).
 
   * _**1_Corn_inputs.csv**_
   * _**2_Wheat_inputs.csv**_
   * _**3_Soybean_inputs.csv**_
   * _**4_Milo_inputs.csv**_
+  * _**5_Corn_GCMs.csv**_
+  * _**6_Wheat_GCMs.csv**_
+  * _**7_Soybean_GCMs.csv**_
+  * _**8_Milo_GCMs.csv**_
 
 These files are composed of a number of columns which column headers are not well-defined. Here is a detailed explanation of those values.
 
@@ -3042,11 +3097,18 @@ These files are composed of a number of columns which column headers are not wel
   * **Irrig_1 (in):** simulated irrigation from irrigated farming using historical data.
   * **Yield_2 (bu/ac):** simulated yield from dryland farming using historical data.
   * **Irrig_2 (in):** simulated irrigation from dryland farming using historical data. Values in this column are always zero.
-  * **Yield_3 (bu/ac):** simulated yield from irrigated farming using Global Climate Models (GCMs) data.
-  * **Irrig_3 (in):** simulated irrigation from irrigated farming using Global Climate Models (GCMs) data.
-  * **Yield_4 (bu/ac):** simulated yield from dryland farming using Global Climate Models (GCMs) data.
-  * **Irrig_4 (in):** simulated irrigation from dryland farming using Global Climate Models (GCMs) data. Values in this column are always zero.
-  * **Unit explanation:** in is inch, $ is dollar, bu is bushel, and ac is acre.
+  * **N-app (kh/ha):** Nitrogen fertilizer rate
+  * **Precip8.5 (in):** Precipitation projection under PRPCP8.5
+  * **Yield_3 (bu/ac):** simulated yield from irrigated farming using GCM data under RCP8.5 scenario.
+  * **Irrig_3 (in):** simulated irrigation from irrigated farming using GCM data under RCP8.5 scenario.
+  * **Yield_4 (bu/ac):** simulated yield from dryland farming using GCM data under RCP8.5 scenario.
+  * **Irrig_4 (in):** simulated irrigation from dryland farming using GCM data under RCP8.5 scenario. Values in this column are always zero.
+  * **Precip4.5 (in):** Precipitation projection under PRPCP4.5
+  * **Yield_5 (bu/ac):** simulated yield from irrigated farming using GCM data under RCP4.5 scenario.
+  * **Irrig_5 (in):** simulated irrigation from irrigated farming using GCM data under RCP4.5 scenario.
+  * **Yield_6 (bu/ac):** simulated yield from dryland farming using GCM data under RCP4.5 scenario.
+  * **Irrig_6 (in):** simulated irrigation from dryland farming using GCM data under RCP4.5 scenario. Values in this column are always zero.
+  * **Unit explanation:** in is inch, $ is US dollar, bu is bushel, and ac is acre.
 
 **Unit conversion**
 
@@ -3057,47 +3119,50 @@ These files are composed of a number of columns which column headers are not wel
 
 FEWCalc allows users to specify parameters for their own simulation in the NetLogo's interface. It is designed to define those numbers easily by using input box, slider, and chooser. Each parameter is described below.
 
-  * **Input-years:** a period of simulation.
-  * **Aquifer-thickness:** a thickness of aquifer in foot unit.
-  * **Corn-area:** an area of corn in acre unit.
-  * **Wheat-area:** an area of wheat in acre unit.
-  * **Soybean-area:** an area of soybean in acre unit.
-  * **Milo-area:** an area of milo in acre unit.
-  * **#Solar_panel_sets:** a number of solar panel set (each set has 1000 solar panels).
-  * **Panel_power:** power of solar panel (a default value is 250 watts).
-  * **#Wind_turbines:** a number of wind turbines.
-  * **Future_Process:** a drop-down menu of future process. Future process will be activated automatically after 10-year simulation using historical data from 2008 to 2017.
-    * Repeat Historical - 10-year DSSAT results are repeated consecutively.
-    * Wetter Years - a future that is wetter than historical period.
-    * Dryer Years - a future that is drier than historical period.
-    * Climate Projection - a future involved climate change.
+  * **Simulation_period:** A period of simulation.
+  * **Agriculture**
+    * **Corn-area:** A total area of corn in acre.
+    * **Wheat-area:** A total area of wheat in acre.
+    * **Soybean-area:** A area of soybeans in acre.
+    * **Milo-area:** A total area of grain sorghum (milo) in acre.
+  * **Energy**
+    * **Energy_value:** Energy buyback rate
+    * **#Panel_sets:** A number of solar panel set (one set is 1000 panels).
+    * **Capacity_S:** Installed PV capacity, for each panel
+    * **Nyear_S:** Solar panel lifespan
+    * **Degrade_S:** Annual degradation rate
+    * **Cost_S:** Solar panel capital costs
+    * **ITC_S:** Investment Tax Credit
+    * **PTC_S:** Production Tax Credit
+    * **#Wind_turbines:** A number of wind turbines
+    * **Capacity_W:** Installed wind capacity, for each turbine
+    * **Nyear_W:** Wind turbine lifespan
+    * **Degrade_W:** Annual degradation rate
+    * **Cost_W:** Wind turbine capital costs
+    * **ITC_W:** Investment Tax Credit
+    * **PTC_W:** Production Tax Credit  
+  * **Water**
+    * **Aquifer_thickness:** Saturated thickness of the aquifer
+    * **Min_Aq_Thickness:** Minimum available aquifer thickness
+  * **Future_Process:** A drop-down menu of future process. Future process will be activated automatically after year 10 using historical data from 2008 to 2017 and GCM data (2018-2098).
+    * **Repeat Historical:** Ten-year DSSAT results are repeated consecutively.
+    * **Wetter Years:** A future that is wetter than historical period.
+    * **Dryer Years:** A future that is drier than historical period.
+    * **Impose P, T, & S:** A future involved climate change.
+        * **Climate_Model:** RCP4.5 and RCP8.5
 
 ## Model function
 
 
 ### Agriculture
 
-Crop simulations in FEWCalc are from simulated data from DSSAT. Results from DSSAT were based on both historical weather data from 2008 to 2017 and statistically downscaled Global Climate Models (GCMs) data under RCP8.5. Users have to select one of the future processes under **Climate Scenario** section. There are 4 options including _(1) Repeat Historical, (2) Wetter Years, (3) Dryer Years, and (4) Climate Projection._ Climate Projection scenario is the only one option applying GCMs data for the projection.
+Crop simulations in FEWCalc are from simulated data from DSSAT. Results from DSSAT were based on both historical weather data from 2008 to 2017 and statistically downscaled Global Climate Models (GCMs) data under RCP4.5 and RCP8.5. Users have to select one of the future processes under **Climate Scenario** section. There are 4 options including _(1) Repeat Historical, (2) Wetter Years, (3) Dryer Years, and (4) Impose T, P, & S Changes._ Climate Projection scenario is the only one option applying GCM data for the projection.
 
 **IRRIGATED FARMING**
-FEWCalc assumes that water for irrigation is all from groundwater. The model simulates irrigated farmland if the water is available and the aquifer thickness is not less than 20 percent of its initial thickness.
+FEWCalc assumes that water for irrigation is all from groundwater. The model simulates irrigated farmland if the water is available and the aquifer thickness is not less than a minimum aquifer thickness defined by users.
 
 **DRYLAND FARMING**
-During the simulation, groundwater is being consumed to supply water through the system. When the aquifer is depleted more than 80 percent of its initial thickness, the model stops irrigating and then applies dryland farming in the system. 
-
-
-**CROP INSURANCE**
-When crop production declines significantly, farmers would be able to claim insurance. Simulating crop insurance payment requires an understanding of insurance guarantees. Crop insurance guarantees are based on the level of coverage:
-
-  * Corn 75%
-  * Wheat 70%
-  * Soybean 65-70%
-  * Milo 65%
-
-These guarantees are calculated by taking this equation:
->   * Insurance guarantee ($/ac) = average 10-year production history * level of coverage * base price
-
-Contact: Wade Heger KU (wheger@ku.edu), Allan Andales CSU (Allan.Andales@colostate.edu), and Garvey Smith CSU (Garvey.Smith@colostate.edu)
+During the simulation, groundwater is being consumed to supply water through the system. When the aquifer thickness is below a minimum aquifer thickness, the model stops irrigating and then applies dryland farming in the system. During dryland farming, the groundwater level rises due to the recharge rate.
 
 ### Energy
 
@@ -3105,32 +3170,41 @@ This recent version of FEWCalc assumes that installation cost spreads over 30 ye
 
 _EQUATIONS:_
 
->  * Solar production (MWh) = number of solar panels * power * average peak sun hours
-  * Wind production (MWh) = number of wind turbine * power * capacity factor
-  * Solar cost ($) = number of solar panels * power * $3050/kW
-  * Wind cost ($) = number of wind turbines * [($2,000,000 / 30 years) + $60,000]
-  * Solar sell ($) = solar production * $38/MWh
-  * Wind sell ($) = wind production * $38/MWh
+>  * Solar production (MWh) = #solar panels * Capacity_S * average peak sun hours * Degrade_S * 365 days/yr
+  * Wind production (MWh) = #wind turbine * Capacity_W * capacity factor * Degrade_W * 8,760 hrs/yr
+  * Solar cost ($) = #solar panels * Capacity_S / 1000 * Cost_S / Nyear_S * (1 - ITC_S / 100)
+  * Wind cost ($) = #wind turbines * [(Capacity_W * Cost_W / Nyear_W) + O&M costs] * (1 - ITC_W / 100)
+  * Solar sell ($) = solar production * Energy_value
+  * Wind sell ($) = wind production * Energy_value
 
-Installation cost is $1000/kW. Hence, a 2-MW wind turbine costs $2,000,000 for installation (operate over 30 years). Operations and maintenance costs are about 3% of the installation cost, accounting for $60,000.
+Default values are in Appendix C.
 
 Contact: Bob Johnson (bobjohnson@centurylink.net), Earnie Lehman (earnielehman@gmail.com), and Hongyu Wu (hongyuwu@ksu.edu)
 
 ### Water
+
+**SURFACE WATER**
+
+  * **Nitrogen Concentration in Surface Water**
+About 10% of applied nitrogen fertilizer remains in the soil during dry and moderate years until it is moved to surface-water bodies in wet years. The equation used are as follows.
+
+_EQUATIONS:_
+
+> N_field = 10% × N_applied × N_acres / 1.12	 -> _Accumulated until moved_
+  N_stream = ∑time (N_field) 	                 -> _Moved in wet or extremely wet years_
 
 **GROUNDWATER**
 
   * **Water-level change versus water use:**
 [Whittemore et al (2016)](https://doi.org/10.1080/02626667.2014.959958) assessed the main drivers of water-level changes in the High Plain aquifer. They computed linear regression equations for correlation of mean annual water-level changes with reported water use during 1996-2012. They also evaluated the predicted response of the HPA and concluded that (1) water pumped for irrigation is the major driver of water-level changes. Besides, (2) a pumping reduction of 22% would stabilize the water level, and this could help extend the usable lifetime of the aquifer.
   * **Groundwater depletion:** 
-FEWCalc employs a statistical method to determine the specific relationship between water-level change and water use for agriculture. A linear regression equation below was calculated based on historical data from 2008 to 2017 in Finney County, Kansas.
+FEWCalc employs a statistical method to determine the specific relationship between water-level change and water use for agriculture. A two-step process is used to calculate grounwater-level changes in this work (see section 2.5.2 in the article). Linear regression equations below were calculated based on historical data from 2008 to 2017 in Finney County, Kansas.
 
-> Water-level change (ft) = [-8.6628 * water use (ft)] + 8.4722
+_EQUATIONS:_
 
-**FUTURE WORK:** SURFACE WATER
+> Step 1: **Reported gw use (ft)** = [0.114 * DSSAT water use (ft)] + 0.211
+  Step 2: Average annual water-level change (ft) = [-32.386 * **Reported gw use (ft)**] + 8.001
 
-  * Surface water contamination
-  * Treatment processes
 
 Contact: Blake B. Wilson KGS (bwilson@kgs.ku.edu)
 
