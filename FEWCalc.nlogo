@@ -1454,7 +1454,7 @@ to energy-calculation
     ]
   ]
 
-  set solar-cost (#Solar_Panels * (Capacity_S / 1000) * Cost_S / term-loan_S * (1 - (ITC_S / 100)))
+  set solar-cost ((#Solar_Panels * (Capacity_S / 1000) * Cost_S / term-loan_S + (18 * #solar_panels * (Capacity_S / 1000))) * (1 - (ITC_S / 100)))
   ;print (word "solar prod for cost cal: " solar-production)
 
   if count-solar-lifespan-sell <= Nyear_S [
@@ -1963,7 +1963,7 @@ to reset
   set SG_area 125
   set Energy_value 38
   set #Panel_sets 3
-  set Nyear_S 30
+  set Nyear_S 25
   set ITC_S 30
   set Capacity_S 250
   set Degrade_S 0.5
@@ -1978,7 +1978,7 @@ to reset
   set Min_Aq_Thickness 30
   set Future_Process "Repeat Historical"
   set Climate_Model "RCP4.5"
-  set cost_S 3050
+  set cost_S 1750
   set cost_W 1470
 end
 @#$#@#$#@
@@ -2838,7 +2838,7 @@ Nyear_S
 Nyear_S
 20
 30
-30.0
+25.0
 1
 1
 Yrs
@@ -2853,7 +2853,7 @@ Nyear_W
 Nyear_W
 20
 30
-30.0
+20.0
 1
 1
 Yrs
@@ -3002,8 +3002,8 @@ SLIDER
 Cost_S
 Cost_S
 0
-4000
-3050.0
+3000
+1750.0
 1
 1
 $/kW
