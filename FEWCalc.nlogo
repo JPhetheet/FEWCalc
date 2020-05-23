@@ -26,7 +26,7 @@ globals [
   corn-use-in wheat-use-in soybeans-use-in milo-use-in water-use-feet gw-change calibrated-water-use dryland-check? GCM-random-year level-30 level-30-patch level-60 level-60-patch gw-upper-limit
   corn-N-app wheat-N-app soybeans-N-app milo-N-app N-accu N-accu2 N-accu-temp
   #Solar_panels solar-production solar-production_temp count-solar-lifespan solar-cost solar-sell solar-sell_temp solar-net-income %Solar-production count-solar-lifespan-sell term-loan_S interest-rate_S term-loan_W interest-rate_W
-  wind-factor wind-production wind-production_temp wind-cost wind-sell wind-sell_temp wind-net-income energy-net-income %Wind-production count-wind-lifespan count-wind-lifespan-cost count-wind-lifespan-sell
+  wind-production wind-production_temp wind-cost wind-sell wind-sell_temp wind-net-income energy-net-income %Wind-production count-wind-lifespan count-wind-lifespan-cost count-wind-lifespan-sell
 ]
 
 to setup
@@ -37,9 +37,6 @@ to setup
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;;;;;;;;;;;;;;;; ADVANCED USER INPUTS ;;;;;;;;;;;;;;;;
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-  ;Wind production factor
-  set wind-factor 0.421                                                                             ;Wind production factor. Kansas = 42.1% (Wiser and Bolinger, 2019)
 
   ;Level of coverage
   set corn-coverage 0.75                                                                            ;Level of coverage
@@ -1351,12 +1348,12 @@ to dryland-farming_4
   set soybeans-yield-guarantee (soybeans-mean-yield * soybeans-coverage)
   set milo-yield-guarantee (milo-mean-yield * milo-coverage)
 
-  set corn-income-guarantee ((corn-yield-guarantee * corn-price-FM) * Corn_area)                 ;Calculate guarantee growth crop income
+  set corn-income-guarantee ((corn-yield-guarantee * corn-price-FM) * Corn_area)                    ;Calculate guarantee growth crop income
   set wheat-income-guarantee ((wheat-yield-guarantee * wheat-price-FM) * Wheat_area)
   set soybeans-income-guarantee ((soybeans-yield-guarantee * soybeans-price-FM) * Soybeans_area)
   set milo-income-guarantee ((milo-yield-guarantee * milo-price-FM) * SG_area)
 
-  set corn-tot-income (corn-tot-yield * (one-of corn-price) * Corn_area)                 ;Calculate farm gross income
+  set corn-tot-income (corn-tot-yield * (one-of corn-price) * Corn_area)                            ;Calculate farm gross income
   set wheat-tot-income (wheat-tot-yield * (one-of wheat-price) * Wheat_area)
   set soybeans-tot-income (soybeans-tot-yield * (one-of soybeans-price) * Soybeans_area)
   set milo-tot-income (milo-tot-yield * (one-of milo-price) * SG_area)
@@ -1400,7 +1397,7 @@ to dryland-farming_5
   set soybeans-yield-guarantee (soybeans-mean-yield * soybeans-coverage)
   set milo-yield-guarantee (milo-mean-yield * milo-coverage)
 
-  set corn-income-guarantee ((corn-yield-guarantee * corn-price-FM) * Corn_area)                 ;Calculate guarantee growth crop income
+  set corn-income-guarantee ((corn-yield-guarantee * corn-price-FM) * Corn_area)                    ;Calculate guarantee growth crop income
   set wheat-income-guarantee ((wheat-yield-guarantee * wheat-price-FM) * Wheat_area)
   set soybeans-income-guarantee ((soybeans-yield-guarantee * soybeans-price-FM) * Soybeans_area)
   set milo-income-guarantee ((milo-yield-guarantee * milo-price-FM) * SG_area)
@@ -1426,7 +1423,7 @@ to energy-calculation
 
   if count-solar-lifespan <= Nyear_S [
   ifelse count-solar-lifespan = 0 [
-    set solar-production_temp (#Solar_Panels * Capacity_S * 5.6 * 365 / 1000000)                   ;MWh = power(Watt) * 5.6hrs/day * 365days/year / 1000000
+    set solar-production_temp (#Solar_Panels * Capacity_S * 5.6 * 365 / 1000000)                    ;MWh = power(Watt) * 5.6hrs/day * 365days/year / 1000000
     set solar-production solar-production_temp
     ;print (word ticks " New solar: solar production = " solar-production)
     set count-solar-lifespan (count-solar-lifespan + 1)]
@@ -1441,7 +1438,7 @@ to energy-calculation
 
   if count-wind-lifespan <= Nyear_W [
   ifelse count-wind-lifespan <= 9 [                                                                 ;Count 10 years (0 to 9)
-    set wind-production_temp (#wind_turbines * Capacity_W * wind-factor * 24 * 365)                     ;MWh = power(MW) * Kansas_wind_Capacity_S * 24hrs/day * 365days/year, Capacity_S 42.1% (Berkeley Lab)
+    set wind-production_temp (#wind_turbines * Capacity_W * (wind_factor * 0.01) * 24 * 365)        ;MWh = power(MW) * Kansas_wind_Capacity_S * 24hrs/day * 365days/year, Capacity_S 42.1% (Berkeley Lab)
     set wind-production wind-production_temp
     ;print (word ticks "100% solar production = " wind-production)
     set count-wind-lifespan (count-wind-lifespan + 1)]
@@ -1454,7 +1451,9 @@ to energy-calculation
     ]
   ]
 
-  set solar-cost ((#Solar_Panels * (Capacity_S / 1000) * Cost_S / term-loan_S + (18 * #solar_panels * (Capacity_S / 1000))) * (1 - (ITC_S / 100)))
+  ifelse #Solar_Panels * (Capacity_S / 1000) < 10
+  [set solar-cost ((#Solar_Panels * (Capacity_S / 1000) * Cost_S / term-loan_S + (22 * #solar_panels * (Capacity_S / 1000))) * (1 - (ITC_S / 100)))]      ;Residential
+  [set solar-cost ((#Solar_Panels * (Capacity_S / 1000) * Cost_S / term-loan_S + (18 * #solar_panels * (Capacity_S / 1000))) * (1 - (ITC_S / 100)))]      ;Commercial
   ;print (word "solar prod for cost cal: " solar-production)
 
   if count-solar-lifespan-sell <= Nyear_S [
@@ -1645,7 +1644,6 @@ to gw-depletion_4
 end
 
 to gw-depletion_5
-
   ifelse ticks < 91
   [let m (ticks - 10)
    set corn-use-in (item m corn-irrig_5)
@@ -1833,7 +1831,7 @@ to initialize-energy
   set #Solar_panels (#Panel_sets * 1000)
   set solar-production (#Solar_Panels * Capacity_S * 5.6 * 365 / 1000000)
   ;print (word "initialize " solar-production)
-  set wind-production (#wind_turbines * Capacity_W * wind-factor * 24 * 365)
+  set wind-production (#wind_turbines * Capacity_W * (wind_factor * 0.01) * 24 * 365)
   set %Solar-production (Solar-production * 100 / (Solar-production + Wind-production))
   set %Wind-production (Wind-production * 100 / (Solar-production + Wind-production))
 
@@ -1918,7 +1916,7 @@ to reset-symbols                                                                
 
   if ticks = 0 [
     set solar-production (#Solar_Panels * Capacity_S * 5.6 * 365 / 1000000)
-    set wind-production (#wind_turbines * Capacity_W * wind-factor * 24 * 365)]
+    set wind-production (#wind_turbines * Capacity_W * (wind_factor * 0.01) * 24 * 365)]
 
   set solar-production solar-production
   ;print (word "reset-symbol " solar-production)
@@ -1964,13 +1962,13 @@ to reset
   set Energy_value 38
   set #Panel_sets 3
   set Nyear_S 25
-  set ITC_S 30
+  set ITC_S 0
   set Capacity_S 250
   set Degrade_S 0.5
   set PTC_S 0
   set #Wind_turbines 2
   set Nyear_W 30
-  set ITC_W 30
+  set ITC_W 0
   set Capacity_W 2
   set Degrade_W 1
   set PTC_W 0
@@ -1980,6 +1978,8 @@ to reset
   set Climate_Model "RCP4.5"
   set cost_S 1750
   set cost_W 1470
+  set sun_hrs 5.6
+  set Wind_factor 42.1
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -2235,7 +2235,7 @@ SLIDER
 278
 Capacity_S
 Capacity_S
-0
+100
 300
 250.0
 10
@@ -2462,9 +2462,9 @@ PENS
 TEXTBOX
 8
 280
-45
-298
-• Wind
+65
+308
+• Wind:
 11
 25.0
 1
@@ -2474,7 +2474,7 @@ TEXTBOX
 196
 47
 214
-• Solar
+• Solar:
 11
 25.0
 1
@@ -2805,11 +2805,11 @@ Degrade_W
 HORIZONTAL
 
 TEXTBOX
-248
-330
-376
-364
-Wind degradation applies after 10 yrs.
+51
+282
+261
+300
+Wind degradation applies after 10 yrs
 9
 25.0
 1
@@ -2853,7 +2853,7 @@ Nyear_W
 Nyear_W
 20
 30
-20.0
+30.0
 1
 1
 Yrs
@@ -2898,7 +2898,7 @@ ITC_W
 ITC_W
 0
 40
-30.0
+0.0
 1
 1
 %
@@ -2913,7 +2913,7 @@ ITC_S
 ITC_S
 0
 40
-30.0
+0.0
 1
 1
 %
@@ -3001,8 +3001,8 @@ SLIDER
 243
 Cost_S
 Cost_S
-0
-3000
+1000
+4000
 1750.0
 1
 1
@@ -3035,11 +3035,11 @@ Choose 1, ITC: Investment TC (%) OR PTC: Production TC ($/kWh)
 1
 
 TEXTBOX
-249
-245
-384
-289
-A set of panels = 1,000 solar panels. Solar degradation starts at year 2.
+50
+198
+195
+216
+1 set = 1,000 panels
 9
 25.0
 1
@@ -3060,6 +3060,36 @@ NIL
 NIL
 NIL
 1
+
+SLIDER
+247
+245
+381
+278
+Sun_hrs
+Sun_hrs
+3
+6
+5.6
+0.1
+1
+hrs/day
+HORIZONTAL
+
+SLIDER
+247
+329
+381
+362
+Wind_factor
+Wind_factor
+30
+50
+42.1
+0.1
+1
+%
+HORIZONTAL
 
 @#$#@#$#@
 # FEWCalc
