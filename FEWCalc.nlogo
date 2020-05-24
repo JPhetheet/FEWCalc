@@ -2935,10 +2935,10 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-265
-161
-381
-183
+693
+10
+809
+32
 *NYear is lifespan (years)
 9
 25.0
