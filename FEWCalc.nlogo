@@ -3016,8 +3016,8 @@ SLIDER
 327
 Cost_W
 Cost_W
-0
-2000
+1000
+2500
 1470.0
 1
 1
@@ -3068,8 +3068,8 @@ SLIDER
 278
 Sun_hrs
 Sun_hrs
-3
-6
+0
+8
 5.6
 0.1
 1
@@ -3083,8 +3083,8 @@ SLIDER
 362
 Wind_factor
 Wind_factor
-30
-50
+20
+60
 42.1
 0.1
 1
