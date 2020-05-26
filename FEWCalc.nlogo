@@ -240,7 +240,7 @@ to setup
   set solar-patches patches with [pxcor > 0 and pxcor < 65 and pycor > 33 and pycor < 100]         ;Set a location to place solar symbols
 
   let t 0                                                                                          ;Set a temporary variable
-    repeat #Panel_sets [                                                                           ;Using ifelse statement to place solar panels as grid arrangement
+    repeat ceiling #Panel_sets [                                                                           ;Using ifelse statement to place solar panels as grid arrangement
       ifelse t < 5 [
         crt 1 [
         setxy 56 (65 - (t * 12))
@@ -1296,7 +1296,6 @@ to dryland-farming_3
 end
 
 to dryland-farming_4
-
   ifelse ticks < 91
   [let m (ticks - 10)
    set corn-tot-yield (item m corn-yield_4)                                                         ;Access data from GCM8.5 list
@@ -1345,7 +1344,6 @@ to dryland-farming_4
 end
 
 to dryland-farming_5
-
   ifelse ticks < 91
   [let m (ticks - 10)
    set corn-tot-yield (item m corn-yield_6)                                                         ;Access data from GCM4.5 list
@@ -1434,7 +1432,7 @@ to energy-calculation
   ;;Solar cost;;
   ;;;;;;;;;;;;;;
 
-  ifelse #Solar_Panels * (Capacity_S / 1000) < 10                                                   ;Calculate solar panel's capital costs for different scales
+  ifelse #Solar_Panels * (Capacity_S / 1000) < 0.01                                                 ;Calculate solar panel's capital costs for different scales (10kW = 0.01MW)
   [set solar-cost ((#Solar_Panels * (Capacity_S / 1000) * Cost_S / term-loan_S + (22 * #solar_panels * (Capacity_S / 1000))) * (1 - (ITC_S / 100)))]      ;Residential
   [set solar-cost ((#Solar_Panels * (Capacity_S / 1000) * Cost_S / term-loan_S + (18 * #solar_panels * (Capacity_S / 1000))) * (1 - (ITC_S / 100)))]      ;Commercial
 
@@ -2286,7 +2284,7 @@ SLIDER
 0
 8
 3.0
-1
+0.1
 1
 NIL
 HORIZONTAL
@@ -2469,7 +2467,7 @@ CHOOSER
 Future_Process
 Future_Process
 "Repeat Historical" "Wetter Future" "Dryer Future" "Impose T, P, & S Changes"
-3
+0
 
 PLOT
 824
