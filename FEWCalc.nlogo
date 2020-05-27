@@ -101,7 +101,7 @@ to setup
   ask aquifer-patches [set pcolor blue]                                                             ;Set aquifer-patches = blue
   ask patch 79 -97 [set plabel "GW"]                                                                ;Label GW
 
-  set gw-upper-limit 60                                                                             ;Set upper threshold of gw level during dryland farming
+  set gw-upper-limit (Min_Aq_Thickness + 30)                                                        ;Set upper threshold of gw level during dryland farming
   set level-low-patch (Min_Aq_Thickness * 170 / Aquifer_thickness)                                  ;Calculate #patches below Min_AQ_Thickness in gw-patches (lower limit)
   set level-60-patch (gw-upper-limit * 170 / Aquifer_thickness)                                     ;Calculate #patches below 60 feet in gw-patches (upper limit)
   set level-low (-100 + level-low-patch)                                                            ;Locate a level where lower level is.
@@ -2718,7 +2718,7 @@ true
 PENS
 "GW level   " 1.0 0 -14454117 true "" "plot gw-level"
 "Min Aq" 1.0 2 -5298144 true "" "plot (Min_Aq_Thickness)"
-"60 ft" 1.0 2 -7500403 true "" "plot (gw-upper-limit)"
+"Min+30" 1.0 2 -7500403 true "" "plot (gw-upper-limit)"
 
 TEXTBOX
 386
@@ -3124,7 +3124,7 @@ HORIZONTAL
 
 @#$#@#$#@
 # FEWCalc
-**FEWCalc** is the **Food-Energy-Water Calculator** assembled by Jirapat Phetheet and Professor Mary C. Hill from Department of Geology, the University of Kansas. 
+**FEWCalc** is the **Food-Energy-Water Calculator** assembled by Jirapat (Mos) Phetheet -- a Master's student and Professor Mary C. Hill from Department of Geology, the University of Kansas. 
 
 The calculation is divided into two parts. The first part is crop calculation using a crop model called Decision Support System for Agrotechnology Transfer (DSSAT) which was developed by [Jones et al., 2003](https://doi.org/10.1016/S1161-0301(02)00107-7) from the University of Florida. The other is the FEWCalc conducted using NetLogo agent-based modeling software by [Uri Wilensky, 1999](https://ccl.northwestern.edu/netlogo/docs). 
 
