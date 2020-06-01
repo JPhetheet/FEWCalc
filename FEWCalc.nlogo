@@ -31,24 +31,24 @@ globals [
 
 to setup
   ca                                                                                                ;Clear all
-  import-data                                                                                       ;Import data from csv file in the FEWCalc folder
+  import-data                                                                                       ;Import data from csv files in the FEWCalc folder
 
 
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  ;;;;;;;;;;;;;;;; ADVANCED USER INPUTS ;;;;;;;;;;;;;;;;
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-  ;Level of coverage
-  set corn-coverage 0.75                                                                            ;Level of coverage
-  set wheat-coverage 0.7                                                                            ;Level of coverage
-  set soybeans-coverage 0.7                                                                         ;Level of coverage
-  set milo-coverage 0.65                                                                            ;Level of coverage
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;;;;; ADDITIONAL PARAMETERS THAT CAN BE CHANGED ;;;;;
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
   ;Future market price
   set corn-price-FM 4.12                                                                            ;Futures market price for crop insurance calculation
   set wheat-price-FM 6.94                                                                           ;Futures market price for crop insurance calculation
   set soybeans-price-FM 9.39                                                                        ;Futures market price for crop insurance calculation
   set milo-price-FM 3.14                                                                            ;Futures market price for crop insurance calculation
+
+  ;Level of coverage
+  set corn-coverage 0.75                                                                            ;Level of coverage for crop insurance
+  set wheat-coverage 0.7                                                                            ;Level of coverage for crop insurance
+  set soybeans-coverage 0.7                                                                         ;Level of coverage for crop insurance
+  set milo-coverage 0.65                                                                            ;Level of coverage for crop insurance
 
   ;Finance: the recent work, term loan = lifespan of the equipments
   set term-loan_S Nyear_S                                                                           ;Set solar production term loan = solar panel lifespan (Future work)
@@ -2125,7 +2125,7 @@ $
 10.0
 true
 true
-"set-plot-background-color 58" ""
+"set-plot-background-color [212 237 217]" ""
 PENS
 "Corn" 1.0 0 -4079321 true "" "plot corn-net-income"
 "Wheat" 1.0 0 -3844592 true "" "plot wheat-net-income"
@@ -2184,7 +2184,7 @@ Inches
 10.0
 true
 true
-"set-plot-background-color 88" ""
+"set-plot-background-color [196 231 233]" ""
 PENS
 "Corn" 1.0 0 -4079321 true "" "plot corn-use-in"
 "Wheat" 1.0 0 -3844592 true "" "plot wheat-use-in"
@@ -2205,7 +2205,7 @@ Bu/ac
 10.0
 true
 true
-"set-plot-background-color 58" ""
+"set-plot-background-color [212 237 217]" ""
 PENS
 "Corn" 1.0 0 -4079321 true "" "plot corn-tot-yield\n"
 "Wheat" 1.0 0 -3844592 true "" "plot wheat-tot-yield"
@@ -2423,7 +2423,7 @@ MWh
 2000.0
 true
 true
-"set-plot-background-color 28" ""
+"set-plot-background-color [255 201 173]" ""
 PENS
 "Solar        " 1.0 0 -5298144 true "" "ifelse ticks = 0 [set solar-production 0\nplot solar-production]\n[plot solar-production]"
 "Wind      " 1.0 0 -14070903 true "" "ifelse ticks = 0 [set wind-production 0\nplot wind-production]\n[plot wind-production]"
@@ -2524,7 +2524,7 @@ $
 15000.0
 true
 true
-"set-plot-background-color 28" ""
+"set-plot-background-color [255 201 173]" ""
 PENS
 "Solar        " 1.0 0 -5298144 true "" "ifelse ticks = 0 [set solar-net-income 0\nplot (solar-net-income)]\n[plot (solar-net-income)]"
 "Wind" 1.0 0 -14070903 true "" "ifelse ticks = 0 [set wind-net-income 0\nplot (wind-net-income)]\n[plot (wind-net-income)]"
@@ -2565,9 +2565,9 @@ TEXTBOX
 468
 814
 503
-• First 10 years use historical data (2008-2017), subsequent years apply Future Process.
-10
-5.0
+• First 10 years use historical data (2008-2017), subsequent years apply Future Process. Year represents a sequential year. Year 1 is 2008 and year 60 is 2067.
+11
+3.0
 1
 
 TEXTBOX
@@ -2625,19 +2625,9 @@ water-use-feet
 11
 
 TEXTBOX
-386
-486
-814
-504
-• Year in the plots represents a sequential year. Year 1 is 2008 and year 60 is 2067.
-10
-5.0
-1
-
-TEXTBOX
-390
+403
 37
-540
+455
 56
 World
 15
@@ -2714,7 +2704,7 @@ Feet
 10.0
 true
 true
-"set-plot-background-color 88" ""
+"set-plot-background-color [196 231 233]" ""
 PENS
 "GW level   " 1.0 0 -14454117 true "" "plot gw-level"
 "Min Aq" 1.0 2 -5298144 true "" "plot (Min_Aq_Thickness)"
@@ -2722,12 +2712,12 @@ PENS
 
 TEXTBOX
 386
-505
+502
 812
-523
+520
 • FEWCalc requires NetLogo version 6.1.0 or higher.
-10
-5.0
+11
+3.0
 1
 
 TEXTBOX
@@ -2791,13 +2781,13 @@ Climate_Model
 0
 
 TEXTBOX
-385
-525
-820
-572
+386
+523
+821
+579
 • The Representative Concentration Pathways (RCPs) are used for making climate projections largely based on greenhouse gas (GHG) emissions. RCP4.5 is representative of an intermediate scenario, whearas RCP8.5 is a scenario with very high GHG emissions.
-10
-5.0
+11
+3.0
 1
 
 TEXTBOX
@@ -2929,7 +2919,7 @@ ITC_W
 ITC_W
 0
 40
-0.0
+30.0
 1
 1
 %
@@ -2944,7 +2934,7 @@ ITC_S
 ITC_S
 0
 40
-0.0
+30.0
 1
 1
 %
@@ -3097,8 +3087,8 @@ SLIDER
 245
 381
 278
-Sun_hrs
-Sun_hrs
+Sun_Hrs
+Sun_Hrs
 0
 8
 5.6
