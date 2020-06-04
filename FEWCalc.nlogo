@@ -2127,7 +2127,7 @@ true
 true
 "set-plot-background-color [212 237 217]" ""
 PENS
-"Corn" 1.0 0 -4079321 true "" "plot corn-net-income"
+"Corn" 1.0 0 -8684775 true "" "plot corn-net-income"
 "Wheat" 1.0 0 -3844592 true "" "plot wheat-net-income"
 "Soybeans" 1.0 0 -13210332 true "" "plot soybeans-net-income"
 "SG" 1.0 0 -12440034 true "" "plot milo-net-income"
@@ -2186,7 +2186,7 @@ true
 true
 "set-plot-background-color [196 231 233]" ""
 PENS
-"Corn" 1.0 0 -4079321 true "" "plot corn-use-in"
+"Corn" 1.0 0 -8684775 true "" "plot corn-use-in"
 "Wheat" 1.0 0 -3844592 true "" "plot wheat-use-in"
 "Soybeans" 1.0 0 -13210332 true "" "plot soybeans-use-in"
 "SG" 1.0 0 -12440034 true "" "plot milo-use-in"
@@ -2207,7 +2207,7 @@ true
 true
 "set-plot-background-color [212 237 217]" ""
 PENS
-"Corn" 1.0 0 -4079321 true "" "plot corn-tot-yield\n"
+"Corn" 1.0 0 -8684775 true "" "plot corn-tot-yield\n"
 "Wheat" 1.0 0 -3844592 true "" "plot wheat-tot-yield"
 "Soybeans" 1.0 0 -13210332 true "" "plot soybeans-tot-yield"
 "SG" 1.0 0 -12440034 true "" "plot milo-tot-yield"
@@ -2466,7 +2466,7 @@ CHOOSER
 523
 Future_Process
 Future_Process
-"Repeat Historical" "Wetter Future" "Dryer Future" "Impose T, P, & S Changes"
+"Repeat Historical" "Wetter Future" "Dryer Future" "GCM"
 0
 
 PLOT
@@ -2761,11 +2761,11 @@ SG = Grain \nsorghum
 1
 
 TEXTBOX
-192
-434
-378
-492
-Climate scenario controls annual temperature (T), precipitation (P), and solar radiation (S).
+193
+433
+379
+491
+Alternative future annual values for temperature (T), precipitation (P), and solar radiation (S).
 11
 0.0
 1
@@ -2778,14 +2778,14 @@ CHOOSER
 Climate_Model
 Climate_Model
 "RCP4.5" "RCP8.5"
-0
+1
 
 TEXTBOX
 386
 523
 821
 579
-• The Representative Concentration Pathways (RCPs) are used for making climate projections largely based on greenhouse gas (GHG) emissions. RCP4.5 is representative of an intermediate scenario, whearas RCP8.5 is a scenario with very high GHG emissions.
+• Global climate models (GCMs) are used to project future climate. Climate projections are largely based on greenhouse gas (GHG) emissions. RCP4.5 represents an intermediate scenario, whearas RCP8.5 is a scenario with very high GHG emissions.
 11
 3.0
 1
@@ -2795,7 +2795,7 @@ TEXTBOX
 526
 373
 554
-For \"Impose T, P, and S Changes\"
+For \"GCM\"
 11
 0.0
 1
