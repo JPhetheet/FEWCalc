@@ -565,79 +565,79 @@ to calculate-expenses_yield_2                                                   
 end
 
 to calculate-expenses_yield_3                                                                       ;Expenses for irrigated farming (using GCMs data) [ref: AgManager.info]
-  let k (ticks mod 10)
-  if (item (item k yrs-seq) corn-yield_3) < 210 [set corn-expenses (786.23 * Corn_area)]
-  if (item (item k yrs-seq) corn-yield_3) >= 210 and (item (item k yrs-seq) corn-yield_3) <= 237.5 [set corn-expenses (861.41 * Corn_area)]
-  if (item (item k yrs-seq) corn-yield_3) > 237.5 [set corn-expenses (920.04 * Corn_area)]
+  let k (ticks - 10)
+  if (item k corn-yield_3) < 210 [set corn-expenses (786.23 * Corn_area)]
+  if (item k corn-yield_3) >= 210 and (item k corn-yield_3) <= 237.5 [set corn-expenses (861.41 * Corn_area)]
+  if (item k corn-yield_3) > 237.5 [set corn-expenses (920.04 * Corn_area)]
 
-  if (item (item k yrs-seq) wheat-yield_3) < 62.5 [set wheat-expenses (498.13 * Wheat_area)]
-  if (item (item k yrs-seq) wheat-yield_3) >= 62.5 and (item (item k yrs-seq) wheat-yield_3) <= 67.5 [set wheat-expenses (523.43 * Wheat_area)]
-  if (item (item k yrs-seq) wheat-yield_3) > 67.5 [set wheat-expenses (548.74 * Wheat_area)]
+  if (item k wheat-yield_3) < 62.5 [set wheat-expenses (498.13 * Wheat_area)]
+  if (item k wheat-yield_3) >= 62.5 and (item k wheat-yield_3) <= 67.5 [set wheat-expenses (523.43 * Wheat_area)]
+  if (item k wheat-yield_3) > 67.5 [set wheat-expenses (548.74 * Wheat_area)]
 
-  if (item (item k yrs-seq) soybeans-yield_3) < 58 [set soybeans-expenses (542.07 * Soybeans_area)]
-  if (item (item k yrs-seq) soybeans-yield_3) >= 58 and (item (item k yrs-seq) soybeans-yield_3) <= 64 [set soybeans-expenses (572.48 * Soybeans_area)]
-  if (item (item k yrs-seq) soybeans-yield_3) > 64 [set soybeans-expenses (620.95 * Soybeans_area)]
+  if (item k soybeans-yield_3) < 58 [set soybeans-expenses (542.07 * Soybeans_area)]
+  if (item k soybeans-yield_3) >= 58 and (item k soybeans-yield_3) <= 64 [set soybeans-expenses (572.48 * Soybeans_area)]
+  if (item k soybeans-yield_3) > 64 [set soybeans-expenses (620.95 * Soybeans_area)]
 
-  if (item (item k yrs-seq) milo-yield_3) < 150 [set milo-expenses (618.55 * SG_area)]
-  if (item (item k yrs-seq) milo-yield_3) >= 150 and (item (item k yrs-seq) milo-yield_3) <= 170 [set milo-expenses (666.17 * SG_area)]
-  if (item (item k yrs-seq) milo-yield_3) > 170 [set milo-expenses (713.79 * SG_area)]
+  if (item k milo-yield_3) < 150 [set milo-expenses (618.55 * SG_area)]
+  if (item k milo-yield_3) >= 150 and (item k milo-yield_3) <= 170 [set milo-expenses (666.17 * SG_area)]
+  if (item k milo-yield_3) > 170 [set milo-expenses (713.79 * SG_area)]
 end
 
 to calculate-expenses_yield_4                                                                       ;Expenses for dryland farming (using GCMs data) [ref: AgManager.info]
-  let k (ticks mod 10)
-  if (item (item k yrs-seq) corn-yield_4) < 66 [set corn-expenses (273.10 * Corn_area)]
-  if (item (item k yrs-seq) corn-yield_4) >= 66 and (item (item k yrs-seq) corn-yield_4) <= 91 [set corn-expenses (337.57 * Corn_area)]
-  if (item (item k yrs-seq) corn-yield_4) > 91 [set corn-expenses (377.54 * Corn_area)]
+  let k (ticks - 10)
+  if (item k corn-yield_4) < 66 [set corn-expenses (273.10 * Corn_area)]
+  if (item k corn-yield_4) >= 66 and (item k corn-yield_4) <= 91 [set corn-expenses (337.57 * Corn_area)]
+  if (item k corn-yield_4) > 91 [set corn-expenses (377.54 * Corn_area)]
 
-  if (item (item k yrs-seq) wheat-yield_4) < 37.5 [set wheat-expenses (245.47 * Wheat_area)]
-  if (item (item k yrs-seq) wheat-yield_4) >= 37.5 and (item (item k yrs-seq) wheat-yield_4) <= 46.5 [set wheat-expenses (277.41 * Wheat_area)]
-  if (item (item k yrs-seq) wheat-yield_4) > 46.5 [set wheat-expenses (309.35 * Wheat_area)]
+  if (item k wheat-yield_4) < 37.5 [set wheat-expenses (245.47 * Wheat_area)]
+  if (item k wheat-yield_4) >= 37.5 and (item k wheat-yield_4) <= 46.5 [set wheat-expenses (277.41 * Wheat_area)]
+  if (item k wheat-yield_4) > 46.5 [set wheat-expenses (309.35 * Wheat_area)]
 
-  if (item (item k yrs-seq) soybeans-yield_4) < 22.5 [set soybeans-expenses (224.51 * Soybeans_area)]
-  if (item (item k yrs-seq) soybeans-yield_4) >= 22.5 and (item (item k yrs-seq) soybeans-yield_4) <= 27.5 [set soybeans-expenses (248.50 * Soybeans_area)]
-  if (item (item k yrs-seq) soybeans-yield_4) > 27.5 [set soybeans-expenses (272.48 * Soybeans_area)]
+  if (item k soybeans-yield_4) < 22.5 [set soybeans-expenses (224.51 * Soybeans_area)]
+  if (item k soybeans-yield_4) >= 22.5 and (item k soybeans-yield_4) <= 27.5 [set soybeans-expenses (248.50 * Soybeans_area)]
+  if (item k soybeans-yield_4) > 27.5 [set soybeans-expenses (272.48 * Soybeans_area)]
 
-  if (item (item k yrs-seq) milo-yield_4) < 68 [set milo-expenses (263.01 * SG_area)]
-  if (item (item k yrs-seq) milo-yield_4) >= 68 and (item (item k yrs-seq) milo-yield_4) <= 93 [set milo-expenses (314.41 * SG_area)]
-  if (item (item k yrs-seq) milo-yield_4) > 93 [set milo-expenses (361.86 * SG_area)]
+  if (item k milo-yield_4) < 68 [set milo-expenses (263.01 * SG_area)]
+  if (item k milo-yield_4) >= 68 and (item k milo-yield_4) <= 93 [set milo-expenses (314.41 * SG_area)]
+  if (item k milo-yield_4) > 93 [set milo-expenses (361.86 * SG_area)]
 end
 
 to calculate-expenses_yield_5                                                                       ;Expenses for irrigated farming (using GCMs data) [ref: AgManager.info]
-  let k (ticks mod 10)
-  if (item (item k yrs-seq) corn-yield_5) < 210 [set corn-expenses (786.23 * Corn_area)]
-  if (item (item k yrs-seq) corn-yield_5) >= 210 and (item (item k yrs-seq) corn-yield_5) <= 237.5 [set corn-expenses (861.41 * Corn_area)]
-  if (item (item k yrs-seq) corn-yield_5) > 237.5 [set corn-expenses (920.04 * Corn_area)]
+  let k (ticks - 10)
+  if (item k corn-yield_5) < 210 [set corn-expenses (786.23 * Corn_area)]
+  if (item k corn-yield_5) >= 210 and (item k corn-yield_5) <= 237.5 [set corn-expenses (861.41 * Corn_area)]
+  if (item k corn-yield_5) > 237.5 [set corn-expenses (920.04 * Corn_area)]
 
-  if (item (item k yrs-seq) wheat-yield_5) < 62.5 [set wheat-expenses (498.13 * Wheat_area)]
-  if (item (item k yrs-seq) wheat-yield_5) >= 62.5 and (item (item k yrs-seq) wheat-yield_5) <= 67.5 [set wheat-expenses (523.43 * Wheat_area)]
-  if (item (item k yrs-seq) wheat-yield_5) > 67.5 [set wheat-expenses (548.74 * Wheat_area)]
+  if (item k wheat-yield_5) < 62.5 [set wheat-expenses (498.13 * Wheat_area)]
+  if (item k wheat-yield_5) >= 62.5 and (item k wheat-yield_5) <= 67.5 [set wheat-expenses (523.43 * Wheat_area)]
+  if (item k wheat-yield_5) > 67.5 [set wheat-expenses (548.74 * Wheat_area)]
 
-  if (item (item k yrs-seq) soybeans-yield_5) < 58 [set soybeans-expenses (542.07 * Soybeans_area)]
-  if (item (item k yrs-seq) soybeans-yield_5) >= 58 and (item (item k yrs-seq) soybeans-yield_5) <= 64 [set soybeans-expenses (572.48 * Soybeans_area)]
-  if (item (item k yrs-seq) soybeans-yield_5) > 64 [set soybeans-expenses (620.95 * Soybeans_area)]
+  if (item k soybeans-yield_5) < 58 [set soybeans-expenses (542.07 * Soybeans_area)]
+  if (item k soybeans-yield_5) >= 58 and (item k soybeans-yield_5) <= 64 [set soybeans-expenses (572.48 * Soybeans_area)]
+  if (item k soybeans-yield_5) > 64 [set soybeans-expenses (620.95 * Soybeans_area)]
 
-  if (item (item k yrs-seq) milo-yield_5) < 150 [set milo-expenses (618.55 * SG_area)]
-  if (item (item k yrs-seq) milo-yield_5) >= 150 and (item (item k yrs-seq) milo-yield_5) <= 170 [set milo-expenses (666.17 * SG_area)]
-  if (item (item k yrs-seq) milo-yield_5) > 170 [set milo-expenses (713.79 * SG_area)]
+  if (item k milo-yield_5) < 150 [set milo-expenses (618.55 * SG_area)]
+  if (item k milo-yield_5) >= 150 and (item k milo-yield_5) <= 170 [set milo-expenses (666.17 * SG_area)]
+  if (item k milo-yield_5) > 170 [set milo-expenses (713.79 * SG_area)]
 end
 
 to calculate-expenses_yield_6                                                                       ;Expenses for dryland farming (using GCMs data) [ref: AgManager.info]
-  let k (ticks mod 10)
-  if (item (item k yrs-seq) corn-yield_6) < 66 [set corn-expenses (273.10 * Corn_area)]
-  if (item (item k yrs-seq) corn-yield_6) >= 66 and (item (item k yrs-seq) corn-yield_6) <= 91 [set corn-expenses (337.57 * Corn_area)]
-  if (item (item k yrs-seq) corn-yield_6) > 91 [set corn-expenses (377.54 * Corn_area)]
+  let k (ticks - 10)
+  if (item k corn-yield_6) < 66 [set corn-expenses (273.10 * Corn_area)]
+  if (item k corn-yield_6) >= 66 and (item k corn-yield_6) <= 91 [set corn-expenses (337.57 * Corn_area)]
+  if (item k corn-yield_6) > 91 [set corn-expenses (377.54 * Corn_area)]
 
-  if (item (item k yrs-seq) wheat-yield_6) < 37.5 [set wheat-expenses (245.47 * Wheat_area)]
-  if (item (item k yrs-seq) wheat-yield_6) >= 37.5 and (item (item k yrs-seq) wheat-yield_6) <= 46.5 [set wheat-expenses (277.41 * Wheat_area)]
-  if (item (item k yrs-seq) wheat-yield_6) > 46.5 [set wheat-expenses (309.35 * Wheat_area)]
+  if (item k wheat-yield_6) < 37.5 [set wheat-expenses (245.47 * Wheat_area)]
+  if (item k wheat-yield_6) >= 37.5 and (item k wheat-yield_6) <= 46.5 [set wheat-expenses (277.41 * Wheat_area)]
+  if (item k wheat-yield_6) > 46.5 [set wheat-expenses (309.35 * Wheat_area)]
 
-  if (item (item k yrs-seq) soybeans-yield_6) < 22.5 [set soybeans-expenses (224.51 * Soybeans_area)]
-  if (item (item k yrs-seq) soybeans-yield_6) >= 22.5 and (item (item k yrs-seq) soybeans-yield_6) <= 27.5 [set soybeans-expenses (248.50 * Soybeans_area)]
-  if (item (item k yrs-seq) soybeans-yield_6) > 27.5 [set soybeans-expenses (272.48 * Soybeans_area)]
+  if (item k soybeans-yield_6) < 22.5 [set soybeans-expenses (224.51 * Soybeans_area)]
+  if (item k soybeans-yield_6) >= 22.5 and (item k soybeans-yield_6) <= 27.5 [set soybeans-expenses (248.50 * Soybeans_area)]
+  if (item k soybeans-yield_6) > 27.5 [set soybeans-expenses (272.48 * Soybeans_area)]
 
-  if (item (item k yrs-seq) milo-yield_6) < 68 [set milo-expenses (263.01 * SG_area)]
-  if (item (item k yrs-seq) milo-yield_6) >= 68 and (item (item k yrs-seq) milo-yield_6) <= 93 [set milo-expenses (314.41 * SG_area)]
-  if (item (item k yrs-seq) milo-yield_6) > 93 [set milo-expenses (361.86 * SG_area)]
+  if (item k milo-yield_6) < 68 [set milo-expenses (263.01 * SG_area)]
+  if (item k milo-yield_6) >= 68 and (item k milo-yield_6) <= 93 [set milo-expenses (314.41 * SG_area)]
+  if (item k milo-yield_6) > 93 [set milo-expenses (361.86 * SG_area)]
 end
 
 to calculate-insurance
@@ -2526,7 +2526,7 @@ CHOOSER
 Future_Process
 Future_Process
 "Repeat Historical" "Wetter Future" "Dryer Future" "GCM"
-2
+3
 
 PLOT
 824
@@ -2837,7 +2837,7 @@ CHOOSER
 Climate_Model
 Climate_Model
 "RCP4.5" "RCP8.5"
-0
+1
 
 TEXTBOX
 386
