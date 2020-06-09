@@ -982,8 +982,6 @@ to food-calculation_1-2                                                         
   set soybeans-tot-income (item (n mod 10) soybeans-yield_1 * item (n mod 10) soybeans-price * Soybeans_area)
   set milo-tot-income (item (n mod 10) milo-yield_1 * item (n mod 10) milo-price * SG_area)
 
-  print (word "Corn-price = " item (n mod 10) corn-price)
-
   calculate-expenses_yield_1                                                                        ;See "to calculate-expenses_yield_1"
   calculate-insurance                                                                               ;See "to calculate-insurance"
   calculate-net-income                                                                              ;See "to calculate-net-income"
@@ -1024,13 +1022,7 @@ to food-calculation_2                                                           
   set corn-tot-income (item (item n yrs-seq) corn-yield_1 * (item (item n yrs-seq) corn-price) * Corn_area)          ;Calculate farm gross income
   set wheat-tot-income (item (item n yrs-seq) wheat-yield_1 * (one-of wheat-price) * Wheat_area)
   set soybeans-tot-income (item (item n yrs-seq) soybeans-yield_1 * (item (item n yrs-seq) soybeans-price) * Soybeans_area)
-  set milo-tot-income (item (item n yrs-seq) milo-yield_1 * (item (item n yrs-seq) milo-price) * SG_area)
-
-  print (word "n = " n)
-  print (word "year-seq = " (item n yrs-seq))
-  print (word "year: " (ticks + 2008))
-  print (word "corn-price = " (item (item n yrs-seq) corn-price))
-
+  set milo-tot-income (item (item n yrs-seq) milo-yield_1 * (one-of milo-price) * SG_area)
 
   calculate-expenses_yield_1                                                                        ;See "to calculate-expenses_yield_1"
   calculate-insurance                                                                               ;See "to calculate-insurance"
@@ -1072,11 +1064,7 @@ to food-calculation_3                                                           
   set corn-tot-income (item (item n yrs-seq) corn-yield_1 * (item (item n yrs-seq) corn-price) * Corn_area)          ;Calculate farm gross income
   set wheat-tot-income (item (item n yrs-seq) wheat-yield_1 * (one-of wheat-price) * Wheat_area)
   set soybeans-tot-income (item (item n yrs-seq) soybeans-yield_1 * (item (item n yrs-seq) soybeans-price) * Soybeans_area)
-  set milo-tot-income (item (item n yrs-seq) milo-yield_1 * (item (item n yrs-seq) milo-price) * SG_area)
-
-  print (word "n = " n)
-  print (word "year-seq = " (item n yrs-seq))
-  print (word "sorghum-price = " (item (item n yrs-seq) milo-price))
+  set milo-tot-income (item (item n yrs-seq) milo-yield_1 * (one-of milo-price) * SG_area)
 
   calculate-expenses_yield_1                                                                        ;See "to calculate-expenses_yield_1"
   calculate-insurance                                                                               ;See "to calculate-insurance"
@@ -1089,24 +1077,18 @@ to tot-income-for-GCM4.5                                                        
     set corn-tot-income (corn-tot-yield * (item (one-of [3 4 5]) corn-price) * Corn_area)           ;items 3, 4, and 5 represent dry years
     set wheat-tot-income (wheat-tot-yield * (one-of wheat-price) * Wheat_area)                      ;wheat applies a random number of crop price
     set soybeans-tot-income (soybeans-tot-yield * (item (one-of [3 4 5]) soybeans-price) * Soybeans_area)
-    set milo-tot-income (milo-tot-yield * (item (one-of [3 4 5]) milo-price) * SG_area)
-    print "dry year"
-    print (word "percip = " (item m precip_RCP4.5))]
+    set milo-tot-income (milo-tot-yield * (one-of milo-price) * SG_area)]
 
     [ifelse (item m precip_RCP4.5) >= 17 and (item m precip_RCP4.5) < 20 [                          ;Calculate farm gross income for moderate years
      set corn-tot-income (corn-tot-yield * (item (one-of [0 1 2 6]) corn-price) * Corn_area)        ;items 0, 1, 2, and 6 represent moderate years
      set wheat-tot-income (wheat-tot-yield * (one-of wheat-price) * Wheat_area)
      set soybeans-tot-income (soybeans-tot-yield * (item (one-of [0 1 2 6]) soybeans-price) * Soybeans_area)
-     set milo-tot-income (milo-tot-yield * (item (one-of [0 1 2 6]) milo-price) * SG_area)
-     print "moderate year"
-     print (word "percip = " (item m precip_RCP4.5))]
+     set milo-tot-income (milo-tot-yield * (one-of milo-price) * SG_area)]
 
      [set corn-tot-income (corn-tot-yield * (item (one-of [7 8 9]) corn-price) * Corn_area)         ;Calculate farm gross income for wet years
       set wheat-tot-income (wheat-tot-yield * (one-of wheat-price) * Wheat_area)                    ;items 7, 8, and 9 represent wet years
       set soybeans-tot-income (soybeans-tot-yield * (item (one-of [7 8 9]) soybeans-price) * Soybeans_area)
-      set milo-tot-income (milo-tot-yield * (item (one-of [7 8 9]) milo-price) * SG_area)
-      print "wet year"
-      print (word "percip = " (item m precip_RCP4.5))]
+      set milo-tot-income (milo-tot-yield * (one-of milo-price) * SG_area)]
     ]
 end
 
@@ -1116,24 +1098,18 @@ to tot-income-for-GCM8.5                                                        
     set corn-tot-income (corn-tot-yield * (item (one-of [3 4 5]) corn-price) * Corn_area)           ;items 3, 4, and 5 represent dry years
     set wheat-tot-income (wheat-tot-yield * (one-of wheat-price) * Wheat_area)                      ;wheat applies a random number of crop price
     set soybeans-tot-income (soybeans-tot-yield * (item (one-of [3 4 5]) soybeans-price) * Soybeans_area)
-    set milo-tot-income (milo-tot-yield * (item (one-of [3 4 5]) milo-price) * SG_area)
-    print "dry year"
-    print (word "percip = " (item m precip_RCP8.5))]
+    set milo-tot-income (milo-tot-yield * (one-of milo-price) * SG_area)]
 
     [ifelse (item m precip_RCP8.5) >= 17 and (item m precip_RCP8.5) < 20 [                          ;Calculate farm gross income for moderate years
      set corn-tot-income (corn-tot-yield * (item (one-of [0 1 2 6]) corn-price) * Corn_area)        ;items 0, 1, 2, and 6 represent moderate years
      set wheat-tot-income (wheat-tot-yield * (one-of wheat-price) * Wheat_area)
      set soybeans-tot-income (soybeans-tot-yield * (item (one-of [0 1 2 6]) soybeans-price) * Soybeans_area)
-     set milo-tot-income (milo-tot-yield * (item (one-of [0 1 2 6]) milo-price) * SG_area)
-     print "moderate year"
-     print (word "percip = " (item m precip_RCP8.5))]
+     set milo-tot-income (milo-tot-yield * (one-of milo-price) * SG_area)]
 
      [set corn-tot-income (corn-tot-yield * (item (one-of [7 8 9]) corn-price) * Corn_area)         ;Calculate farm gross income for wet years
       set wheat-tot-income (wheat-tot-yield * (one-of wheat-price) * Wheat_area)                    ;items 7, 8, and 9 represent wet years
       set soybeans-tot-income (soybeans-tot-yield * (item (one-of [7 8 9]) soybeans-price) * Soybeans_area)
-      set milo-tot-income (milo-tot-yield * (item (one-of [7 8 9]) milo-price) * SG_area)
-      print "wet year"
-      print (word "percip = " (item m precip_RCP8.5))]
+      set milo-tot-income (milo-tot-yield * (one-of milo-price) * SG_area)]
     ]
 end
 
@@ -1295,7 +1271,7 @@ to dryland-farming_2
   set corn-tot-income (item (item n yrs-seq) corn-yield_2 * (item (item n yrs-seq) corn-price) * Corn_area)          ;Calculate farm gross income
   set wheat-tot-income (item (item n yrs-seq) wheat-yield_2 * (one-of wheat-price) * Wheat_area)
   set soybeans-tot-income (item (item n yrs-seq) soybeans-yield_2 * (item (item n yrs-seq) soybeans-price) * Soybeans_area)
-  set milo-tot-income (item (item n yrs-seq) milo-yield_2 * (item (item n yrs-seq) milo-price) * SG_area)
+  set milo-tot-income (item (item n yrs-seq) milo-yield_2 * (one-of milo-price) * SG_area)
 
   calculate-expenses_yield_2                                                                        ;See "to calculate-expenses_yield_2"
   calculate-insurance                                                                               ;See "to calculate-insurance"
@@ -1343,11 +1319,7 @@ to dryland-farming_3
   set corn-tot-income (item (item n yrs-seq) corn-yield_2 * (item (item n yrs-seq) corn-price) * Corn_area)          ;Calculate farm gross income
   set wheat-tot-income (item (item n yrs-seq) wheat-yield_2 * (one-of wheat-price) * Wheat_area)
   set soybeans-tot-income (item (item n yrs-seq) soybeans-yield_2 * (item (item n yrs-seq) soybeans-price) * Soybeans_area)
-  set milo-tot-income (item (item n yrs-seq) milo-yield_2 * (item (item n yrs-seq) milo-price) * SG_area)
-
-  print (word "n = " n)
-  print (word "year-seq = " (item n yrs-seq))
-  print (word "sorghum-price = " (item (item n yrs-seq) milo-price))
+  set milo-tot-income (item (item n yrs-seq) milo-yield_2 * (one-of milo-price) * SG_area)
 
   calculate-expenses_yield_2                                                                        ;See "to calculate-expenses_yield_2"
   calculate-insurance                                                                               ;See "to calculate-insurance"
@@ -2214,7 +2186,7 @@ TEXTBOX
 414
 185
 446
-Water -----------------
+Water ----------------
 13
 95.0
 1
@@ -2526,7 +2498,7 @@ CHOOSER
 Future_Process
 Future_Process
 "Repeat Historical" "Wetter Future" "Dryer Future" "GCM"
-3
+0
 
 PLOT
 824
@@ -2634,7 +2606,7 @@ TEXTBOX
 468
 189
 514
-• Water is assumed to come from groundwater (GW) pumping.
+• Irrigation comes from groundwater (GW) pumping
 11
 95.0
 1
@@ -2837,7 +2809,7 @@ CHOOSER
 Climate_Model
 Climate_Model
 "RCP4.5" "RCP8.5"
-1
+0
 
 TEXTBOX
 386
@@ -2862,7 +2834,7 @@ For \"GCM\"
 TEXTBOX
 8
 434
-180
+166
 461
 • Effects on surface water (SW) quality are accumulated.
 11
@@ -2978,7 +2950,7 @@ ITC_W
 ITC_W
 0
 40
-30.0
+0.0
 1
 1
 %
@@ -2993,7 +2965,7 @@ ITC_S
 ITC_S
 0
 40
-30.0
+0.0
 1
 1
 %
