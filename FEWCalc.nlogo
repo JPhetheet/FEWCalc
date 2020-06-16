@@ -398,7 +398,7 @@ to import-data                                                                  
   set wheat-GCMs lput csv:from-file "6_Wheat_GCMs.csv" wheat-GCMs                                   ;Import all wheat values to a wheat-GCMs list
   set soybeans-GCMs lput csv:from-file "7_Soybeans_GCMs.csv" soybeans-GCMs                          ;Import all soybeans values to a soybeans-GCMs list
   set milo-GCMs lput csv:from-file "8_Milo_GCMs.csv" milo-GCMs                                      ;Import all milo values to a milo-GCMs list
-  set all-expenses_raw lput csv:from-file "9_Farm_Expenses_For_Users.csv" all-expenses_raw          ;Import all expense values to an all-expenses_raw list
+  set all-expenses_raw lput csv:from-file "9a_Farm_Expenses_For_Users.csv" all-expenses_raw          ;Import all expense values to an all-expenses_raw list
 
   let m 1                                                                                           ;Set a temporary variable
   while [m < 11] [                                                                                  ;10 loops for 10-year data
