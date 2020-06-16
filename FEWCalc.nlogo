@@ -11,7 +11,11 @@ globals [
   wheat-data wheat-GCMs wheat-sum_1 wheat-sum_2 wheat-price wheat-yield_1 wheat-irrig_1 wheat-yield_2 wheat-irrig_2 wheat-yield_3 wheat-irrig_3 wheat-yield_4 wheat-irrig_4 wheat-yield_5 wheat-irrig_5 wheat-yield_6 wheat-irrig_6
   soybeans-data soybeans-GCMs soybeans-sum_1 soybeans-sum_2 soybeans-price soybeans-yield_1 soybeans-irrig_1 soybeans-yield_2 soybeans-irrig_2 soybeans-yield_3 soybeans-irrig_3 soybeans-yield_4 soybeans-irrig_4 soybeans-yield_5 soybeans-irrig_5 soybeans-yield_6 soybeans-irrig_6
   milo-data milo-GCMs milo-sum_1 milo-sum_2 milo-price milo-yield_1 milo-irrig_1 milo-yield_2 milo-irrig_2 milo-yield_3 milo-irrig_3 milo-yield_4 milo-irrig_4 milo-yield_5 milo-irrig_5 milo-yield_6 milo-irrig_6
-  corn-expenses wheat-expenses soybeans-expenses milo-expenses
+  corn-expenses wheat-expenses soybeans-expenses milo-expenses all-expenses_raw
+  corn-costs-irrig-low corn-costs-irrig-moderate corn-costs-irrig-high corn-costs-dry-low corn-costs-dry-moderate corn-costs-dry-high
+  wheat-costs-irrig-low wheat-costs-irrig-moderate wheat-costs-irrig-high wheat-costs-dry-low wheat-costs-dry-moderate wheat-costs-dry-high
+  soybeans-costs-irrig-low soybeans-costs-irrig-moderate soybeans-costs-irrig-high soybeans-costs-dry-low soybeans-costs-dry-moderate soybeans-costs-dry-high
+  milo-costs-irrig-low milo-costs-irrig-moderate milo-costs-irrig-high milo-costs-dry-low milo-costs-dry-moderate milo-costs-dry-high
   corn-tot-income wheat-tot-income soybeans-tot-income milo-tot-income
   corn-net-income wheat-net-income soybeans-net-income milo-net-income
   corn-history wheat-history soybeans-history milo-history
@@ -25,8 +29,8 @@ globals [
   corn-irrig-increment wheat-irrig-increment soybeans-irrig-increment milo-irrig-increment
   corn-use-in wheat-use-in soybeans-use-in milo-use-in water-use-feet gw-change calibrated-water-use dryland-check? GCM-random-year level-low level-low-patch level-60 level-60-patch gw-upper-limit
   corn-N-app wheat-N-app soybeans-N-app milo-N-app N-accu N-accu2 N-accu-temp
-  #Solar_panels solar-production solar-production_temp count-solar-lifespan solar-cost solar-sell solar-sell_temp solar-net-income %Solar-production count-solar-lifespan-sell term-loan_S interest-rate_S term-loan_W interest-rate_W
-  wind-production wind-production_temp wind-cost wind-sell wind-sell_temp wind-net-income energy-net-income %Wind-production count-wind-lifespan count-wind-lifespan-cost count-wind-lifespan-sell
+  #Solar_panels solar-production solar-production_temp count-solar-lifespan solar-cost solar-sell solar-sell_temp solar-net-income %Solar-production count-solar-lifespan-sell term-loan_S interest-rate_S annual_payment_s balance_s interest_s principal_s count_loan_term_s
+  wind-production wind-production_temp wind-cost wind-sell wind-sell_temp wind-net-income energy-net-income %Wind-production count-wind-lifespan count-wind-lifespan-cost count-wind-lifespan-sell term-loan_W interest-rate_W  annual_payment_w balance_w interest_w principal_w count_loan_term_w
 ]
 
 to setup
@@ -50,11 +54,11 @@ to setup
   set soybeans-coverage 0.7                                                                         ;Level of coverage for crop insurance
   set milo-coverage 0.65                                                                            ;Level of coverage for crop insurance
 
-  ;Finance: the recent work, term loan = lifespan of the equipments
-  set term-loan_S Nyear_S                                                                           ;Set solar production term loan = solar panel lifespan (Future work)
-  set interest-rate_S 0                                                                             ;Set solar production interest rate = 0% per year (Future work)
-  set term-loan_W Nyear_W                                                                           ;Set wind production loan = wind turbine lifespan (Future work)
-  set interest-rate_W 0                                                                             ;Set wind production interest rate = 0% per year (Future work)
+  ;Finance:
+  set term-loan_S (Loan_term * Nyear_S)                                                             ;Set solar production term loan = solar panel lifespan (Future work)
+  set interest-rate_S (interest / 100)                                                                      ;Set solar production interest rate = 0% per year (Future work)
+  set term-loan_W (Loan_term * Nyear_W)                                                             ;Set wind production loan = wind turbine lifespan (Future work)
+  set interest-rate_W (interest / 100)                                                                     ;Set wind production interest rate = 0% per year (Future work)
 
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;;;;;;;;;;;;;;;;;; cropland patches ;;;;;;;;;;;;;;;;;;
@@ -267,6 +271,8 @@ to setup
   reset-ticks                                                                                       ;Reset tick to zero
 end
 
+
+
 to go                                                                                               ;Go procedure
   if ticks = Simulation_period [stop]                                                               ;FEWCalc stops simulation when ticks exceed simulation_period
   check-area                                                                                        ;If a crop is not applied, FEWCalc sets all input variables to zero.
@@ -300,6 +306,14 @@ to import-data                                                                  
   set corn-yield_6 []                                                                               ;Yield_6 means simulated yield from GCMs data + dryland simulation (dryland RCP4.5)
   set corn-irrig_6 []                                                                               ;Irrig_6 means simulated irrigation from GCMs data + dryland simulation (dryland RCP4.5)
   set corn-N-app []                                                                                 ;N application
+  set all-expenses_raw []                                                                           ;Create a list of all expanses raw
+  set corn-costs-irrig-low []                                                                       ;Irrigated corn expenses for low yield
+  set corn-costs-irrig-moderate []                                                                  ;Irrigated corn expenses for moderate yield
+  set corn-costs-irrig-high []                                                                      ;Irrigated corn expenses for high yield
+  set corn-costs-dry-low []                                                                         ;Dryland corn expenses for low yield
+  set corn-costs-dry-moderate []                                                                    ;Dryland corn expenses for moderate yield
+  set corn-costs-dry-high []                                                                        ;Dryland corn expenses for high yield
+
 
   set wheat-data []                                                                                 ;See above from corn
   set Wheat-GCMs []
@@ -319,6 +333,12 @@ to import-data                                                                  
   set wheat-yield_6 []
   set wheat-irrig_6 []
   set wheat-N-app []
+  set wheat-costs-irrig-low []
+  set wheat-costs-irrig-moderate []
+  set wheat-costs-irrig-high []
+  set wheat-costs-dry-low []
+  set wheat-costs-dry-moderate []
+  set wheat-costs-dry-high []
 
   set soybeans-data []                                                                              ;See above from corn
   set soybeans-GCMs []
@@ -338,6 +358,12 @@ to import-data                                                                  
   set soybeans-yield_6 []
   set soybeans-irrig_6 []
   set soybeans-N-app []
+  set soybeans-costs-irrig-low []
+  set soybeans-costs-irrig-moderate []
+  set soybeans-costs-irrig-high []
+  set soybeans-costs-dry-low []
+  set soybeans-costs-dry-moderate []
+  set soybeans-costs-dry-high []
 
   set milo-data []                                                                                  ;See above from corn
   set milo-GCMs []
@@ -357,6 +383,12 @@ to import-data                                                                  
   set milo-yield_6 []
   set milo-irrig_6 []
   set milo-N-app []
+  set milo-costs-irrig-low []
+  set milo-costs-irrig-moderate []
+  set milo-costs-irrig-high []
+  set milo-costs-dry-low []
+  set milo-costs-dry-moderate []
+  set milo-costs-dry-high []
 
   set corn-data lput csv:from-file "1_Corn_inputs.csv" corn-data                                    ;Import all corn values to a corn-data list
   set wheat-data lput csv:from-file "2_Wheat_inputs.csv" wheat-data                                 ;Import all wheat values to a wheat-data list
@@ -366,6 +398,7 @@ to import-data                                                                  
   set wheat-GCMs lput csv:from-file "6_Wheat_GCMs.csv" wheat-GCMs                                   ;Import all wheat values to a wheat-GCMs list
   set soybeans-GCMs lput csv:from-file "7_Soybeans_GCMs.csv" soybeans-GCMs                          ;Import all soybeans values to a soybeans-GCMs list
   set milo-GCMs lput csv:from-file "8_Milo_GCMs.csv" milo-GCMs                                      ;Import all milo values to a milo-GCMs list
+  set all-expenses_raw lput csv:from-file "9_Farm_Expenses_For_Users.csv" all-expenses_raw          ;Import all expense values to an all-expenses_raw list
 
   let m 1                                                                                           ;Set a temporary variable
   while [m < 11] [                                                                                  ;10 loops for 10-year data
@@ -524,120 +557,176 @@ let n 1                                                                         
   set wheat-history wheat-yield_1                                                                   ;Set historical production list for crop insurance calculation
   set soybeans-history soybeans-yield_1                                                             ;Set historical production list for crop insurance calculation
   set milo-history milo-yield_1                                                                     ;Set historical production list for crop insurance calculation
+
+  let row 3
+  while [row <= 28] [
+    foreach all-expenses_raw [x -> let col (item 1 item row item 0 all-expenses_raw)
+       set corn-costs-irrig-low lput col corn-costs-irrig-low]
+    foreach all-expenses_raw [x -> let col (item 2 item row item 0 all-expenses_raw)
+       set corn-costs-irrig-moderate lput col corn-costs-irrig-moderate]
+    foreach all-expenses_raw [x -> let col (item 3 item row item 0 all-expenses_raw)
+       set corn-costs-irrig-high lput col corn-costs-irrig-high]
+    foreach all-expenses_raw [x -> let col (item 4 item row item 0 all-expenses_raw)
+       set corn-costs-dry-low lput col corn-costs-dry-low]
+    foreach all-expenses_raw [x -> let col (item 5 item row item 0 all-expenses_raw)
+       set corn-costs-dry-moderate lput col corn-costs-dry-moderate]
+    foreach all-expenses_raw [x -> let col (item 6 item row item 0 all-expenses_raw)
+       set corn-costs-dry-high lput col corn-costs-dry-high]
+
+    foreach all-expenses_raw [x -> let col (item 7 item row item 0 all-expenses_raw)
+       set wheat-costs-irrig-low lput col wheat-costs-irrig-low]
+    foreach all-expenses_raw [x -> let col (item 8 item row item 0 all-expenses_raw)
+       set wheat-costs-irrig-moderate lput col wheat-costs-irrig-moderate]
+    foreach all-expenses_raw [x -> let col (item 9 item row item 0 all-expenses_raw)
+       set wheat-costs-irrig-high lput col wheat-costs-irrig-high]
+    foreach all-expenses_raw [x -> let col (item 10 item row item 0 all-expenses_raw)
+       set wheat-costs-dry-low lput col wheat-costs-dry-low]
+    foreach all-expenses_raw [x -> let col (item 11 item row item 0 all-expenses_raw)
+       set wheat-costs-dry-moderate lput col wheat-costs-dry-moderate]
+    foreach all-expenses_raw [x -> let col (item 12 item row item 0 all-expenses_raw)
+       set wheat-costs-dry-high lput col wheat-costs-dry-high]
+
+    foreach all-expenses_raw [x -> let col (item 7 item row item 0 all-expenses_raw)
+       set soybeans-costs-irrig-low lput col soybeans-costs-irrig-low]
+    foreach all-expenses_raw [x -> let col (item 8 item row item 0 all-expenses_raw)
+       set soybeans-costs-irrig-moderate lput col soybeans-costs-irrig-moderate]
+    foreach all-expenses_raw [x -> let col (item 9 item row item 0 all-expenses_raw)
+       set soybeans-costs-irrig-high lput col soybeans-costs-irrig-high]
+    foreach all-expenses_raw [x -> let col (item 10 item row item 0 all-expenses_raw)
+       set soybeans-costs-dry-low lput col soybeans-costs-dry-low]
+    foreach all-expenses_raw [x -> let col (item 11 item row item 0 all-expenses_raw)
+       set soybeans-costs-dry-moderate lput col soybeans-costs-dry-moderate]
+    foreach all-expenses_raw [x -> let col (item 12 item row item 0 all-expenses_raw)
+       set soybeans-costs-dry-high lput col soybeans-costs-dry-high]
+
+    foreach all-expenses_raw [x -> let col (item 13 item row item 0 all-expenses_raw)
+       set milo-costs-irrig-low lput col milo-costs-irrig-low]
+    foreach all-expenses_raw [x -> let col (item 14 item row item 0 all-expenses_raw)
+       set milo-costs-irrig-moderate lput col milo-costs-irrig-moderate]
+    foreach all-expenses_raw [x -> let col (item 15 item row item 0 all-expenses_raw)
+       set milo-costs-irrig-high lput col milo-costs-irrig-high]
+    foreach all-expenses_raw [x -> let col (item 16 item row item 0 all-expenses_raw)
+       set milo-costs-dry-low lput col milo-costs-dry-low]
+    foreach all-expenses_raw [x -> let col (item 17 item row item 0 all-expenses_raw)
+       set milo-costs-dry-moderate lput col milo-costs-dry-moderate]
+    foreach all-expenses_raw [x -> let col (item 18 item row item 0 all-expenses_raw)
+       set milo-costs-dry-high lput col milo-costs-dry-high]
+  set row (row + 1)
+  ]
 end
 
 to calculate-expenses_yield_1                                                                       ;Expenses for irrigated farming [ref: AgManager.info (K-State, 2020 report)]
   let k (ticks mod 10)
-  if (item (item k yrs-seq) corn-yield_1) < 210 [set corn-expenses (786.23 * Corn_area)]
-  if (item (item k yrs-seq) corn-yield_1) >= 210 and (item (item k yrs-seq) corn-yield_1) <= 237.5 [set corn-expenses (861.41 * Corn_area)]
-  if (item (item k yrs-seq) corn-yield_1) > 237.5 [set corn-expenses (920.04 * Corn_area)]
+  if (item (item k yrs-seq) corn-yield_1) < 210 [set corn-expenses ((sum corn-costs-irrig-low) * Corn_area)]
+  if (item (item k yrs-seq) corn-yield_1) >= 210 and (item (item k yrs-seq) corn-yield_1) <= 237.5 [set corn-expenses ((sum corn-costs-irrig-moderate) * Corn_area)]
+  if (item (item k yrs-seq) corn-yield_1) > 237.5 [set corn-expenses ((sum corn-costs-irrig-high) * Corn_area)]
 
-  if (item (item k yrs-seq) wheat-yield_1) < 62.5 [set wheat-expenses (498.13 * Wheat_area)]
-  if (item (item k yrs-seq) wheat-yield_1) >= 62.5 and (item (item k yrs-seq) wheat-yield_1) <= 67.5 [set wheat-expenses (523.43 * Wheat_area)]
-  if (item (item k yrs-seq) wheat-yield_1) > 67.5 [set wheat-expenses (548.74 * Wheat_area)]
+  if (item (item k yrs-seq) wheat-yield_1) < 62.5 [set wheat-expenses ((sum wheat-costs-irrig-low) * Wheat_area)]
+  if (item (item k yrs-seq) wheat-yield_1) >= 62.5 and (item (item k yrs-seq) wheat-yield_1) <= 67.5 [set wheat-expenses ((sum wheat-costs-irrig-moderate) * Wheat_area)]
+  if (item (item k yrs-seq) wheat-yield_1) > 67.5 [set wheat-expenses ((sum wheat-costs-irrig-high) * Wheat_area)]
 
-  if (item (item k yrs-seq) soybeans-yield_1) < 58 [set soybeans-expenses (542.07 * Soybeans_area)]
-  if (item (item k yrs-seq) soybeans-yield_1) >= 58 and (item (item k yrs-seq) soybeans-yield_1) <= 64 [set soybeans-expenses (572.48 * Soybeans_area)]
-  if (item (item k yrs-seq) soybeans-yield_1) > 64 [set soybeans-expenses (620.95 * Soybeans_area)]
+  if (item (item k yrs-seq) soybeans-yield_1) < 58 [set soybeans-expenses ((sum soybeans-costs-irrig-low) * Soybeans_area)]
+  if (item (item k yrs-seq) soybeans-yield_1) >= 58 and (item (item k yrs-seq) soybeans-yield_1) <= 64 [set soybeans-expenses ((sum soybeans-costs-irrig-moderate) * Soybeans_area)]
+  if (item (item k yrs-seq) soybeans-yield_1) > 64 [set soybeans-expenses ((sum soybeans-costs-irrig-high) * Soybeans_area)]
 
-  if (item (item k yrs-seq) milo-yield_1) < 150 [set milo-expenses (618.55 * SG_area)]
-  if (item (item k yrs-seq) milo-yield_1) >= 150 and (item (item k yrs-seq) milo-yield_1) <= 170 [set milo-expenses (666.17 * SG_area)]
-  if (item (item k yrs-seq) milo-yield_1) > 170 [set milo-expenses (713.79 * SG_area)]
+  if (item (item k yrs-seq) milo-yield_1) < 150 [set milo-expenses ((sum milo-costs-irrig-low) * SG_area)]
+  if (item (item k yrs-seq) milo-yield_1) >= 150 and (item (item k yrs-seq) milo-yield_1) <= 170 [set milo-expenses ((sum milo-costs-irrig-moderate) * SG_area)]
+  if (item (item k yrs-seq) milo-yield_1) > 170 [set milo-expenses ((sum milo-costs-irrig-high) * SG_area)]
 end
 
 to calculate-expenses_yield_2                                                                       ;Expenses for dryland farming [ref: AgManager.info (K-State, 2020 report)]
   let k (ticks mod 10)
-  if (item (item k yrs-seq) corn-yield_2) < 66 [set corn-expenses (273.10 * Corn_area)]
-  if (item (item k yrs-seq) corn-yield_2) >= 66 and (item (item k yrs-seq) corn-yield_2) <= 91 [set corn-expenses (337.57 * Corn_area)]
-  if (item (item k yrs-seq) corn-yield_2) > 91 [set corn-expenses (377.54 * Corn_area)]
+  if (item (item k yrs-seq) corn-yield_2) < 66 [set corn-expenses ((sum corn-costs-dry-low) * Corn_area)]
+  if (item (item k yrs-seq) corn-yield_2) >= 66 and (item (item k yrs-seq) corn-yield_2) <= 91 [set corn-expenses ((sum corn-costs-dry-moderate) * Corn_area)]
+  if (item (item k yrs-seq) corn-yield_2) > 91 [set corn-expenses ((sum corn-costs-dry-high) * Corn_area)]
 
-  if (item (item k yrs-seq) wheat-yield_2) < 37.5 [set wheat-expenses (245.47 * Wheat_area)]
-  if (item (item k yrs-seq) wheat-yield_2) >= 37.5 and (item (item k yrs-seq) wheat-yield_2) <= 46.5 [set wheat-expenses (277.41 * Wheat_area)]
-  if (item (item k yrs-seq) wheat-yield_2) > 46.5 [set wheat-expenses (309.35 * Wheat_area)]
+  if (item (item k yrs-seq) wheat-yield_2) < 37.5 [set wheat-expenses ((sum wheat-costs-dry-low) * Wheat_area)]
+  if (item (item k yrs-seq) wheat-yield_2) >= 37.5 and (item (item k yrs-seq) wheat-yield_2) <= 46.5 [set wheat-expenses ((sum wheat-costs-dry-moderate) * Wheat_area)]
+  if (item (item k yrs-seq) wheat-yield_2) > 46.5 [set wheat-expenses ((sum wheat-costs-dry-high) * Wheat_area)]
 
-  if (item (item k yrs-seq) soybeans-yield_2) < 22.5 [set soybeans-expenses (224.51 * Soybeans_area)]
-  if (item (item k yrs-seq) soybeans-yield_2) >= 22.5 and (item (item k yrs-seq) soybeans-yield_2) <= 27.5 [set soybeans-expenses (248.50 * Soybeans_area)]
-  if (item (item k yrs-seq) soybeans-yield_2) > 27.5 [set soybeans-expenses (272.48 * Soybeans_area)]
+  if (item (item k yrs-seq) soybeans-yield_2) < 22.5 [set soybeans-expenses ((sum soybeans-costs-dry-low) * Soybeans_area)]
+  if (item (item k yrs-seq) soybeans-yield_2) >= 22.5 and (item (item k yrs-seq) soybeans-yield_2) <= 27.5 [set soybeans-expenses ((sum soybeans-costs-dry-moderate) * Soybeans_area)]
+  if (item (item k yrs-seq) soybeans-yield_2) > 27.5 [set soybeans-expenses ((sum soybeans-costs-dry-high) * Soybeans_area)]
 
-  if (item (item k yrs-seq) milo-yield_2) < 68 [set milo-expenses (263.01 * SG_area)]
-  if (item (item k yrs-seq) milo-yield_2) >= 68 and (item (item k yrs-seq) milo-yield_2) <= 93 [set milo-expenses (314.41 * SG_area)]
-  if (item (item k yrs-seq) milo-yield_2) > 93 [set milo-expenses (361.86 * SG_area)]
+  if (item (item k yrs-seq) milo-yield_2) < 68 [set milo-expenses ((sum milo-costs-dry-low) * SG_area)]
+  if (item (item k yrs-seq) milo-yield_2) >= 68 and (item (item k yrs-seq) milo-yield_2) <= 93 [set milo-expenses ((sum milo-costs-dry-moderate) * SG_area)]
+  if (item (item k yrs-seq) milo-yield_2) > 93 [set milo-expenses ((sum milo-costs-dry-high) * SG_area)]
 end
 
 to calculate-expenses_yield_3                                                                       ;Expenses for irrigated farming (using GCMs data) [ref: AgManager.info]
   let k (ticks - 10)
-  if (item k corn-yield_3) < 210 [set corn-expenses (786.23 * Corn_area)]
-  if (item k corn-yield_3) >= 210 and (item k corn-yield_3) <= 237.5 [set corn-expenses (861.41 * Corn_area)]
-  if (item k corn-yield_3) > 237.5 [set corn-expenses (920.04 * Corn_area)]
+  if (item k corn-yield_3) < 210 [set corn-expenses ((sum corn-costs-irrig-low) * Corn_area)]
+  if (item k corn-yield_3) >= 210 and (item k corn-yield_3) <= 237.5 [set corn-expenses ((sum corn-costs-irrig-moderate) * Corn_area)]
+  if (item k corn-yield_3) > 237.5 [set corn-expenses ((sum corn-costs-irrig-high) * Corn_area)]
 
-  if (item k wheat-yield_3) < 62.5 [set wheat-expenses (498.13 * Wheat_area)]
-  if (item k wheat-yield_3) >= 62.5 and (item k wheat-yield_3) <= 67.5 [set wheat-expenses (523.43 * Wheat_area)]
-  if (item k wheat-yield_3) > 67.5 [set wheat-expenses (548.74 * Wheat_area)]
+  if (item k wheat-yield_3) < 62.5 [set wheat-expenses ((sum wheat-costs-irrig-low) * Wheat_area)]
+  if (item k wheat-yield_3) >= 62.5 and (item k wheat-yield_3) <= 67.5 [set wheat-expenses ((sum wheat-costs-irrig-moderate) * Wheat_area)]
+  if (item k wheat-yield_3) > 67.5 [set wheat-expenses ((sum wheat-costs-irrig-high) * Wheat_area)]
 
-  if (item k soybeans-yield_3) < 58 [set soybeans-expenses (542.07 * Soybeans_area)]
-  if (item k soybeans-yield_3) >= 58 and (item k soybeans-yield_3) <= 64 [set soybeans-expenses (572.48 * Soybeans_area)]
-  if (item k soybeans-yield_3) > 64 [set soybeans-expenses (620.95 * Soybeans_area)]
+  if (item k soybeans-yield_3) < 58 [set soybeans-expenses ((sum soybeans-costs-irrig-low) * Soybeans_area)]
+  if (item k soybeans-yield_3) >= 58 and (item k soybeans-yield_3) <= 64 [set soybeans-expenses ((sum soybeans-costs-irrig-moderate) * Soybeans_area)]
+  if (item k soybeans-yield_3) > 64 [set soybeans-expenses ((sum soybeans-costs-irrig-high) * Soybeans_area)]
 
-  if (item k milo-yield_3) < 150 [set milo-expenses (618.55 * SG_area)]
-  if (item k milo-yield_3) >= 150 and (item k milo-yield_3) <= 170 [set milo-expenses (666.17 * SG_area)]
-  if (item k milo-yield_3) > 170 [set milo-expenses (713.79 * SG_area)]
+  if (item k milo-yield_3) < 150 [set milo-expenses ((sum milo-costs-irrig-low) * SG_area)]
+  if (item k milo-yield_3) >= 150 and (item k milo-yield_3) <= 170 [set milo-expenses ((sum milo-costs-irrig-moderate) * SG_area)]
+  if (item k milo-yield_3) > 170 [set milo-expenses ((sum milo-costs-irrig-high) * SG_area)]
 end
 
 to calculate-expenses_yield_4                                                                       ;Expenses for dryland farming (using GCMs data) [ref: AgManager.info]
   let k (ticks - 10)
-  if (item k corn-yield_4) < 66 [set corn-expenses (273.10 * Corn_area)]
-  if (item k corn-yield_4) >= 66 and (item k corn-yield_4) <= 91 [set corn-expenses (337.57 * Corn_area)]
-  if (item k corn-yield_4) > 91 [set corn-expenses (377.54 * Corn_area)]
+  if (item k corn-yield_4) < 66 [set corn-expenses ((sum corn-costs-dry-low) * Corn_area)]
+  if (item k corn-yield_4) >= 66 and (item k corn-yield_4) <= 91 [set corn-expenses ((sum corn-costs-dry-moderate) * Corn_area)]
+  if (item k corn-yield_4) > 91 [set corn-expenses ((sum corn-costs-dry-high) * Corn_area)]
 
-  if (item k wheat-yield_4) < 37.5 [set wheat-expenses (245.47 * Wheat_area)]
-  if (item k wheat-yield_4) >= 37.5 and (item k wheat-yield_4) <= 46.5 [set wheat-expenses (277.41 * Wheat_area)]
-  if (item k wheat-yield_4) > 46.5 [set wheat-expenses (309.35 * Wheat_area)]
+  if (item k wheat-yield_4) < 37.5 [set wheat-expenses ((sum wheat-costs-dry-low) * Wheat_area)]
+  if (item k wheat-yield_4) >= 37.5 and (item k wheat-yield_4) <= 46.5 [set wheat-expenses ((sum wheat-costs-dry-moderate) * Wheat_area)]
+  if (item k wheat-yield_4) > 46.5 [set wheat-expenses ((sum wheat-costs-dry-high) * Wheat_area)]
 
-  if (item k soybeans-yield_4) < 22.5 [set soybeans-expenses (224.51 * Soybeans_area)]
-  if (item k soybeans-yield_4) >= 22.5 and (item k soybeans-yield_4) <= 27.5 [set soybeans-expenses (248.50 * Soybeans_area)]
-  if (item k soybeans-yield_4) > 27.5 [set soybeans-expenses (272.48 * Soybeans_area)]
+  if (item k soybeans-yield_4) < 22.5 [set soybeans-expenses ((sum soybeans-costs-dry-low) * Soybeans_area)]
+  if (item k soybeans-yield_4) >= 22.5 and (item k soybeans-yield_4) <= 27.5 [set soybeans-expenses ((sum soybeans-costs-dry-moderate) * Soybeans_area)]
+  if (item k soybeans-yield_4) > 27.5 [set soybeans-expenses ((sum soybeans-costs-dry-high) * Soybeans_area)]
 
-  if (item k milo-yield_4) < 68 [set milo-expenses (263.01 * SG_area)]
-  if (item k milo-yield_4) >= 68 and (item k milo-yield_4) <= 93 [set milo-expenses (314.41 * SG_area)]
-  if (item k milo-yield_4) > 93 [set milo-expenses (361.86 * SG_area)]
+  if (item k milo-yield_4) < 68 [set milo-expenses ((sum milo-costs-dry-low) * SG_area)]
+  if (item k milo-yield_4) >= 68 and (item k milo-yield_4) <= 93 [set milo-expenses ((sum milo-costs-dry-moderate) * SG_area)]
+  if (item k milo-yield_4) > 93 [set milo-expenses ((sum milo-costs-dry-high) * SG_area)]
 end
 
 to calculate-expenses_yield_5                                                                       ;Expenses for irrigated farming (using GCMs data) [ref: AgManager.info]
   let k (ticks - 10)
-  if (item k corn-yield_5) < 210 [set corn-expenses (786.23 * Corn_area)]
-  if (item k corn-yield_5) >= 210 and (item k corn-yield_5) <= 237.5 [set corn-expenses (861.41 * Corn_area)]
-  if (item k corn-yield_5) > 237.5 [set corn-expenses (920.04 * Corn_area)]
+  if (item k corn-yield_5) < 210 [set corn-expenses ((sum corn-costs-irrig-low) * Corn_area)]
+  if (item k corn-yield_5) >= 210 and (item k corn-yield_5) <= 237.5 [set corn-expenses ((sum corn-costs-irrig-moderate) * Corn_area)]
+  if (item k corn-yield_5) > 237.5 [set corn-expenses ((sum corn-costs-irrig-high) * Corn_area)]
 
-  if (item k wheat-yield_5) < 62.5 [set wheat-expenses (498.13 * Wheat_area)]
-  if (item k wheat-yield_5) >= 62.5 and (item k wheat-yield_5) <= 67.5 [set wheat-expenses (523.43 * Wheat_area)]
-  if (item k wheat-yield_5) > 67.5 [set wheat-expenses (548.74 * Wheat_area)]
+  if (item k wheat-yield_5) < 62.5 [set wheat-expenses ((sum wheat-costs-irrig-low) * Wheat_area)]
+  if (item k wheat-yield_5) >= 62.5 and (item k wheat-yield_5) <= 67.5 [set wheat-expenses ((sum wheat-costs-irrig-moderate) * Wheat_area)]
+  if (item k wheat-yield_5) > 67.5 [set wheat-expenses ((sum wheat-costs-irrig-high) * Wheat_area)]
 
-  if (item k soybeans-yield_5) < 58 [set soybeans-expenses (542.07 * Soybeans_area)]
-  if (item k soybeans-yield_5) >= 58 and (item k soybeans-yield_5) <= 64 [set soybeans-expenses (572.48 * Soybeans_area)]
-  if (item k soybeans-yield_5) > 64 [set soybeans-expenses (620.95 * Soybeans_area)]
+  if (item k soybeans-yield_5) < 58 [set soybeans-expenses ((sum soybeans-costs-irrig-low) * Soybeans_area)]
+  if (item k soybeans-yield_5) >= 58 and (item k soybeans-yield_5) <= 64 [set soybeans-expenses ((sum soybeans-costs-irrig-moderate) * Soybeans_area)]
+  if (item k soybeans-yield_5) > 64 [set soybeans-expenses ((sum soybeans-costs-irrig-high) * Soybeans_area)]
 
-  if (item k milo-yield_5) < 150 [set milo-expenses (618.55 * SG_area)]
-  if (item k milo-yield_5) >= 150 and (item k milo-yield_5) <= 170 [set milo-expenses (666.17 * SG_area)]
-  if (item k milo-yield_5) > 170 [set milo-expenses (713.79 * SG_area)]
+  if (item k milo-yield_5) < 150 [set milo-expenses ((sum milo-costs-irrig-low) * SG_area)]
+  if (item k milo-yield_5) >= 150 and (item k milo-yield_5) <= 170 [set milo-expenses ((sum milo-costs-irrig-moderate) * SG_area)]
+  if (item k milo-yield_5) > 170 [set milo-expenses ((sum milo-costs-irrig-high) * SG_area)]
 end
 
 to calculate-expenses_yield_6                                                                       ;Expenses for dryland farming (using GCMs data) [ref: AgManager.info]
   let k (ticks - 10)
-  if (item k corn-yield_6) < 66 [set corn-expenses (273.10 * Corn_area)]
-  if (item k corn-yield_6) >= 66 and (item k corn-yield_6) <= 91 [set corn-expenses (337.57 * Corn_area)]
-  if (item k corn-yield_6) > 91 [set corn-expenses (377.54 * Corn_area)]
+  if (item k corn-yield_6) < 66 [set corn-expenses ((sum corn-costs-dry-low) * Corn_area)]
+  if (item k corn-yield_6) >= 66 and (item k corn-yield_6) <= 91 [set corn-expenses ((sum corn-costs-dry-moderate) * Corn_area)]
+  if (item k corn-yield_6) > 91 [set corn-expenses ((sum corn-costs-dry-high) * Corn_area)]
 
-  if (item k wheat-yield_6) < 37.5 [set wheat-expenses (245.47 * Wheat_area)]
-  if (item k wheat-yield_6) >= 37.5 and (item k wheat-yield_6) <= 46.5 [set wheat-expenses (277.41 * Wheat_area)]
-  if (item k wheat-yield_6) > 46.5 [set wheat-expenses (309.35 * Wheat_area)]
+  if (item k wheat-yield_6) < 37.5 [set wheat-expenses ((sum wheat-costs-dry-low) * Wheat_area)]
+  if (item k wheat-yield_6) >= 37.5 and (item k wheat-yield_6) <= 46.5 [set wheat-expenses ((sum wheat-costs-dry-moderate) * Wheat_area)]
+  if (item k wheat-yield_6) > 46.5 [set wheat-expenses ((sum wheat-costs-dry-high) * Wheat_area)]
 
-  if (item k soybeans-yield_6) < 22.5 [set soybeans-expenses (224.51 * Soybeans_area)]
-  if (item k soybeans-yield_6) >= 22.5 and (item k soybeans-yield_6) <= 27.5 [set soybeans-expenses (248.50 * Soybeans_area)]
-  if (item k soybeans-yield_6) > 27.5 [set soybeans-expenses (272.48 * Soybeans_area)]
+  if (item k soybeans-yield_6) < 22.5 [set soybeans-expenses ((sum soybeans-costs-dry-low) * Soybeans_area)]
+  if (item k soybeans-yield_6) >= 22.5 and (item k soybeans-yield_6) <= 27.5 [set soybeans-expenses ((sum soybeans-costs-dry-moderate) * Soybeans_area)]
+  if (item k soybeans-yield_6) > 27.5 [set soybeans-expenses ((sum soybeans-costs-dry-high) * Soybeans_area)]
 
-  if (item k milo-yield_6) < 68 [set milo-expenses (263.01 * SG_area)]
-  if (item k milo-yield_6) >= 68 and (item k milo-yield_6) <= 93 [set milo-expenses (314.41 * SG_area)]
-  if (item k milo-yield_6) > 93 [set milo-expenses (361.86 * SG_area)]
+  if (item k milo-yield_6) < 68 [set milo-expenses ((sum milo-costs-dry-low) * SG_area)]
+  if (item k milo-yield_6) >= 68 and (item k milo-yield_6) <= 93 [set milo-expenses ((sum milo-costs-dry-moderate) * SG_area)]
+  if (item k milo-yield_6) > 93 [set milo-expenses ((sum milo-costs-dry-high) * SG_area)]
 end
 
 to calculate-insurance
@@ -1463,9 +1552,40 @@ to energy-calculation
   ;;Solar cost;;
   ;;;;;;;;;;;;;;
 
+  ifelse count_loan_term_s < term-loan_S
+  [ifelse ticks mod Nyear_S = 0
+  [set count_loan_term_s 1
+   set balance_s (#Solar_Panels * (Capacity_S / 1000) * Cost_S)
+   print (word "tick = " ticks ", year = " (ticks + 2008) ", S_balance = ," balance_s)
+   ]
+  [set count_loan_term_s (count_loan_term_s + 1)
+   set balance_s balance_s - principal_s
+   print (word "tick = " ticks ", year = " (ticks + 2008) ", S_balance = ," balance_s)
+    ]
+
+    set annual_payment_s ((#Solar_Panels * (Capacity_S / 1000) * Cost_S) * interest-rate_S / (1 - (1 + interest-rate_S) ^ (-1 * term-loan_S)))
+    set interest_s (balance_s * interest-rate_S)
+    set principal_s (annual_payment_s - interest_s)
+
+    print (word "tick = " ticks ", year = " (ticks + 2008) ", S_annual payment = ," annual_payment_s)
+    print (word "tick = " ticks ", year = " (ticks + 2008) ", S_interest = ," interest_s)
+    print (word "tick = " ticks ", year = " (ticks + 2008) ", S_principal = ," principal_s)
+    print (word "tick = " ticks ", year = " (ticks + 2008) ", S_ending balance = ," round(balance_s - principal_s))
+  ]
+
+  [set annual_payment_s 0
+   set interest_s 0
+   set principal_s 0
+   set balance_s 0
+   set count_loan_term_s (count_loan_term_s + 1)
+   print (word "tick = " ticks ", year = " (ticks + 2008) ", S_annual payment = ," annual_payment_s)
+  ]
+
+  if count_loan_term_s = Nyear_S [set count_loan_term_s 0]
+
   ifelse #Solar_Panels * (Capacity_S / 1000) < 0.01                                                 ;Calculate solar panel's capital costs for different scales (10kW = 0.01MW)
-  [set solar-cost ((#Solar_Panels * (Capacity_S / 1000) * Cost_S / term-loan_S + (22 * #solar_panels * (Capacity_S / 1000))) * (1 - (ITC_S / 100)))]      ;Residential
-  [set solar-cost ((#Solar_Panels * (Capacity_S / 1000) * Cost_S / term-loan_S + (18 * #solar_panels * (Capacity_S / 1000))) * (1 - (ITC_S / 100)))]      ;Commercial
+  [set solar-cost ((annual_payment_s + (22 * #solar_panels * (Capacity_S / 1000))) * (1 - (ITC_S / 100)))]      ;Residential
+  [set solar-cost ((annual_payment_s + (18 * #solar_panels * (Capacity_S / 1000))) * (1 - (ITC_S / 100)))]      ;Commercial
 
   ;;;;;;;;;;;;;;;;
   ;;Solar income;;
@@ -1491,13 +1611,40 @@ to energy-calculation
   ;Wind cost = $1470/kW + (O&M costs) * #wind_turbines, (ref. Berkeley Lab, Hongyu Wu)
   ;Operations and maintenance costs: $45,000/MW for turbine aged between 0 and 10 years, and $50,000/MW beyond 10 years
 
+  ifelse count_loan_term_w < term-loan_W
+  [ifelse ticks mod Nyear_W = 0
+  [set count_loan_term_w 1
+   set balance_w ((Cost_W * 1000) * Capacity_W * #Wind_turbines)
+   print (word "tick = " ticks ", year = " (ticks + 2008) ", W_balance = " balance_w)]
+  [set count_loan_term_w (count_loan_term_w + 1)
+   set balance_w balance_w - principal_w
+   print (word "tick = " ticks ", year = " (ticks + 2008) ", W_balance = " balance_w)]
+
+    set annual_payment_w ((Cost_W * 1000) * Capacity_W * #Wind_turbines * interest-rate_W / (1 - (1 + interest-rate_W) ^ (-1 * term-loan_W)))
+    set interest_w (balance_w * interest-rate_W)
+    set principal_w (annual_payment_w - interest_w)
+
+    print (word "tick = " ticks ", year = " (ticks + 2008) ", W_annual payment = ," annual_payment_w)
+    print (word "tick = " ticks ", year = " (ticks + 2008) ", W_interest = ," interest_w)
+    print (word "tick = " ticks ", year = " (ticks + 2008) ", W_principal = ," principal_w)
+    print (word "tick = " ticks ", year = " (ticks + 2008) ", W_ending balance = ," round(balance_w - principal_w))]
+
+  [set annual_payment_w 0
+   set interest_w 0
+   set principal_w 0
+   set balance_w 0
+   set count_loan_term_w (count_loan_term_w + 1)
+   print (word "tick = " ticks ", year = " (ticks + 2008) ", W_annual payment = ," annual_payment_w)]
+
+  if count_loan_term_w = Nyear_W [set count_loan_term_w 0]
+
   if count-wind-lifespan-cost <= Nyear_W [
   ifelse count-wind-lifespan-cost <= 9 [                                                            ;First 10 years, O&M costs = $45/kW
-    set wind-cost (((Cost_W * 1000) * Capacity_W / term-loan_W) + (45000 * Capacity_W)) * #wind_turbines * (1 - (ITC_W / 100))
+    set wind-cost (annual_payment_w + (45000 * Capacity_W * #wind_turbines))  * (1 - (ITC_W / 100))
     set count-wind-lifespan-cost (count-wind-lifespan-cost + 1)                                     ;Advance one year
     ]
 
-    [set wind-cost (((Cost_W * 1000) * Capacity_W / term-loan_W) + (50000 * Capacity_W)) * #wind_turbines * (1 - (ITC_W / 100))    ;Else: year 11 to the end. O&M costs = $50/kW
+    [set wind-cost (annual_payment_w + (50000 * Capacity_W * #wind_turbines)) * (1 - (ITC_W / 100))    ;Else: year 11 to the end. O&M costs = $50/kW
      set count-wind-lifespan-cost (count-wind-lifespan-cost + 1)                                    ;Advance one year
      if count-wind-lifespan-cost = Nyear_W [set count-wind-lifespan-cost 0]                         ;Equipment is replaced
     ]
@@ -2042,6 +2189,8 @@ to Default                                                                      
   set cost_W 1470
   set sun_hrs 5.6
   set Wind_factor 42.1
+  set loan_term 1
+  set interest 5
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -2196,7 +2345,7 @@ TEXTBOX
 142
 382
 174
-Energy -----------------------------------------
+Energy ------------
 13
 25.0
 1
@@ -2920,7 +3069,7 @@ PTC_W
 PTC_W
 0
 0.03
-0.0
+0.023
 0.001
 1
 NIL
@@ -2949,7 +3098,7 @@ SLIDER
 ITC_W
 ITC_W
 0
-40
+10
 0.0
 1
 1
@@ -2965,7 +3114,7 @@ ITC_S
 ITC_S
 0
 40
-0.0
+30.0
 1
 1
 %
@@ -2987,11 +3136,11 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-266
-161
-382
-183
-*NYear is lifespan (years)
+152
+145
+437
+163
+NYear is lifespan, Loan-term is a fraction of Nyear.
 9
 25.0
 1
@@ -3142,6 +3291,110 @@ Wind_factor
 1
 %
 HORIZONTAL
+
+SLIDER
+168
+162
+287
+195
+Loan_term
+Loan_term
+0.1
+1
+0.6
+0.1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+289
+162
+381
+195
+Interest
+Interest
+0.1
+10
+2.0
+0.1
+1
+%
+HORIZONTAL
+
+PLOT
+241
+633
+532
+753
+Finance_S
+NIL
+NIL
+0.0
+60.0
+0.0
+10.0
+true
+true
+"" ""
+PENS
+"Interest_S" 1.0 0 -2674135 true "" "plot interest_s"
+"Principal_S" 1.0 0 -13345367 true "" "plot principal_s"
+
+PLOT
+535
+633
+807
+753
+Balance_S
+NIL
+NIL
+0.0
+60.0
+0.0
+10.0
+true
+true
+"" ""
+PENS
+"Balance_S" 1.0 0 -16777216 true "" "plot round(balance_s - principal_s)"
+
+PLOT
+815
+633
+1100
+753
+Finance_W
+NIL
+NIL
+0.0
+60.0
+0.0
+10.0
+true
+true
+"" ""
+PENS
+"Interest_W" 1.0 0 -2674135 true "" "plot interest_w"
+"Principal_W" 1.0 0 -13345367 true "" "plot principal_w"
+
+PLOT
+1104
+633
+1395
+753
+Balance_W
+NIL
+NIL
+0.0
+60.0
+0.0
+10.0
+true
+true
+"" ""
+PENS
+"Balance_W" 1.0 0 -16777216 true "" "plot round(balance_w - principal_w)"
 
 @#$#@#$#@
 # FEWCalc
