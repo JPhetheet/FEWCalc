@@ -2272,9 +2272,9 @@ Years
 30.0
 
 BUTTON
-160
+159
 10
-215
+214
 43
 NIL
 Setup
@@ -2291,7 +2291,7 @@ NIL
 INPUTBOX
 6
 66
-90
+98
 126
 Corn_area
 200.0
@@ -2300,9 +2300,9 @@ Corn_area
 Number
 
 INPUTBOX
-92
+100
 66
-176
+192
 126
 Wheat_area
 125.0
@@ -2311,9 +2311,9 @@ Wheat_area
 Number
 
 INPUTBOX
-178
+194
 66
-262
+286
 126
 Soybeans_area
 0.0
@@ -2322,9 +2322,9 @@ Soybeans_area
 Number
 
 INPUTBOX
-264
+288
 66
-348
+380
 126
 SG_area
 125.0
@@ -2365,9 +2365,9 @@ PENS
 "US$0" 1.0 2 -8053223 true "" "plot zero-line"
 
 BUTTON
-216
+215
 10
-271
+270
 43
 Go once
 Go
@@ -2444,9 +2444,9 @@ PENS
 "SG" 1.0 0 -12440034 true "" "plot milo-tot-yield"
 
 BUTTON
-272
+271
 10
-327
+326
 43
 NIL
 Go
@@ -3108,9 +3108,9 @@ TEXTBOX
 1
 
 BUTTON
-328
+327
 10
-383
+382
 43
 Default
 Default
@@ -3186,9 +3186,9 @@ HORIZONTAL
 
 PLOT
 824
-824
+936
 1112
-944
+1056
 Depreciation
 NIL
 $
