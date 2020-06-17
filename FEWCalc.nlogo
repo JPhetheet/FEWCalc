@@ -31,6 +31,7 @@ globals [
   corn-N-app wheat-N-app soybeans-N-app milo-N-app N-accu N-accu2 N-accu-temp
   #Solar_panels solar-production solar-production_temp count-solar-lifespan solar-cost solar-sell solar-sell_temp solar-net-income %Solar-production count-solar-lifespan-sell term-loan_S interest-rate_S annual_payment_s balance_s interest_s principal_s count_loan_term_s
   wind-production wind-production_temp wind-cost wind-sell wind-sell_temp wind-net-income energy-net-income %Wind-production count-wind-lifespan count-wind-lifespan-cost count-wind-lifespan-sell term-loan_W interest-rate_W  annual_payment_w balance_w interest_w principal_w count_loan_term_w
+  cap-depreciation cap-tax-rate cap-%-wind cap-%-solar cap-wind-%-depre cap-solar-%-depre count-cap-wind count-cap-solar count-depreciation_W count-depreciation_S depreciation_S depreciation_W
 ]
 
 to setup
@@ -306,6 +307,10 @@ to import-data                                                                  
   set corn-yield_6 []                                                                               ;Yield_6 means simulated yield from GCMs data + dryland simulation (dryland RCP4.5)
   set corn-irrig_6 []                                                                               ;Irrig_6 means simulated irrigation from GCMs data + dryland simulation (dryland RCP4.5)
   set corn-N-app []                                                                                 ;N application
+
+  set cap-depreciation []                                                                           ;A list for depreciation data
+  set cap-wind-%-depre []                                                                           ;A list for %wind depreciation
+  set cap-solar-%-depre []                                                                          ;A list for %solar depreciation
   set all-expenses_raw []                                                                           ;Create a list of all expanses raw
   set corn-costs-irrig-low []                                                                       ;Irrigated corn expenses for low yield
   set corn-costs-irrig-moderate []                                                                  ;Irrigated corn expenses for moderate yield
@@ -313,7 +318,6 @@ to import-data                                                                  
   set corn-costs-dry-low []                                                                         ;Dryland corn expenses for low yield
   set corn-costs-dry-moderate []                                                                    ;Dryland corn expenses for moderate yield
   set corn-costs-dry-high []                                                                        ;Dryland corn expenses for high yield
-
 
   set wheat-data []                                                                                 ;See above from corn
   set Wheat-GCMs []
@@ -398,7 +402,12 @@ to import-data                                                                  
   set wheat-GCMs lput csv:from-file "6_Wheat_GCMs.csv" wheat-GCMs                                   ;Import all wheat values to a wheat-GCMs list
   set soybeans-GCMs lput csv:from-file "7_Soybeans_GCMs.csv" soybeans-GCMs                          ;Import all soybeans values to a soybeans-GCMs list
   set milo-GCMs lput csv:from-file "8_Milo_GCMs.csv" milo-GCMs                                      ;Import all milo values to a milo-GCMs list
-  set all-expenses_raw lput csv:from-file "9a_Farm_Expenses_For_Users.csv" all-expenses_raw          ;Import all expense values to an all-expenses_raw list
+  set all-expenses_raw lput csv:from-file "9a_Farm_Expenses_For_Users.csv" all-expenses_raw         ;Import all expense values to an all-expenses_raw list
+  set cap-depreciation lput csv:from-file "10a_Capital_depreciation.csv" cap-depreciation           ;Import values for depreciation
+
+  set cap-tax-rate item 0 item 1 item 0 cap-depreciation                                            ;set cap-tax-rate = tax rate
+  set cap-%-wind item 1 item 1 item 0 cap-depreciation                                              ;set cap-%-wind = percent wind capital cost
+  set cap-%-solar item 2 item 1 item 0 cap-depreciation                                             ;set cap-%-solar = percent solar capital cost
 
   let m 1                                                                                           ;Set a temporary variable
   while [m < 11] [                                                                                  ;10 loops for 10-year data
@@ -613,6 +622,20 @@ let n 1                                                                         
        set milo-costs-dry-high lput col milo-costs-dry-high]
   set row (row + 1)
   ]
+
+  let cap-row 3
+  while [cap-row <= 32] [
+    foreach cap-depreciation [x -> let cap-col (item 1 item cap-row item 0 cap-depreciation)
+      if cap-col != 0 [set cap-wind-%-depre lput cap-col cap-wind-%-depre]]
+    foreach cap-depreciation [x -> let cap-col (item 2 item cap-row item 0 cap-depreciation)
+      if cap-col != 0 [set cap-solar-%-depre lput cap-col cap-solar-%-depre]]
+
+  set cap-row (cap-row + 1)
+  ]
+
+  set count-cap-wind length cap-wind-%-depre
+  set count-cap-solar length cap-solar-%-depre
+
 end
 
 to calculate-expenses_yield_1                                                                       ;Expenses for irrigated farming [ref: AgManager.info (K-State, 2020 report)]
@@ -1552,25 +1575,38 @@ to energy-calculation
   ;;Solar cost;;
   ;;;;;;;;;;;;;;
 
+  ;;; Depreciation ;;;
+
+  ifelse (ticks mod Nyear_S) = 0
+   [set count-depreciation_S 0
+    if count-depreciation_S < count-cap-solar [
+      set depreciation_S ((#Solar_Panels * (Capacity_S / 1000) * Cost_S) * cap-%-solar / 100 * cap-tax-rate / 100 * (item count-depreciation_S cap-solar-%-depre) / 100)
+      set count-depreciation_S (count-depreciation_S + 1)
+      print (word "Year 1: Depreciation_S = " depreciation_S)]
+   ]
+
+    [ifelse count-depreciation_S < count-cap-solar
+      [set depreciation_S ((#Solar_Panels * (Capacity_S / 1000) * Cost_S) * cap-%-solar / 100 * cap-tax-rate / 100 * (item count-depreciation_S cap-solar-%-depre) / 100)
+       set count-depreciation_S (count-depreciation_S + 1)
+       print (word "Year " count-depreciation_S ": Depreciation_S = " depreciation_S)]
+
+      [set depreciation_S 0
+       set count-depreciation_S (count-depreciation_S + 1)
+       print (word "Year " count-depreciation_S ": Depreciation_S = " depreciation_S)]
+    ]
+
+  ;;; Loan ;;;
+
   ifelse count_loan_term_s < term-loan_S
   [ifelse ticks mod Nyear_S = 0
   [set count_loan_term_s 1
-   set balance_s (#Solar_Panels * (Capacity_S / 1000) * Cost_S)
-   print (word "tick = " ticks ", year = " (ticks + 2008) ", S_balance = ," balance_s)
-   ]
+   set balance_s (#Solar_Panels * (Capacity_S / 1000) * Cost_S)]
   [set count_loan_term_s (count_loan_term_s + 1)
-   set balance_s balance_s - principal_s
-   print (word "tick = " ticks ", year = " (ticks + 2008) ", S_balance = ," balance_s)
-    ]
+   set balance_s balance_s - principal_s]
 
     set annual_payment_s ((#Solar_Panels * (Capacity_S / 1000) * Cost_S) * interest-rate_S / (1 - (1 + interest-rate_S) ^ (-1 * term-loan_S)))
     set interest_s (balance_s * interest-rate_S)
     set principal_s (annual_payment_s - interest_s)
-
-    print (word "tick = " ticks ", year = " (ticks + 2008) ", S_annual payment = ," annual_payment_s)
-    print (word "tick = " ticks ", year = " (ticks + 2008) ", S_interest = ," interest_s)
-    print (word "tick = " ticks ", year = " (ticks + 2008) ", S_principal = ," principal_s)
-    print (word "tick = " ticks ", year = " (ticks + 2008) ", S_ending balance = ," round(balance_s - principal_s))
   ]
 
   [set annual_payment_s 0
@@ -1578,14 +1614,15 @@ to energy-calculation
    set principal_s 0
    set balance_s 0
    set count_loan_term_s (count_loan_term_s + 1)
-   print (word "tick = " ticks ", year = " (ticks + 2008) ", S_annual payment = ," annual_payment_s)
   ]
 
   if count_loan_term_s = Nyear_S [set count_loan_term_s 0]
 
   ifelse #Solar_Panels * (Capacity_S / 1000) < 0.01                                                 ;Calculate solar panel's capital costs for different scales (10kW = 0.01MW)
-  [set solar-cost ((annual_payment_s + (22 * #solar_panels * (Capacity_S / 1000))) * (1 - (ITC_S / 100)))]      ;Residential
-  [set solar-cost ((annual_payment_s + (18 * #solar_panels * (Capacity_S / 1000))) * (1 - (ITC_S / 100)))]      ;Commercial
+  [set solar-cost (annual_payment_s + (22 * #solar_panels * (Capacity_S / 1000)))]                  ;Residential
+  [set solar-cost (annual_payment_s + (18 * #solar_panels * (Capacity_S / 1000)))]                  ;Commercial
+
+  if (ticks mod Nyear_S) = 0 [set solar-cost (solar-cost * (1 - ITC_S / 100))]                        ;Apply ITC in year 1 of solar installation
 
   ;;;;;;;;;;;;;;;;
   ;;Solar income;;
@@ -1593,11 +1630,11 @@ to energy-calculation
 
   if count-solar-lifespan-sell <= Nyear_S [
   ifelse count-solar-lifespan-sell <= 9 [                                                           ;First 10 years (PTC). Because we set "count-solar-lifespan-sell" = 0 at the beginning
-     set solar-sell_temp (solar-production * (Energy_value + (100 * PTC_S)))                        ;Calculate temp income
+     set solar-sell_temp (solar-production * (Energy_value + (100 * PTC_S))) + depreciation_S       ;Calculate temp income
      set solar-sell solar-sell_temp                                                                 ;Set income
      set count-solar-lifespan-sell (count-solar-lifespan-sell + 1)]                                 ;Advance one year
 
-    [set solar-sell_temp (solar-production * Energy_value)                                          ;Else: year 10 to the end. Calculate income without PTC.
+    [set solar-sell_temp (solar-production * Energy_value) + depreciation_S                         ;Else: year 10 to the end. Calculate income without PTC.
      set solar-sell solar-sell_temp                                                                 ;Set income
      set count-solar-lifespan-sell (count-solar-lifespan-sell + 1)                                  ;Advance one year
      if count-solar-lifespan-sell = Nyear_S [set count-solar-lifespan-sell 0]                       ;Equipment is replaced
@@ -1608,43 +1645,58 @@ to energy-calculation
   ;;Wind cost;;
   ;;;;;;;;;;;;;
 
+  ;;; Depreciation ;;;
+
+  ifelse (ticks mod Nyear_W) = 0
+   [set count-depreciation_W 0
+    if count-depreciation_W < count-cap-wind [
+      set depreciation_W (((Cost_W * 1000) * Capacity_W * #Wind_turbines) * cap-%-wind / 100 * cap-tax-rate / 100 * (item count-depreciation_W cap-wind-%-depre) / 100)
+      set count-depreciation_W (count-depreciation_W + 1)
+      print (word "Year 1: Depreciation_W = " depreciation_W)]
+   ]
+
+    [ifelse count-depreciation_W < count-cap-wind
+      [set depreciation_W (((Cost_W * 1000) * Capacity_W * #Wind_turbines) * cap-%-wind / 100 * cap-tax-rate / 100 * (item count-depreciation_W cap-wind-%-depre) / 100)
+       set count-depreciation_W (count-depreciation_W + 1)
+       print (word "Year " count-depreciation_W ": Depreciation_W = " depreciation_W)]
+
+      [set depreciation_W 0
+       set count-depreciation_W (count-depreciation_W + 1)
+       print (word "Year " count-depreciation_W ": Depreciation_W = " depreciation_W)]
+    ]
+
+  ;;; Loan ;;;
+
   ;Wind cost = $1470/kW + (O&M costs) * #wind_turbines, (ref. Berkeley Lab, Hongyu Wu)
   ;Operations and maintenance costs: $45,000/MW for turbine aged between 0 and 10 years, and $50,000/MW beyond 10 years
 
   ifelse count_loan_term_w < term-loan_W
   [ifelse ticks mod Nyear_W = 0
   [set count_loan_term_w 1
-   set balance_w ((Cost_W * 1000) * Capacity_W * #Wind_turbines)
-   print (word "tick = " ticks ", year = " (ticks + 2008) ", W_balance = " balance_w)]
+   set balance_w ((Cost_W * 1000) * Capacity_W * #Wind_turbines)]
   [set count_loan_term_w (count_loan_term_w + 1)
-   set balance_w balance_w - principal_w
-   print (word "tick = " ticks ", year = " (ticks + 2008) ", W_balance = " balance_w)]
+   set balance_w balance_w - principal_w]
 
     set annual_payment_w ((Cost_W * 1000) * Capacity_W * #Wind_turbines * interest-rate_W / (1 - (1 + interest-rate_W) ^ (-1 * term-loan_W)))
     set interest_w (balance_w * interest-rate_W)
     set principal_w (annual_payment_w - interest_w)
-
-    print (word "tick = " ticks ", year = " (ticks + 2008) ", W_annual payment = ," annual_payment_w)
-    print (word "tick = " ticks ", year = " (ticks + 2008) ", W_interest = ," interest_w)
-    print (word "tick = " ticks ", year = " (ticks + 2008) ", W_principal = ," principal_w)
-    print (word "tick = " ticks ", year = " (ticks + 2008) ", W_ending balance = ," round(balance_w - principal_w))]
+  ]
 
   [set annual_payment_w 0
    set interest_w 0
    set principal_w 0
    set balance_w 0
-   set count_loan_term_w (count_loan_term_w + 1)
-   print (word "tick = " ticks ", year = " (ticks + 2008) ", W_annual payment = ," annual_payment_w)]
+   set count_loan_term_w (count_loan_term_w + 1)]
 
   if count_loan_term_w = Nyear_W [set count_loan_term_w 0]
 
   if count-wind-lifespan-cost <= Nyear_W [
   ifelse count-wind-lifespan-cost <= 9 [                                                            ;First 10 years, O&M costs = $45/kW
-    set wind-cost (annual_payment_w + (45000 * Capacity_W * #wind_turbines))  * (1 - (ITC_W / 100))
+    set wind-cost (annual_payment_w + (45000 * Capacity_W * #wind_turbines))
     set count-wind-lifespan-cost (count-wind-lifespan-cost + 1)                                     ;Advance one year
     ]
 
-    [set wind-cost (annual_payment_w + (50000 * Capacity_W * #wind_turbines)) * (1 - (ITC_W / 100))    ;Else: year 11 to the end. O&M costs = $50/kW
+    [set wind-cost (annual_payment_w + (50000 * Capacity_W * #wind_turbines))                       ;Else: year 11 to the end. O&M costs = $50/kW
      set count-wind-lifespan-cost (count-wind-lifespan-cost + 1)                                    ;Advance one year
      if count-wind-lifespan-cost = Nyear_W [set count-wind-lifespan-cost 0]                         ;Equipment is replaced
     ]
@@ -1656,11 +1708,11 @@ to energy-calculation
 
   if count-wind-lifespan-sell <= Nyear_W [
   ifelse count-wind-lifespan-sell <= 9 [                                                            ;First 10 years with PTC
-     set wind-sell_temp (wind-production * (Energy_value + (100 * PTC_W)))                          ;Calculate temp wind income
+     set wind-sell_temp (wind-production * (Energy_value + (100 * PTC_W))) + depreciation_W         ;Calculate temp wind income
      set wind-sell wind-sell_temp                                                                   ;Set wind income
      set count-wind-lifespan-sell (count-wind-lifespan-sell + 1)]                                   ;Advance one year
 
-    [set wind-sell_temp (wind-production * Energy_value)                                            ;Else: year 11 to the end without PTC
+    [set wind-sell_temp (wind-production * Energy_value) + depreciation_W                           ;Else: year 11 to the end without PTC
      set wind-sell wind-sell_temp                                                                   ;Set wind income
      set count-wind-lifespan-sell (count-wind-lifespan-sell + 1)                                    ;Advance one year
      if count-wind-lifespan-sell = Nyear_W [set count-wind-lifespan-sell 0]                         ;Equipment is replaced
@@ -2177,7 +2229,6 @@ to Default                                                                      
   set PTC_S 0
   set #Wind_turbines 2
   set Nyear_W 30
-  set ITC_W 0
   set Capacity_W 2
   set Degrade_W 1
   set PTC_W 0
@@ -2190,7 +2241,7 @@ to Default                                                                      
   set sun_hrs 5.6
   set Wind_factor 42.1
   set loan_term 1
-  set interest 5
+  set interest 2
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -2221,9 +2272,9 @@ Years
 30.0
 
 BUTTON
-215
+160
 10
-270
+215
 43
 NIL
 Setup
@@ -2240,7 +2291,7 @@ NIL
 INPUTBOX
 6
 66
-86
+90
 126
 Corn_area
 200.0
@@ -2249,9 +2300,9 @@ Corn_area
 Number
 
 INPUTBOX
-88
+92
 66
-167
+176
 126
 Wheat_area
 125.0
@@ -2260,9 +2311,9 @@ Wheat_area
 Number
 
 INPUTBOX
-169
+178
 66
-253
+262
 126
 Soybeans_area
 0.0
@@ -2271,9 +2322,9 @@ Soybeans_area
 Number
 
 INPUTBOX
-255
+264
 66
-335
+348
 126
 SG_area
 125.0
@@ -2314,9 +2365,9 @@ PENS
 "US$0" 1.0 2 -8053223 true "" "plot zero-line"
 
 BUTTON
-271
+216
 10
-326
+271
 43
 Go once
 Go
@@ -2393,9 +2444,9 @@ PENS
 "SG" 1.0 0 -12440034 true "" "plot milo-tot-yield"
 
 BUTTON
-327
+272
 10
-382
+327
 43
 NIL
 Go
@@ -2469,116 +2520,6 @@ SLIDER
 NIL
 HORIZONTAL
 
-MONITOR
-7
-924
-148
-969
-solar-production (MWh)
-round solar-production
-17
-1
-11
-
-MONITOR
-7
-993
-148
-1038
-Wind-production (MWh)
-round Wind-production
-17
-1
-11
-
-MONITOR
-154
-924
-239
-969
-solar-cost ($)
-solar-cost
-17
-1
-11
-
-MONITOR
-409
-924
-536
-969
-solar-sell ($ per year)
-solar-sell
-17
-1
-11
-
-MONITOR
-154
-993
-239
-1038
-wind-cost ($)
-wind-cost
-17
-1
-11
-
-MONITOR
-409
-993
-535
-1038
-wind-sell ($ per year)
-round wind-sell
-17
-1
-11
-
-MONITOR
-245
-924
-403
-969
-Solar-cost / 30 ($ per year)
-round (Solar-cost / 30)
-17
-1
-11
-
-MONITOR
-245
-993
-404
-1038
-wind-cost / 30 ($ per year)
-wind-cost / 30
-17
-1
-11
-
-MONITOR
-541
-994
-650
-1039
-wind-net-income
-round wind-net-income
-17
-1
-11
-
-MONITOR
-541
-924
-650
-969
-solar-net-income
-round solar-net-income
-17
-1
-11
-
 TEXTBOX
 7
 127
@@ -2608,26 +2549,6 @@ PENS
 "Solar        " 1.0 0 -5298144 true "" "ifelse ticks = 0 [set solar-production 0\nplot solar-production]\n[plot solar-production]"
 "Wind      " 1.0 0 -14070903 true "" "ifelse ticks = 0 [set wind-production 0\nplot wind-production]\n[plot wind-production]"
 "0 MWh" 1.0 2 -8053223 true "" "plot zero-line"
-
-TEXTBOX
-8
-904
-158
-922
-Solar outputs
-11
-0.0
-1
-
-TEXTBOX
-9
-976
-159
-994
-Wind outputs
-11
-0.0
-1
 
 TEXTBOX
 192
@@ -2701,7 +2622,7 @@ $
 0.0
 60.0
 0.0
-15000.0
+0.0
 true
 true
 "set-plot-background-color [255 201 173]" ""
@@ -2759,50 +2680,6 @@ TEXTBOX
 11
 95.0
 1
-
-MONITOR
-853
-925
-932
-970
-NIL
-current-elev
-3
-1
-11
-
-MONITOR
-1011
-925
-1101
-970
-NIL
-patch-change
-3
-1
-11
-
-MONITOR
-935
-925
-1008
-970
-NIL
-gw-change
-3
-1
-11
-
-MONITOR
-757
-925
-850
-970
-NIL
-water-use-feet
-3
-1
-11
 
 TEXTBOX
 403
@@ -3061,15 +2938,15 @@ Yrs
 HORIZONTAL
 
 SLIDER
-288
+195
 378
-380
+287
 411
 PTC_W
 PTC_W
 0
 0.03
-0.023
+0.0
 0.001
 1
 NIL
@@ -3091,21 +2968,6 @@ MW
 HORIZONTAL
 
 SLIDER
-195
-378
-287
-411
-ITC_W
-ITC_W
-0
-10
-0.0
-1
-1
-%
-HORIZONTAL
-
-SLIDER
 7
 378
 99
@@ -3113,8 +2975,8 @@ SLIDER
 ITC_S
 ITC_S
 0
-40
-30.0
+30
+0.0
 1
 1
 %
@@ -3246,9 +3108,9 @@ TEXTBOX
 1
 
 BUTTON
-159
+328
 10
-214
+383
 43
 Default
 Default
@@ -3301,7 +3163,7 @@ Loan_term
 Loan_term
 0.1
 1
-0.6
+1.0
 0.1
 1
 NIL
@@ -3323,78 +3185,23 @@ Interest
 HORIZONTAL
 
 PLOT
-241
-633
-532
-753
-Finance_S
+824
+824
+1112
+944
+Depreciation
 NIL
-NIL
+$
 0.0
-60.0
+10.0
 0.0
 10.0
 true
 true
 "" ""
 PENS
-"Interest_S" 1.0 0 -2674135 true "" "plot interest_s"
-"Principal_S" 1.0 0 -13345367 true "" "plot principal_s"
-
-PLOT
-535
-633
-807
-753
-Balance_S
-NIL
-NIL
-0.0
-60.0
-0.0
-10.0
-true
-true
-"" ""
-PENS
-"Balance_S" 1.0 0 -16777216 true "" "plot round(balance_s - principal_s)"
-
-PLOT
-815
-633
-1100
-753
-Finance_W
-NIL
-NIL
-0.0
-60.0
-0.0
-10.0
-true
-true
-"" ""
-PENS
-"Interest_W" 1.0 0 -2674135 true "" "plot interest_w"
-"Principal_W" 1.0 0 -13345367 true "" "plot principal_w"
-
-PLOT
-1104
-633
-1395
-753
-Balance_W
-NIL
-NIL
-0.0
-60.0
-0.0
-10.0
-true
-true
-"" ""
-PENS
-"Balance_W" 1.0 0 -16777216 true "" "plot round(balance_w - principal_w)"
+"Wind" 1.0 0 -13345367 true "" "plot depreciation_W"
+"Solar" 1.0 0 -2674135 true "" "plot depreciation_S"
 
 @#$#@#$#@
 # FEWCalc
