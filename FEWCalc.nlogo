@@ -43,23 +43,19 @@ to setup
   ;;;;; ADDITIONAL PARAMETERS THAT CAN BE CHANGED ;;;;;
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-  ;Future market price
-  set corn-price-FM 4.12                                                                            ;Futures market price for crop insurance calculation
-  set wheat-price-FM 6.94                                                                           ;Futures market price for crop insurance calculation
-  set soybeans-price-FM 9.39                                                                        ;Futures market price for crop insurance calculation
-  set milo-price-FM 3.14                                                                            ;Futures market price for crop insurance calculation
+  ;Future market price for crop insurance calculation
+  set corn-price-FM 4.12                                                                            ;Default: 4.12
+  set wheat-price-FM 6.94                                                                           ;Default: 6.94
+  set soybeans-price-FM 9.39                                                                        ;Default: 9.39
+  set milo-price-FM 3.14                                                                            ;Default: 3.14
 
-  ;Level of coverage
-  set corn-coverage 0.75                                                                            ;Level of coverage for crop insurance
-  set wheat-coverage 0.7                                                                            ;Level of coverage for crop insurance
-  set soybeans-coverage 0.7                                                                         ;Level of coverage for crop insurance
-  set milo-coverage 0.65                                                                            ;Level of coverage for crop insurance
+  ;Level of coverage for crop insurance
+  set corn-coverage 0.75                                                                            ;Default: 0.75 (75%)
+  set wheat-coverage 0.7                                                                            ;Default: 0.7 (70%)
+  set soybeans-coverage 0.7                                                                         ;Default: 0.7 (70%)
+  set milo-coverage 0.65                                                                            ;Default: 0.65 (65%)
 
-  ;Finance:
-  set term-loan_S (Loan_term * Nyear_S)                                                             ;Set solar production term loan = solar panel lifespan (Future work)
-  set interest-rate_S (interest / 100)                                                                      ;Set solar production interest rate = 0% per year (Future work)
-  set term-loan_W (Loan_term * Nyear_W)                                                             ;Set wind production loan = wind turbine lifespan (Future work)
-  set interest-rate_W (interest / 100)                                                                     ;Set wind production interest rate = 0% per year (Future work)
+
 
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;;;;;;;;;;;;;;;;;; cropland patches ;;;;;;;;;;;;;;;;;;
@@ -270,6 +266,12 @@ to setup
     ]
 
   reset-ticks                                                                                       ;Reset tick to zero
+
+  ;Finance:
+  set term-loan_S (Loan_term * Nyear_S)                                                             ;Set solar production term loan = solar panel lifespan
+  set interest-rate_S (interest / 100)                                                              ;Set solar production
+  set term-loan_W (Loan_term * Nyear_W)                                                             ;Set wind production loan = wind turbine lifespan
+  set interest-rate_W (interest / 100)                                                              ;Set wind production
 end
 
 
@@ -1600,7 +1602,7 @@ to energy-calculation
   ifelse count_loan_term_s < term-loan_S
   [ifelse ticks mod Nyear_S = 0
   [set count_loan_term_s 1
-   set balance_s (#Solar_Panels * (Capacity_S / 1000) * Cost_S)]
+   set balance_s (#Solar_Panels * (Capacity_S / 1000) * Cost_S) * (1 - ITC_S / 100)]
   [set count_loan_term_s (count_loan_term_s + 1)
    set balance_s balance_s - principal_s]
 
@@ -1630,7 +1632,7 @@ to energy-calculation
 
   if count-solar-lifespan-sell <= Nyear_S [
   ifelse count-solar-lifespan-sell <= 9 [                                                           ;First 10 years (PTC). Because we set "count-solar-lifespan-sell" = 0 at the beginning
-     set solar-sell_temp (solar-production * (Energy_value + (100 * PTC_S))) + depreciation_S       ;Calculate temp income
+     set solar-sell_temp (solar-production * Energy_value) + depreciation_S                         ;Calculate temp income
      set solar-sell solar-sell_temp                                                                 ;Set income
      set count-solar-lifespan-sell (count-solar-lifespan-sell + 1)]                                 ;Advance one year
 
@@ -2214,7 +2216,8 @@ to reset-symbols                                                                
     set plabel-color white]
 end
 
-to Default                                                                                          ;Default button
+;Default button
+to Default
   set simulation_period 60
   set corn_area 200
   set wheat_area 125
@@ -2243,6 +2246,7 @@ to Default                                                                      
   set loan_term 1
   set interest 2
 end
+
 @#$#@#$#@
 GRAPHICS-WINDOW
 386
@@ -2334,9 +2338,9 @@ Number
 
 TEXTBOX
 7
-48
+50
 386
-72
+74
 Agriculture -------------------------------------\n
 13
 63.0
@@ -2461,10 +2465,10 @@ NIL
 1
 
 SLIDER
-7
-294
-118
-327
+8
+210
+119
+243
 #Wind_turbines
 #Wind_turbines
 1
@@ -2491,10 +2495,10 @@ Ft
 HORIZONTAL
 
 SLIDER
-7
-245
-118
-278
+8
+328
+119
+361
 Capacity_S
 Capacity_S
 100
@@ -2506,10 +2510,10 @@ W
 HORIZONTAL
 
 SLIDER
-7
-210
-118
-243
+8
+293
+119
+326
 #Panel_sets
 #Panel_sets
 0
@@ -2546,8 +2550,8 @@ true
 true
 "set-plot-background-color [255 201 173]" ""
 PENS
-"Solar        " 1.0 0 -5298144 true "" "ifelse ticks = 0 [set solar-production 0\nplot solar-production]\n[plot solar-production]"
-"Wind      " 1.0 0 -14070903 true "" "ifelse ticks = 0 [set wind-production 0\nplot wind-production]\n[plot wind-production]"
+"Wind        " 1.0 0 -14070903 true "" "ifelse ticks = 0 [set wind-production 0\nplot wind-production]\n[plot wind-production]"
+"Solar " 1.0 0 -5298144 true "" "ifelse ticks = 0 [set solar-production 0\nplot solar-production]\n[plot solar-production]"
 "0 MWh" 1.0 2 -8053223 true "" "plot zero-line"
 
 TEXTBOX
@@ -2592,20 +2596,20 @@ PENS
 "US$0" 1.0 2 -8053223 true "" "plot zero-line"
 
 TEXTBOX
-8
-280
-65
-308
+9
+196
+66
+224
 • Wind:
 11
 25.0
 1
 
 TEXTBOX
-7
-196
-47
-214
+8
+279
+48
+297
 • Solar:
 11
 25.0
@@ -2627,8 +2631,8 @@ true
 true
 "set-plot-background-color [255 201 173]" ""
 PENS
-"Solar        " 1.0 0 -5298144 true "" "ifelse ticks = 0 [set solar-net-income 0\nplot (solar-net-income)]\n[plot (solar-net-income)]"
-"Wind" 1.0 0 -14070903 true "" "ifelse ticks = 0 [set wind-net-income 0\nplot (wind-net-income)]\n[plot (wind-net-income)]"
+"Wind        " 1.0 0 -14070903 true "" "ifelse ticks = 0 [set wind-net-income 0\nplot (wind-net-income)]\n[plot (wind-net-income)]"
+"Solar" 1.0 0 -5298144 true "" "ifelse ticks = 0 [set solar-net-income 0\nplot (solar-net-income)]\n[plot (solar-net-income)]"
 "US$0" 1.0 2 -8053223 true "" "plot zero-line"
 
 TEXTBOX
@@ -2868,10 +2872,10 @@ TEXTBOX
 1
 
 SLIDER
-120
-329
+121
 245
-362
+246
+278
 Degrade_W
 Degrade_W
 0
@@ -2883,10 +2887,10 @@ Degrade_W
 HORIZONTAL
 
 TEXTBOX
-51
-282
-261
-300
+52
+198
+262
+216
 Wind degradation applies after 10 yrs
 9
 25.0
@@ -2908,10 +2912,10 @@ $/MWh
 HORIZONTAL
 
 SLIDER
-120
-210
-245
-243
+121
+293
+246
+326
 Nyear_S
 Nyear_S
 20
@@ -2923,10 +2927,10 @@ Yrs
 HORIZONTAL
 
 SLIDER
-120
-294
-245
-327
+121
+210
+246
+243
 Nyear_W
 Nyear_W
 20
@@ -2938,9 +2942,9 @@ Yrs
 HORIZONTAL
 
 SLIDER
-195
+9
 378
-287
+135
 411
 PTC_W
 PTC_W
@@ -2949,14 +2953,14 @@ PTC_W
 0.0
 0.001
 1
-NIL
+$/kWh
 HORIZONTAL
 
 SLIDER
-7
-329
-118
-362
+8
+245
+119
+278
 Capacity_W
 Capacity_W
 1
@@ -2968,25 +2972,25 @@ MW
 HORIZONTAL
 
 SLIDER
-7
-378
-99
-411
+165
+379
+257
+412
 ITC_S
 ITC_S
 0
 30
-0.0
+30.0
 1
 1
 %
 HORIZONTAL
 
 SLIDER
-101
-378
-193
-411
+259
+379
+381
+412
 PTC_S
 PTC_S
 0
@@ -2994,7 +2998,7 @@ PTC_S
 0.0
 0.001
 1
-NIL
+$/kWh
 HORIZONTAL
 
 TEXTBOX
@@ -3008,10 +3012,10 @@ NYear is lifespan, Loan-term is a fraction of Nyear.
 1
 
 SLIDER
-120
-245
-245
-278
+121
+328
+246
+361
 Degrade_S
 Degrade_S
 0
@@ -3058,10 +3062,10 @@ TEXTBOX
 1
 
 SLIDER
-247
-210
-381
-243
+248
+293
+382
+326
 Cost_S
 Cost_S
 1000
@@ -3073,10 +3077,10 @@ $/kW
 HORIZONTAL
 
 SLIDER
-247
-294
-381
-327
+248
+210
+382
+243
 Cost_W
 Cost_W
 1000
@@ -3088,20 +3092,20 @@ $/kW
 HORIZONTAL
 
 TEXTBOX
-86
-365
-416
-387
-Choose 1, ITC: Investment TC (%) OR PTC: Production TC ($/kWh)
-9
+166
+364
+356
+382
+Solar. Choose 1, ITC OR PTC
+11
 25.0
 1
 
 TEXTBOX
-50
-198
-195
-216
+51
+281
+196
+299
 1 set = 1,000 panels
 9
 25.0
@@ -3109,9 +3113,9 @@ TEXTBOX
 
 BUTTON
 327
-10
+23
 382
-43
+56
 Default
 Default
 NIL
@@ -3125,10 +3129,10 @@ NIL
 1
 
 SLIDER
-247
-245
-381
-278
+248
+328
+382
+361
 Sun_Hrs
 Sun_Hrs
 0
@@ -3140,10 +3144,10 @@ hrs/day
 HORIZONTAL
 
 SLIDER
-247
-329
-381
-362
+248
+245
+382
+278
 Wind_factor
 Wind_factor
 20
@@ -3184,24 +3188,25 @@ Interest
 %
 HORIZONTAL
 
-PLOT
-824
-936
-1112
-1056
-Depreciation
-NIL
-$
+TEXTBOX
+84
+363
+112
+381
+Wind
+11
+25.0
+1
+
+TEXTBOX
+335
+10
+380
+28
+Restore
+11
 0.0
-10.0
-0.0
-10.0
-true
-true
-"" ""
-PENS
-"Wind" 1.0 0 -13345367 true "" "plot depreciation_W"
-"Solar" 1.0 0 -2674135 true "" "plot depreciation_S"
+1
 
 @#$#@#$#@
 # FEWCalc
