@@ -1,6 +1,6 @@
 Crop type,Corn,Corn,Corn,Corn,Corn,Corn,Wheat,Wheat,Wheat,Wheat,Wheat,Wheat,Soybeans,Soybeans,Soybeans,Soybeans,Soybeans,Soybeans,Sorghum,Sorghum,Sorghum,Sorghum,Sorghum,Sorghum
 Irrigation_System,Irrigated,Irrigated,Irrigated,Dryland,Dryland,Dryland,Irrigated,Irrigated,Irrigated,Dryland,Dryland,Dryland,Irrigated,Irrigated,Irrigated,Dryland,Dryland,Dryland,Irrigated,Irrigated,Irrigated,Dryland,Dryland,Dryland
-Yield,Low,Moderate,High,Low,Moderate,High,Low,Moderate,High,Low,Moderate,High,Low,Moderate,High,Low,Moderate,High,Low,Moderate,High,Low,Moderate,High
+Yield,Low (<210),Moderate (210-237.5),High (>237.5),Low (<66),Moderate (66-91),High (>91),Low (<62.5),Moderate (62.5-67.5),High (>67.5),Low (<37.5),Moderate (37.5-46.5),High (>46.5),Low (<58),Moderate (58-64),High (>64),Low (<22.5),Moderate (22.5-27.5),High (>27.5),Low (<150),Moderate (150-170),High (>170),Low (<68),Moderate (68-93),High (>93)
 Seed,103.51,119.43,132.7,25.6,41.98,51.19,20.56,22.28,23.99,12.64,16.09,19.53,45.52,50.49,55.46,32.31,40.39,48.47,11.36,12.98,14.6,4.96,7.31,9.47
 Fertilizer,91.14,105.16,116.84,22.5,36.9,45,45.3,49.07,52.85,18.78,23.9,29.03,17.84,19.78,21.73,6.64,8.3,9.97,66.18,75.63,85.09,25.47,37.51,48.63
 Herbicides_Burndown,8.46,8.46,8.46,20.52,20.52,20.52,0,0,0,12.87,12.87,12.87,3.21,3.21,3.21,10.26,10.26,10.26,8.46,8.46,8.46,20.52,20.52,20.52
