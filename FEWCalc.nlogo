@@ -1606,7 +1606,7 @@ to energy-calculation
   [set count_loan_term_s (count_loan_term_s + 1)
    set balance_s balance_s - principal_s]
 
-    set annual_payment_s ((#Solar_Panels * (Capacity_S / 1000) * Cost_S) * interest-rate_S / (1 - (1 + interest-rate_S) ^ (-1 * term-loan_S)))
+    set annual_payment_s (((#Solar_Panels * (Capacity_S / 1000) * Cost_S) * (1 - ITC_S / 100)) * interest-rate_S / (1 - (1 + interest-rate_S) ^ (-1 * term-loan_S)))
     set interest_s (balance_s * interest-rate_S)
     set principal_s (annual_payment_s - interest_s)
   ]
@@ -1623,8 +1623,6 @@ to energy-calculation
   ifelse #Solar_Panels * (Capacity_S / 1000) < 0.01                                                 ;Calculate solar panel's capital costs for different scales (10kW = 0.01MW)
   [set solar-cost (annual_payment_s + (22 * #solar_panels * (Capacity_S / 1000)))]                  ;Residential
   [set solar-cost (annual_payment_s + (18 * #solar_panels * (Capacity_S / 1000)))]                  ;Commercial
-
-  if (ticks mod Nyear_S) = 0 [set solar-cost (solar-cost * (1 - ITC_S / 100))]                        ;Apply ITC in year 1 of solar installation
 
   ;;;;;;;;;;;;;;;;
   ;;Solar income;;
@@ -2246,7 +2244,6 @@ to Default
   set loan_term 1
   set interest 2
 end
-
 @#$#@#$#@
 GRAPHICS-WINDOW
 386
@@ -2936,7 +2933,7 @@ Nyear_W
 20
 30
 30.0
-1
+2
 1
 Yrs
 HORIZONTAL
@@ -2980,7 +2977,7 @@ ITC_S
 ITC_S
 0
 30
-30.0
+0.0
 1
 1
 %
@@ -3165,10 +3162,10 @@ SLIDER
 195
 Loan_term
 Loan_term
-0.1
+0
 1
 1.0
-0.1
+0.2
 1
 NIL
 HORIZONTAL
