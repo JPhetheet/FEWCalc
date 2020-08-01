@@ -71,9 +71,9 @@ When the simulation is completed using the default values, FEWCalc will look lik
 
 Annotated images of the central area, which is called the World are shown in **Fig. 8.** 
 
+<img width="470" alt="Fig8" src="https://user-images.githubusercontent.com/47259270/89095509-f0970280-d3f8-11ea-8b06-a49a82b9d662.png">
 
-
-**Fig. 8** (a) FEWCalc interface and (b) a list of graphical components within the World.
+**Fig. 8.** (a) FEWCalc interface and (b) a list of graphical components within the World.
 
 To obtain the results shown in the article for which this section in an appendix, add a Production Tax Credit (PTC) of 30% and rerun FEWCalc.
 
@@ -83,4 +83,29 @@ To save the input file for the altered run, click File at the top left of the Ne
 
 ### 6.1 More Information About FEWCalc
 For more information, you can click an Info tab at the top of the program **(Fig. 9).**
+
+<img width="470" alt="Fig9" src="https://user-images.githubusercontent.com/47259270/89095541-49669b00-d3f9-11ea-921b-ce6a754e0efb.png">
+
+**Fig. 9.** Info tab.
+
+### 6.2 Additional Parameters That Can Be Changed
+Selected parameters are listed at the top of the program under a Code tab, as shown in **Fig. 10.** Here, users are able to adjust model inputs such as level of crop insurance coverage, and futures market crop price. These changes will be saved if the project is saved as described at the end of Step 5.
+
+<img width="470" alt="Fig10" src="https://user-images.githubusercontent.com/47259270/89095569-964a7180-d3f9-11ea-9e57-74d7c99fbc4c.png">
+
+**Fig. 10** Parameter values for which value can be changed at the top of the Code.
+
+Additional input can be controlled by the user through CSV files. The file *“9a_Farm_Expenses_For_Users.csv”* can be used to control crop expenses. The file *“10_capital _depreciation.csv”* can be used to control depreciation rates for each year. These files include labels that define the values listed.
+
+### 6.3 Restoring Default Values
+A default button is provided in the interface to restore variables defined in the FEWCalc interface to their original values.
+
+For the additional parameters mentioned in Step 6.2, default values can be restored by copying csv files *“9b_Farm_Expenses_Reference.xlsx”* to *“9a_Farm_Expenses_For_Users.csv,”* and *“10b_Capital_depreciation_Reference.xlsx”* to *“10a_Capital_depreciation.csv.”*
+
+For the values listed at the top under the Code tab, any changes from or back to the originally distributed value are controlled by the user.
+
+### 6.4 Saving the nlogo File and Files of Results
+Clicking File on the top right of the interface window provides the opportunity to save the nlogo file for future runs and export a range of output files.
+
+CSV files for results from any graph also can be exported by left-clicking on a graph and choosing “Export”. Default files names are assigned and can be changed by the user.
 
