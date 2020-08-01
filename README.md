@@ -18,7 +18,7 @@ FEWCalc is developed using a NetLogo platform as an agent-based model. NetLogo i
 **Fig. 1.** NetLogo web site.
 
 ## **Step 2. Get FEWCalc From GitHub Repository When You Have NO GitHub Account**
-[See Step 7 if you DO have a GitHub account]
+[See **Step 7** if you DO have a GitHub account]
 
 Go to https://github.com/JPhetheet/FEWCalc. You will see the image in **Fig. 2.** This FEWCalc repository includes a Netlogo file and its supporting documents such as input files and figures used in FEWCalc. Click **“Clone or Download”** in the top right corner to get the dropdown menu shown in **Fig. 2.** 
 
